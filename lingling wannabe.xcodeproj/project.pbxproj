@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		664C2C442610D0B3002301A0 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664C2C432610D0B3002301A0 /* MainView.swift */; };
 		66ADE5A825BE2B0A004B20C6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ADE5A725BE2B0A004B20C6 /* AppDelegate.swift */; };
 		66ADE5AA25BE2B0A004B20C6 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ADE5A925BE2B0A004B20C6 /* SceneDelegate.swift */; };
 		66ADE5AC25BE2B0A004B20C6 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ADE5AB25BE2B0A004B20C6 /* ViewController.swift */; };
@@ -14,6 +15,10 @@
 		66ADE5B425BE2B0B004B20C6 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 66ADE5B225BE2B0B004B20C6 /* LaunchScreen.storyboard */; };
 		66ADE5BF25BE2B0B004B20C6 /* lingling_wannabeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ADE5BE25BE2B0B004B20C6 /* lingling_wannabeTests.swift */; };
 		66ADE5CA25BE2B0B004B20C6 /* lingling_wannabeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ADE5C925BE2B0B004B20C6 /* lingling_wannabeUITests.swift */; };
+		66BBDD5D260A85C4008E54EC /* MSCircularSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66BBDD5C260A85C4008E54EC /* MSCircularSlider.swift */; };
+		66BBDD62260A85CB008E54EC /* MSCircularSliderHandle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66BBDD61260A85CB008E54EC /* MSCircularSliderHandle.swift */; };
+		66BBDD67260A85D8008E54EC /* MSDoubleHandleCircularSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66BBDD66260A85D8008E54EC /* MSDoubleHandleCircularSlider.swift */; };
+		66BBDD6C260A85E0008E54EC /* MSGradientCircularSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66BBDD6B260A85E0008E54EC /* MSGradientCircularSlider.swift */; };
 		66FDECE22607CFA300FB9019 /* AudioStreamAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66FDECE12607CFA300FB9019 /* AudioStreamAnalyzer.swift */; };
 		66FDECE72607CFC500FB9019 /* TwoCategory.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 66FDECE62607CFC500FB9019 /* TwoCategory.mlmodel */; };
 		66FDECEC2607D10900FB9019 /* ResultDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66FDECEB2607D10900FB9019 /* ResultDelegate.swift */; };
@@ -37,6 +42,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		664C2C432610D0B3002301A0 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		66ADE5A425BE2B0A004B20C6 /* lingling wannabe.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "lingling wannabe.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		66ADE5A725BE2B0A004B20C6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		66ADE5A925BE2B0A004B20C6 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -50,6 +56,10 @@
 		66ADE5C525BE2B0B004B20C6 /* lingling wannabeUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "lingling wannabeUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		66ADE5C925BE2B0B004B20C6 /* lingling_wannabeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = lingling_wannabeUITests.swift; sourceTree = "<group>"; };
 		66ADE5CB25BE2B0B004B20C6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		66BBDD5C260A85C4008E54EC /* MSCircularSlider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MSCircularSlider.swift; sourceTree = "<group>"; };
+		66BBDD61260A85CB008E54EC /* MSCircularSliderHandle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MSCircularSliderHandle.swift; sourceTree = "<group>"; };
+		66BBDD66260A85D8008E54EC /* MSDoubleHandleCircularSlider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MSDoubleHandleCircularSlider.swift; sourceTree = "<group>"; };
+		66BBDD6B260A85E0008E54EC /* MSGradientCircularSlider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MSGradientCircularSlider.swift; sourceTree = "<group>"; };
 		66FDECE12607CFA300FB9019 /* AudioStreamAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioStreamAnalyzer.swift; sourceTree = "<group>"; };
 		66FDECE62607CFC500FB9019 /* TwoCategory.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = TwoCategory.mlmodel; sourceTree = "<group>"; };
 		66FDECEB2607D10900FB9019 /* ResultDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultDelegate.swift; sourceTree = "<group>"; };
@@ -108,10 +118,12 @@
 				66FDECE12607CFA300FB9019 /* AudioStreamAnalyzer.swift */,
 				66FDECEB2607D10900FB9019 /* ResultDelegate.swift */,
 				66ADE5AB25BE2B0A004B20C6 /* ViewController.swift */,
+				664C2C432610D0B3002301A0 /* MainView.swift */,
 				66FDECE62607CFC500FB9019 /* TwoCategory.mlmodel */,
 				66ADE5B025BE2B0B004B20C6 /* Assets.xcassets */,
 				66ADE5B225BE2B0B004B20C6 /* LaunchScreen.storyboard */,
 				66ADE5B525BE2B0B004B20C6 /* Info.plist */,
+				66BBDD5B260A857C008E54EC /* MSCircularSlider */,
 			);
 			path = "lingling wannabe";
 			sourceTree = "<group>";
@@ -132,6 +144,17 @@
 				66ADE5CB25BE2B0B004B20C6 /* Info.plist */,
 			);
 			path = "lingling wannabeUITests";
+			sourceTree = "<group>";
+		};
+		66BBDD5B260A857C008E54EC /* MSCircularSlider */ = {
+			isa = PBXGroup;
+			children = (
+				66BBDD5C260A85C4008E54EC /* MSCircularSlider.swift */,
+				66BBDD61260A85CB008E54EC /* MSCircularSliderHandle.swift */,
+				66BBDD66260A85D8008E54EC /* MSDoubleHandleCircularSlider.swift */,
+				66BBDD6B260A85E0008E54EC /* MSGradientCircularSlider.swift */,
+			);
+			path = MSCircularSlider;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -265,8 +288,13 @@
 			files = (
 				66FDECE22607CFA300FB9019 /* AudioStreamAnalyzer.swift in Sources */,
 				66ADE5AC25BE2B0A004B20C6 /* ViewController.swift in Sources */,
+				66BBDD67260A85D8008E54EC /* MSDoubleHandleCircularSlider.swift in Sources */,
 				66ADE5A825BE2B0A004B20C6 /* AppDelegate.swift in Sources */,
+				66BBDD62260A85CB008E54EC /* MSCircularSliderHandle.swift in Sources */,
 				66ADE5AA25BE2B0A004B20C6 /* SceneDelegate.swift in Sources */,
+				66BBDD5D260A85C4008E54EC /* MSCircularSlider.swift in Sources */,
+				664C2C442610D0B3002301A0 /* MainView.swift in Sources */,
+				66BBDD6C260A85E0008E54EC /* MSGradientCircularSlider.swift in Sources */,
 				66FDECE72607CFC500FB9019 /* TwoCategory.mlmodel in Sources */,
 				66FDECEC2607D10900FB9019 /* ResultDelegate.swift in Sources */,
 			);

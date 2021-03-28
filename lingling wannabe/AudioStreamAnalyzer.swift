@@ -36,7 +36,6 @@ class AudioStreamAnalyzer {
         model = classifier.model
         inputFormat = audioEngine.inputNode.inputFormat(forBus: inputBus)
         streamAnalyzer = SNAudioStreamAnalyzer(format: inputFormat)
-        startAudioEngine()
     }
 
     func startAudioEngine() {
@@ -52,6 +51,7 @@ class AudioStreamAnalyzer {
     }
     
     @objc func analyze() {
+        startAudioEngine()
         print("start analyze")
         do {
             let request = try SNClassifySoundRequest(mlModel: model)
@@ -79,6 +79,7 @@ class AudioStreamAnalyzer {
     @objc func stop() {
         streamAnalyzer.completeAnalysis()
         audioEngine.inputNode.removeTap(onBus: inputBus)
+        audioEngine.stop()
     }
 }
 

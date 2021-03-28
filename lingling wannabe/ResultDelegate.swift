@@ -29,8 +29,9 @@ class ResultDelegate {
     @objc func print_() {
         //print(time)
         //print(results)
-        for i in tmp {
-            print(i)
+        for t in tmp {
+            print(t.0, t.1, t.2, separator: ",")
         }
     }
 }
+
