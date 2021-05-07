@@ -9,6 +9,7 @@
 import Foundation
 import AVFoundation
 import SoundAnalysis
+import Accelerate
 
 class AudioStreamAnalyzer {
     static let shared = AudioStreamAnalyzer()
@@ -61,11 +62,20 @@ class AudioStreamAnalyzer {
             return
         }
         print(inputFormat.sampleRate)
+        //let dft = vDSP.DFT(count: 8192, direction: .forward, transformType: .complexReal, ofType: Float.self)
+        //var real = [Float](repeating: 0, count: 8192)
+        //var imag = [Float](repeating: 0, count: 8192)
+        //let tmp = UnsafeMutablePointer<Float>.allocate(capacity: 8192)
+        //let emptyPtr: UnsafeBufferPointer<Float> = UnsafeBufferPointer(start: tmp, count: 8192)
         let url = getDocumentDirectory().appendingPathComponent("recording.wav")
         let audioFile = try? AVAudioFile(forWriting: url, settings: outputFormatSettings, commonFormat: AVAudioCommonFormat.pcmFormatFloat32, interleaved: true)
         audioEngine.inputNode.installTap(onBus: inputBus, bufferSize: 8192, format: inputFormat) {
             buffer, time in self.analysisQueue.async {
                 //let floatArray = Array(UnsafeBufferPointer(start: buffer.floatChannelData![0], count: 8192))
+                //let bufferPtr = UnsafeBufferPointer(start: buffer.floatChannelData![0], count: 8192)
+                //dft?.transform(inputReal: bufferPtr, inputImaginary: emptyPtr, outputReal: &real, outputImaginary: &imag)
+                //print(real.reduce(0, +), real.indices.max(by: {real[$0] < real[$1]} ))
+                //print(imag.reduce(0, +), imag.indices.max(by: {imag[$0] < imag[$1]} ))
                 do {
                     try audioFile?.write(from: buffer)
                 } catch {
