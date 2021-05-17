@@ -17,13 +17,6 @@ class MainViewController: UIViewController {
     }
     
     override func viewDidLoad() {
-        //super.viewDidLoad()
-        //self.view.backgroundColor = .white
-        //let mainView = MainView(frame: view.frame, controller: self)
-        //view.addSubview(mainView)
-        //mainView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        //mainView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
-        //loadTestView()
         
         // TODO: Add intro animation and dismiss it after a delay
     }
@@ -52,11 +45,12 @@ class MainViewController: UIViewController {
         if let mainView = view as? MainView {
             delay = mainView.minutes * 60
         } else {
+            print("failed to cast view as MainView")
             return
         }
-        let analyzeView = AnalyzeViewController()
-        analyzeView.modalPresentationStyle = .fullScreen
-        present(analyzeView, animated: true, completion: {
+        let practiceView = PracticeViewController()
+        practiceView.modalPresentationStyle = .fullScreen
+        present(practiceView, animated: true, completion: {
             AudioStreamAnalyzer.shared.analyze()
             DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
                 AudioStreamAnalyzer.shared.stop()

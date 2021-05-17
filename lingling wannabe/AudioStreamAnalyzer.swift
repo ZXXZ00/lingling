@@ -16,7 +16,20 @@ class AudioStreamAnalyzer {
     
     let classifier = TwoCategory()
     let model: MLModel
-
+    
+    // This idea might be ditched
+    // Note: have to use DFT with .complexComplex and use first half
+    // for consistency with Numpy, Scipy, PyTorch
+    
+    // perform a DFT on 1 minute audio input for every minute
+    // one seconds audio data has buffer length 8192
+    let buffSize = 8192
+    let dft = vDSP.DFT(count: 512, direction: .forward, transformType: .complexComplex, ofType: Float.self)
+    var realIn = [Float](repeating: 0, count: 4096*60)
+    var imagIn = [Float](repeating: 0, count: 4096*60)
+    var realOut = [Float](repeating: 0, count: 4096*60)
+    var imagOut = [Float](repeating: 0, count: 4096*60)
+    
     let audioEngine = AVAudioEngine()
     let inputBus = AVAudioNodeBus(0)
     let inputFormat: AVAudioFormat
@@ -46,13 +59,27 @@ class AudioStreamAnalyzer {
             print(error.localizedDescription)
         }
     }
-    
+    // This function is used to write recording to file, will delete in production
     func getDocumentDirectory() -> URL {
         return FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
     }
     
+    func joint(_ buffer: UnsafeMutablePointer<Float>, tick: Int) {
+        for i in stride(from: 0, to: buffSize, by: 2) {
+            realIn[tick*buffSize + i/2] = buffer[i]
+            imagIn[tick*buffSize + i/2] = buffer[i+1]
+        }
+    }
+    
+    func ft(_ buffer : UnsafeMutablePointer<Float>) { // Fourier Transform
+        for i in stride(from: 0, to: buffSize, by: 2) {
+            realIn[i/2] = buffer[i]
+            imagIn[i/2] = buffer[i+1]
+        }
+        dft?.transform(inputReal: realIn, inputImaginary: imagIn, outputReal: &realOut, outputImaginary: &imagOut)
+    }
+    
     @objc func analyze() {
-        startAudioEngine()
         print("start analyze")
         do {
             let request = try SNClassifySoundRequest(mlModel: model)
@@ -67,10 +94,13 @@ class AudioStreamAnalyzer {
         //var imag = [Float](repeating: 0, count: 8192)
         //let tmp = UnsafeMutablePointer<Float>.allocate(capacity: 8192)
         //let emptyPtr: UnsafeBufferPointer<Float> = UnsafeBufferPointer(start: tmp, count: 8192)
+        
         let url = getDocumentDirectory().appendingPathComponent("recording.wav")
         let audioFile = try? AVAudioFile(forWriting: url, settings: outputFormatSettings, commonFormat: AVAudioCommonFormat.pcmFormatFloat32, interleaved: true)
-        audioEngine.inputNode.installTap(onBus: inputBus, bufferSize: 8192, format: inputFormat) {
+        audioEngine.inputNode.installTap(onBus: inputBus, bufferSize: UInt32(buffSize), format: inputFormat) {
             buffer, time in self.analysisQueue.async {
+                //self.ft(buffer.floatChannelData![0])
+                //assert(buffer.frameLength == UInt32(self.buffSize))
                 //let floatArray = Array(UnsafeBufferPointer(start: buffer.floatChannelData![0], count: 8192))
                 //let bufferPtr = UnsafeBufferPointer(start: buffer.floatChannelData![0], count: 8192)
                 //dft?.transform(inputReal: bufferPtr, inputImaginary: emptyPtr, outputReal: &real, outputImaginary: &imag)
@@ -84,6 +114,7 @@ class AudioStreamAnalyzer {
                 self.streamAnalyzer.analyze(buffer, atAudioFramePosition: time.sampleTime)
             }
         }
+        startAudioEngine()
     }
     
     @objc func stop() {
