@@ -66,4 +66,8 @@ class PracticeViewController : UIViewController {
             metronome?.bpm = bpm
         }
     }
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return UIStatusBarStyle.lightContent
+    }
 }

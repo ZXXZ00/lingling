@@ -1,5 +1,5 @@
 //
-//  FloatViewController.swift
+//  FloatViewDelegate.swift
 //  
 //
 //  Created by Adam Zhao on 5/17/21.
@@ -7,19 +7,12 @@
 
 import UIKit
 
-public class FloatViewController : UIViewController, UIViewControllerTransitioningDelegate {
+public class FloatView : NSObject, UIViewControllerTransitioningDelegate {
     
     let size : CGSize
-    
-    public required init?(coder: NSCoder) {
-        fatalError("NSCoding not supported")
-    }
-    
+
     public init(_ size: CGSize) {
         self.size = size
-        super.init(nibName: nil, bundle: nil)
-        modalPresentationStyle = .custom
-        transitioningDelegate = self
     }
     
     public func presentationController(forPresented presented: UIViewController, presenting: UIViewController?, source: UIViewController) -> UIPresentationController? {

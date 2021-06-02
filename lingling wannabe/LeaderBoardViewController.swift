@@ -7,9 +7,9 @@
 
 import UIKit
 
-class LeaderBoardViewController : FloatViewController {
-    override func loadView() {
-        let view = UIView()
-        self.view = view
-    }
-}
+//class LeaderBoardViewController : FloatViewController {
+//    override func loadView() {
+//        let view = UIView()
+//        self.view = view
+//    }
+//}

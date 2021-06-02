@@ -7,13 +7,28 @@
 
 import UIKit
 
-class UserInfoViewController : FloatViewController {
+class UserInfoViewController : UIViewController {
     
     let calendarData = CalendarData()
     var calendarView: UICollectionView!
     let formatter = DateFormatter()
     let monthLabel = UILabel()
     static var scale: CGFloat = 1
+    
+    let size : CGSize
+    let floatViewDelegate: FloatView
+    
+    required init?(coder: NSCoder) {
+        fatalError("NSCoding not supported")
+    }
+    
+    public init(_ size: CGSize) {
+        self.size = size
+        floatViewDelegate = FloatView(size)
+        super.init(nibName: nil, bundle: nil)
+        modalPresentationStyle = .custom
+        transitioningDelegate = floatViewDelegate
+    }
     
     override func loadView() {
         let view = UIView()

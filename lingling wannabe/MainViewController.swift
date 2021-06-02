@@ -69,6 +69,10 @@ class MainViewController: UIViewController {
         //present(nav, animated: true, completion: nil)
         
     }
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return UIStatusBarStyle.darkContent
+    }
 
 }
 

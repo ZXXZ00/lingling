@@ -35,6 +35,7 @@ public class Metronome {
     let sr : Double = 48000 // the sample rate for tick.wav
     
     public init?() { // start off as 60 bpm
+        // TO DO: Maybe add async init
         guard let url = Bundle.main.url(forResource: "tick", withExtension: "wav") else { return nil }
         file = try! AVAudioFile(forReading: url)
         length = UInt32(sr * 60.0/(Double(bpm)))
