@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  MainViewController.swift
 //  lingling wannabe
 //
 //  Created by Adam Zhao on 1/24/21.
@@ -17,7 +17,6 @@ class MainViewController: UIViewController {
     }
     
     override func viewDidLoad() {
-        
         // TODO: Add intro animation and dismiss it after a delay
     }
 
@@ -60,8 +59,15 @@ class MainViewController: UIViewController {
         })
     }
     
-    override var prefersStatusBarHidden: Bool {
-        return true
+    @objc func showUserInfo() {
+        let itemWidth = (42 * view.frame.width / 360).rounded()
+        let width = itemWidth*7+6
+        let userinfoView = UserInfoViewController(CGSize(width: width, height: width*4/3))
+        present(userinfoView, animated: true, completion: nil)
+        //let nav = UINavigationController(rootViewController: userinfoView)
+        //nav.isToolbarHidden = true
+        //present(nav, animated: true, completion: nil)
+        
     }
 
 }

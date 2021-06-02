@@ -8,7 +8,7 @@
 import Foundation
 import AVFoundation
 
-class Metronome {
+public class Metronome {
     
     let engine = AVAudioEngine()
     let player = AVAudioPlayerNode()
@@ -27,9 +27,14 @@ class Metronome {
             print(buffer.frameLength)
         }
     }
+    public var isPlaying : Bool {
+        get {
+            return player.isPlaying
+        }
+    }
     let sr : Double = 48000 // the sample rate for tick.wav
     
-    init?() { // start off as 60 bpm
+    public init?() { // start off as 60 bpm
         guard let url = Bundle.main.url(forResource: "tick", withExtension: "wav") else { return nil }
         file = try! AVAudioFile(forReading: url)
         length = UInt32(sr * 60.0/(Double(bpm)))
@@ -55,13 +60,18 @@ class Metronome {
         }
     }
     
-    @objc func start() {
+    public func destroy() {
+        player.stop()
+        engine.stop()
+    }
+    
+    @objc public func start() {
         player.prepare(withFrameCount: length)
         player.play()
         player.scheduleBuffer(buffer, at: nil, options: .loops)
     }
     
-    @objc func pause() {
+    @objc public func pause() {
         player.stop()
     }
 }

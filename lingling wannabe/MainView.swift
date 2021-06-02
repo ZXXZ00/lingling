@@ -18,6 +18,7 @@ class MainView: UIView, MSCircularSliderDelegate {
     let buttonScale: CGFloat
     weak var controller: UIViewController?
     let start: UIButton
+    let username: UIButton
     
     public convenience init(frame: CGRect, controller: UIViewController) {
         self.init(frame: frame)
@@ -29,12 +30,18 @@ class MainView: UIView, MSCircularSliderDelegate {
         noteScale = frame.width/300 * 0.4 // 300 is the size of note
         buttonScale = min(frame.width/400, 1.5)
         start = UIButton(frame: CGRect(x: 0, y: 0, width: 103.5*buttonScale, height: 64*buttonScale))
+        username = UIButton(frame: CGRect(x: 0, y: 0, width: frame.width/2, height: 20*buttonScale))
         super.init(frame: frame)
         setUp()
     }
     
     public required init?(coder: NSCoder) {
         fatalError("NSCoding not supported")
+    }
+    
+    override func safeAreaInsetsDidChange() {
+        super.safeAreaInsetsDidChange()
+        username.center.y += safeAreaInsets.top
     }
     
     private func setUp() {
@@ -63,25 +70,22 @@ class MainView: UIView, MSCircularSliderDelegate {
         addSubview(start)
         
         loadSVG(filename: "semiquaver")
+        
+        username.titleLabel?.font = UIFont(name: "AmericanTypewriter", size: 16*buttonScale)
+        username.setTitleColor(.black, for: .normal)
+        username.setTitle("abcdefjhijklmnopqrstuvwxyz0123456789", for: .normal)
+        username.addTarget(controller, action: #selector(MainViewController.showUserInfo), for: .touchUpInside)
+        addSubview(username)
     }
     
     private func loadSVG(filename: String) {
         if (currSymbol == filename) { return }
         noteLayer.removeFromSuperlayer()
         let url = Bundle.main.url(forResource: filename, withExtension: "svg")!
-        let paths = SVGBezierPath.pathsFromSVG(at: url)
-        noteLayer = CALayer()
-        for (index, path) in paths.enumerated() {
-            let shapeLayer = CAShapeLayer()
-            shapeLayer.path = path.cgPath
-            shapeLayer.shouldRasterize = false
-            noteLayer.addSublayer(shapeLayer)
-        }
-        noteLayer.shouldRasterize = false
+        noteLayer = svg(at: url, scale: noteScale)
         noteLayer.bounds = CGRect(x: 0, y: 0, width: 300, height: 300)
         // 300 is the size of notation canvas
         noteLayer.position = self.center
-        noteLayer.transform = CATransform3DMakeScale(noteScale, noteScale, 1)
         self.layer.addSublayer(noteLayer)
         currSymbol = filename
     }
