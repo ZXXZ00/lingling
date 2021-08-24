@@ -15,14 +15,19 @@ class UserInfoViewController : UIViewController {
     let monthLabel = UILabel()
     static var scale: CGFloat = 1
     
-    let size : CGSize
-    let floatViewDelegate: FloatView
+    var size : CGSize
+    var floatViewDelegate: FloatView?
     
     required init?(coder: NSCoder) {
         fatalError("NSCoding not supported")
     }
     
-    public init(_ size: CGSize) {
+    init() {
+        size = .zero
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    init(_ size: CGSize) {
         self.size = size
         floatViewDelegate = FloatView(size)
         super.init(nibName: nil, bundle: nil)
@@ -42,10 +47,10 @@ class UserInfoViewController : UIViewController {
         layout.sectionInset = UIEdgeInsets(top: 1, left: 0, bottom: 0, right: 0)
         let itemWidth = (size.width-6) / 7
         let itemHeight = (itemWidth * 1.618).rounded() // 1.618 golden ratio
-        print(itemWidth)
-        print(itemHeight)
+        //print(itemWidth)
+        //print(itemHeight)
         layout.itemSize = CGSize(width: itemWidth, height: itemHeight)
-        calendarView = UICollectionView(frame: CGRect(x: 0, y: headerHeight, width: size.width, height: size.height - headerHeight), collectionViewLayout: layout)
+        calendarView = UICollectionView(frame: CGRect(x: 0, y: headerHeight+additionalSafeAreaInsets.top, width: size.width, height: size.height - headerHeight), collectionViewLayout: layout)
         calendarView.showsVerticalScrollIndicator = false
         calendarView.collectionViewLayout = layout
         calendarView.backgroundColor = .gray
@@ -55,20 +60,15 @@ class UserInfoViewController : UIViewController {
         view.addSubview(calendarView)
         
         monthLabel.frame = CGRect(x: size.width/1.9, y: 0, width: size.width/2.2, height: headerHeight)
-        monthLabel.center.y = headerHeight/2
+        monthLabel.center.y = headerHeight/2 + additionalSafeAreaInsets.top
         monthLabel.font = UIFont(name: "AmericanTypewriter", size: 16*UserInfoViewController.scale)
         monthLabel.textColor = .black
         monthLabel.textAlignment = .right
         view.addSubview(monthLabel)
         
-        let line = CAShapeLayer()
-        let linePath = UIBezierPath()
-        linePath.move(to: CGPoint(x: 0, y: headerHeight))
-        linePath.addLine(to: CGPoint(x: size.width, y: headerHeight))
-        line.path = linePath.cgPath
-        line.lineWidth = 1
-        line.strokeColor = UIColor.gray.cgColor
-        view.layer.addSublayer(line)
+        let startPoint = CGPoint(x: 0, y: headerHeight+additionalSafeAreaInsets.top)
+        let endPoint = CGPoint(x: size.width, y: headerHeight+additionalSafeAreaInsets.top)
+        view.layer.addLine(start: startPoint, end: endPoint, width: 1)
         
         self.view = view
         formatter.dateFormat = "YYYY-MM"
@@ -93,5 +93,18 @@ extension UserInfoViewController : UIScrollViewDelegate {
                 monthLabel.text = formatter.string(from: date)
             }
         }
+    }
+}
+
+extension CALayer {
+    func addLine(start: CGPoint, end: CGPoint, width: CGFloat) {
+        let line = CAShapeLayer()
+        let linePath = UIBezierPath()
+        linePath.move(to: start)
+        linePath.addLine(to: end)
+        line.path = linePath.cgPath
+        line.lineWidth = width
+        line.strokeColor = UIColor.gray.cgColor
+        self.addSublayer(line)
     }
 }

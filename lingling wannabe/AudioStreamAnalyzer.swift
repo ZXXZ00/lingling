@@ -14,8 +14,7 @@ import Accelerate
 class AudioStreamAnalyzer {
     static let shared = AudioStreamAnalyzer()
     
-    let classifier = TwoCategory()
-    let model: MLModel
+    var model: MLModel!
     
     // This idea might be ditched
     // Note: have to use DFT with .complexComplex and use first half
@@ -47,9 +46,18 @@ class AudioStreamAnalyzer {
         ] as [String : Any]
     
     private init() {
-        model = classifier.model
+        //model = classifier.model
         inputFormat = audioEngine.inputNode.inputFormat(forBus: inputBus)
         streamAnalyzer = SNAudioStreamAnalyzer(format: inputFormat)
+        
+        let tmpconf = MLModelConfiguration()
+        tmpconf.computeUnits = .cpuOnly
+        do {
+            let tmp = try TwoCategory(configuration: tmpconf)
+            model = tmp.model
+        } catch {
+            print("failed to initilize ml model")
+        }
     }
 
     func startAudioEngine() {
@@ -58,10 +66,6 @@ class AudioStreamAnalyzer {
         } catch {
             print(error.localizedDescription)
         }
-    }
-    // This function is used to write recording to file, will delete in production
-    func getDocumentDirectory() -> URL {
-        return FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
     }
     
     func joint(_ buffer: UnsafeMutablePointer<Float>, tick: Int) {

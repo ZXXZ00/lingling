@@ -10,7 +10,7 @@ import UIKit
 class PracticeViewController : UIViewController {
     
     // TO DO for production: Error Handling for metronome it is optional type
-    let metronome = Metronome()
+    var metronome : Metronome!
     let slider = UISlider()
     let playButton = UIButton()
     let label = UILabel()
@@ -43,7 +43,15 @@ class PracticeViewController : UIViewController {
         view.addSubview(slider)
         view.addSubview(label)
         view.addSubview(playButton)
+        
+        DispatchQueue.global(qos: .userInteractive).async {
+            self.metronome = Metronome()
+        }
     }
+    
+    //override func viewDidAppear(_ animated: Bool) {
+    //    metronome = Metronome()
+    //}
     
     override func viewWillDisappear(_ animated: Bool) {
         metronome?.destroy()

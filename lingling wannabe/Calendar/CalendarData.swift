@@ -74,10 +74,9 @@ class CalendarData : NSObject, UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CalendarCell", for: indexPath) as! CalendarCell
-        cell.clearAsset()
         if let date = indexPathToDate(indexPath) {
             cell.dayLabel.text = String(calendar.component(.day, from: date))
-            cell.addAsset(filenames: ["treble", "whole", "semiquaver", "half", "quaver", "crotchet", "bass", "whole", "quaver", "half", "whole", "crotchet"])
+            cell.addAsset(filenames: ["whole", "semiquaver", "half", "quaver", "crotchet", "whole", "quaver", "half", "whole", "crotchet"])
         } else {
             cell.dayLabel.text = ""
         }

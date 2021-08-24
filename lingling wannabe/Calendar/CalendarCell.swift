@@ -29,30 +29,33 @@ class CalendarCell : UICollectionViewCell {
     }
     
     func clearAsset() {
-        if layer.sublayers == nil { return }
-        layer.sublayers?.removeSubrange(1..<layer.sublayers!.count)
+        for subview in subviews {
+            if subview.contentMode == .scaleAspectFit {
+                subview.removeFromSuperview()
+            }
+        }
+        //if layer.sublayers == nil { return }
+        //layer.sublayers?.removeSubrange(1..<layer.sublayers!.count)
+    }
+    
+    override func prepareForReuse() {
+        clearAsset()
     }
     
     func addAsset(filenames: [String]) {
         let scale = UserInfoViewController.scale
         let assetScale = scale * 0.045
         // 300 is the standard size of cavnas
-        var position = CGPoint(x: 300 * assetScale, y: 10 * scale + 300 * assetScale)
+        var position = CGPoint(x: 300/2 * assetScale, y: 10 * scale + 300/2 * assetScale)
         for f in filenames {
-            if let url = Bundle.main.url(forResource: f, withExtension: "svg") {
-                let asset = svg(at: url, scale: assetScale)
-                asset.bounds = CGRect(x: 0, y: 0, width: 300, height: 300)
-                asset.anchorPoint = CGPoint(x: 1, y: 1)
-                asset.position = position
-                if position.x + 300*assetScale < frame.width {
-                    position.x += 300*assetScale
-                } else {
-                    position.x = 300 * assetScale
-                    position.y += 300*assetScale
-                }
-                layer.addSublayer(asset)
+            let asset = pdf(filename: f, scale: assetScale)
+            asset.center = position
+            addSubview(asset)
+            if position.x + 300*assetScale < frame.width {
+                position.x += 300*assetScale
             } else {
-                // for the future it not on device we may retrieve from cloud
+                position.x = 300/2 * assetScale
+                position.y += 300*assetScale
             }
         }
     }

@@ -24,7 +24,6 @@ public class Metronome {
             if (isPlaying) {
                 start()
             }
-            print(buffer.frameLength)
         }
     }
     public var isPlaying : Bool {
@@ -35,11 +34,12 @@ public class Metronome {
     let sr : Double = 48000 // the sample rate for tick.wav
     
     public init?() { // start off as 60 bpm
-        // TO DO: Maybe add async init
         guard let url = Bundle.main.url(forResource: "tick", withExtension: "wav") else { return nil }
         file = try! AVAudioFile(forReading: url)
         length = UInt32(sr * 60.0/(Double(bpm)))
         if let buff = AVAudioPCMBuffer(pcmFormat: file.processingFormat, frameCapacity: UInt32(sr*2)) {
+            // times 2 because the slowest it will be is 40 bpm
+            // and the standard is 60 bpm so it will have sufficent capcaity
             buffer = buff
         } else {
             return nil
@@ -53,6 +53,7 @@ public class Metronome {
         }
         engine.attach(player)
         engine.connect(player, to: engine.mainMixerNode, format: buffer.format)
+        engine.prepare()
         do {
             try engine.start()
         } catch {
@@ -60,19 +61,32 @@ public class Metronome {
             return nil
         }
     }
-    
+
     public func destroy() {
         player.stop()
         engine.stop()
     }
     
     @objc public func start() {
+        //if !engine.isRunning {
+        //    print("engine not running")
+        //    do {
+        //        try engine.start()
+        //    } catch {
+        //        print(error.localizedDescription)
+        //    }
+        //}
+        
+        // TO DO: handel audio interruption
         player.prepare(withFrameCount: length)
         player.play()
         player.scheduleBuffer(buffer, at: nil, options: .loops)
     }
     
     @objc public func pause() {
+        if !engine.isRunning {
+            return
+        }
         player.stop()
     }
 }
