@@ -12,27 +12,43 @@ import PocketSVG
 class MainViewController: UIViewController {
     
     let practiceQueue = DispatchQueue(label: "practicing")
+    var nav: LeaderBoardNavigation!
+    var username = UserDefaults.standard.string(forKey: "username") ?? "guest"
     
     override func loadView() {
-        let mainView = MainView(frame: UIScreen.main.bounds, controller: self)
+        let mainView = MainView(frame: UIScreen.main.bounds, user: username, controller: self)
         mainView.backgroundColor = .white
         self.view = mainView
+        
+        let itemWidth = (42 * view.frame.width / 360).rounded()
+        let width = itemWidth*7+6
+        nav = LeaderBoardNavigation(size: CGSize(width: width, height: view.frame.height*0.8))
     }
     
     override func viewDidLoad() {
-        DataManager.shared.test()
+        if DataManager.shared.checkAndLoad(username: username, time: Date().timeIntervalSince1970) != 0 {
+            // TODO: show user warning
+            return
+        }
+        //DataManager.shared.test()
+        //print(DataManager.shared.getRecord(username: "lingling"))
+        //print(CalendarData.cache)
+        //DataManager.shared.sync()
         // TODO: Add intro animation and dismiss it after a delay
         
-        //let url = URL(string: "https://j7by90n61a.execute-api.us-east-1.amazonaws.com/record?username=adam")
-        //getJSON(url: url!, success: {_ in}, failure: {_ in})
-        //let baseurl = URL(string: "https://j7by90n61a.execute-api.us-east-1.amazonaws.com/record")
-        //let adam: [String: Any] = ["username": "adam", "records": [["time": 1627434964, "duration": 60]]]
-        //postJSON(url: baseurl!, json: adam, success: {_, _ in}, failure: {_ in})
-        //getJSON(url: url!, success: {_ in}, failure: {_ in})
-        //let laohuang = ["username": "laozhang", "password": "password", "email": "laozhang@test.com"]
-        //postJSON(url: url!, json: laohuang as [String: Any], success: {_, _ in}, failure: {_ in})
-        //postJSON(url: url!, json: laohuang as [String: Any], success: {_, _ in}, failure: {_ in})
-        //postJSON(url: url!, json: laohuang, success: {_, _ in}, failure: {_ in})
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        print("hi")
+        if let user = UserDefaults.standard.string(forKey: "username") {
+            username = user
+            if let mainView = view as? MainView {
+                mainView.username.setTitle(username, for: .normal)
+            }
+        } else {
+            let signup = LoginViewController(CGSize(width: view.frame.width, height: view.frame.height), isFullScreen: true)
+            present(signup, animated: false)
+        }
     }
 
     func loadTestView() {
@@ -88,6 +104,17 @@ class MainViewController: UIViewController {
         return ret
     }
     
+    func handleResult(start: Int, duration: Int, assetName: String) {
+        //guard let username = UserDefaults.standard.string(forKey: "username") else { return }
+        var span = duration
+        var asset = assetName
+        if ResultDelegate.shared.musicPercentage(cutoff: ResultDelegate.cutoff) < ResultDelegate.percentage {
+            span = -duration
+            asset = assetName + "_rest"
+        }
+        DataManager.shared.addRecord(username: username, time: start, duration: span, assset: asset)
+    }
+    
     @objc func startAnalyze() {
         if !checkMicrophone() {
             print("nan")
@@ -100,6 +127,7 @@ class MainViewController: UIViewController {
             print("failed to cast view as MainView")
             return
         }
+        let start = Date().timeIntervalSince1970
         let practiceView = PracticeViewController()
         practiceView.modalPresentationStyle = .fullScreen
         present(practiceView, animated: true, completion: {
@@ -108,7 +136,9 @@ class MainViewController: UIViewController {
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
             AudioStreamAnalyzer.shared.stop()
             self.dismiss(animated: true, completion: nil)
-            (self.view as! MainView).showResult()
+            let mainview = self.view as! MainView
+            mainview.showResult()
+            self.handleResult(start: Int(start), duration: Int(delay), assetName: mainview.currSymbol)
             print(ResultDelegate.shared.test())
             print("time","end", "music","bg")
             ResultDelegate.shared.print_()
@@ -116,15 +146,21 @@ class MainViewController: UIViewController {
     }
     
     @objc func showUserInfo() {
+        // 42 * 7 + 6 = 300, so the cell can all fit into a week with 1 being the margin between
         let itemWidth = (42 * view.frame.width / 360).rounded()
         let width = itemWidth*7+6
-        let userinfoView = UserInfoViewController(CGSize(width: width, height: width*4/3))
+        let userinfoView = UserInfoViewController(CGSize(width: width, height: width*4/3), username: username)
         present(userinfoView, animated: true, completion: nil)
         //let nav = LeaderBoardNavigation(size: CGSize(width: width, height: width*4/2.5))
         //nav.isToolbarHidden = true
         //present(nav, animated: true, completion: nil)
         //let loginView = LoginViewController(CGSize(width: width, height: width*4/3))
         //present(loginView, animated: true, completion: nil)
+    }
+    
+    @objc func showLeaderBoard() {
+        nav.isToolbarHidden = true
+        present(nav, animated: true, completion: nil)
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {

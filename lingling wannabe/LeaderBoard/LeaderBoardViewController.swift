@@ -11,6 +11,10 @@ class LeaderBoardViewController : UIViewController {
     let page = UIPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal, options: nil)
     var tables = [UIViewController]()
     weak var control : UISegmentedControl?
+    weak var delegate: LeaderBoardNavigation?
+    let lingling = LeaderBoardCell()
+    let first = LeaderBoardCell()
+    let second = LeaderBoardCell()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -20,29 +24,22 @@ class LeaderBoardViewController : UIViewController {
         addChild(page)
         view.addSubview(page.view)
         
-        let lingling = LeaderBoardCell()
-        lingling.username.text = "lingling"
-        lingling.rank.text = "0"
-        lingling.hours.text = "40"
-        lingling.frame = CGRect(x: 0, y: 44, width: 310, height: lingling.frame.height)
-        lingling.backgroundColor = .white
-        view.addSubview(lingling)
-        
         populate()
         page.setViewControllers([tables[0]], direction: .forward, animated: true)
+        print(tables.first!.view.frame)
         
     }
     
     func populate() {
+        let intervals: [Interval] = [.day, .week, .month, .year]
         for i in 0..<4 {
-            let table = LeaderBoardTableViewController(interval: .day)
-            table.view.backgroundColor = UIColor(hue: 64*CGFloat(i)/256, saturation: 1, brightness: 0.5, alpha: 1)
-            
+            let table = LeaderBoardTableViewController(interval: intervals[i], delegate: delegate)
+            table.view.backgroundColor = .white
             tables.append(table)
         }
     }
     
-    
+    // After swipe change table
     @objc func updateTable() {
         guard let c = control, let vc = page.viewControllers?.first else { return }
         let idx = c.selectedSegmentIndex

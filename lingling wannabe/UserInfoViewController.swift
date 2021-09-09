@@ -9,11 +9,15 @@ import UIKit
 
 class UserInfoViewController : UIViewController {
     
-    let calendarData = CalendarData()
+    var calendarData: CalendarData? = nil
     var calendarView: UICollectionView!
     let formatter = DateFormatter()
     let monthLabel = UILabel()
     static var scale: CGFloat = 1
+    let username: String
+    let baseURL = URL(string: "https://wi6n41chmb.execute-api.us-east-1.amazonaws.com/v1")!
+    
+    let loading = UIActivityIndicatorView(style: .large)
     
     var size : CGSize
     var floatViewDelegate: FloatView?
@@ -22,17 +26,15 @@ class UserInfoViewController : UIViewController {
         fatalError("NSCoding not supported")
     }
     
-    init() {
-        size = .zero
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    init(_ size: CGSize) {
+    init(_ size: CGSize, username: String, isPresentedByMainView: Bool = true) {
         self.size = size
         floatViewDelegate = FloatView(size)
+        self.username = username
         super.init(nibName: nil, bundle: nil)
-        modalPresentationStyle = .custom
-        transitioningDelegate = floatViewDelegate
+        if isPresentedByMainView {
+            modalPresentationStyle = .custom
+            transitioningDelegate = floatViewDelegate
+        }
     }
     
     override func loadView() {
@@ -55,7 +57,7 @@ class UserInfoViewController : UIViewController {
         calendarView.collectionViewLayout = layout
         calendarView.backgroundColor = .gray
         calendarView.register(CalendarCell.self, forCellWithReuseIdentifier: "CalendarCell")
-        calendarView.dataSource = calendarData
+        calendarView.dataSource = nil
         (calendarView as UIScrollView).delegate = self
         view.addSubview(calendarView)
         
@@ -70,26 +72,76 @@ class UserInfoViewController : UIViewController {
         let endPoint = CGPoint(x: size.width, y: headerHeight+additionalSafeAreaInsets.top)
         view.layer.addLine(start: startPoint, end: endPoint, width: 1)
         
+        loading.center = CGPoint(x: size.width/2, y: size.height/2)
+        loading.startAnimating()
+        view.addSubview(loading)
+        
         self.view = view
         formatter.dateFormat = "YYYY-MM"
     }
     
-    override func viewDidLoad() {
-        let today = Date()
-        monthLabel.text = formatter.string(from: today)
-        if let section = calendarData.dateToSections(today) {
-            calendarView.scrollToItem(at: IndexPath(item: 0, section: section), at: .top, animated: false)
+    func loadData() {
+        if CalendarData.cache.keys.contains(username) {
+            calendarData = CalendarData(username: username)
+            calendarView.dataSource = calendarData
+            dataDidLoad()
+        } else {
+            var url = URLComponents(url: baseURL, resolvingAgainstBaseURL: true)
+            url?.query = "username=\(username)"
+            guard let u = url?.url else { return }
+            getJSON(url: u, success: { json in
+                if let assests = json as? [[String:Any]] {
+                    let user = self.username
+                    let formatter = DateFormatter()
+                    formatter.dateFormat = "YYYY-MM-dd"
+                    CalendarData.cache[user] = [:]
+                    for asset in assests {
+                        if let start = asset["start_time"] as? Double,
+                            let name = asset["asset"] as? String {
+                            let key = formatter.string(from: Date(timeIntervalSince1970: start))
+                            if CalendarData.cache[user]!.keys.contains(key) {
+                                CalendarData.cache[user]![key]!.append(name)
+                            } else {
+                                CalendarData.cache[user]![key] = [name]
+                            }
+                        }
+                    }
+                    self.dataDidLoad()
+                } else {
+                    print("user doesn't exist")
+                }
+            }, failure: {err in print("opps!")})
         }
+    }
+    
+    func dataDidLoad() {
+        DispatchQueue.main.async {
+            self.calendarData = CalendarData(username: self.username)
+            self.calendarView.dataSource = self.calendarData
+            self.loading.stopAnimating()
+            self.loading.removeFromSuperview()
+            let today = Date()
+            self.monthLabel.text = self.formatter.string(from: today)
+            if let section = self.calendarData?.dateToSections(today) {
+                self.calendarView.scrollToItem(at: IndexPath(item: 0, section: section), at: .top, animated: false)
+            }
+        }
+        
+    }
+    
+    override func viewDidLoad() {
+        loadData()
     }
 }
 
 extension UserInfoViewController : UIScrollViewDelegate {
+    // update the label
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let visible = calendarView.indexPathsForVisibleItems
         let sum = visible.reduce(0) { $0 + $1.section }
         if visible.count != 0 {
             let section = Int((Double(sum) / Double(visible.count)).rounded())
-            if let (date, _) = calendarData.getDateAndWeekday(monthOffset: section) {
+            if let (date, _) = calendarData?.getDateAndWeekday(monthOffset: section) {
                 monthLabel.text = formatter.string(from: date)
             }
         }

@@ -7,18 +7,18 @@
 
 import UIKit
 
-enum interval : String {
-    case day
-    case week
-    case month
-    case year
+enum Interval : String {
+    case day = "day"
+    case week = "week"
+    case month = "month"
+    case year = "year"
 }
 
 class LeaderBoardNavigation : UINavigationController {
     
     let size : CGSize
     let floatViewDelegate : FloatView
-    let items = ["day", "settimana", "month", "year"]
+    let items = ["day", "week", "month", "year"]
     let control : UISegmentedControl
     let lb: LeaderBoardViewController
     
@@ -35,6 +35,8 @@ class LeaderBoardNavigation : UINavigationController {
         // that loadView will be called after the this initilization finishs
         //root.size = CGSize(width: size.width, height: size.height - navigationBar.frame.height)
         //root.additionalSafeAreaInsets.top = navigationBar.frame.height
+        lb.delegate = self
+
         
         modalPresentationStyle = .custom
         transitioningDelegate = floatViewDelegate
@@ -43,7 +45,8 @@ class LeaderBoardNavigation : UINavigationController {
     }
     
     override func viewDidLoad() {
-        navigationBar.tintColor = .black
+        navigationBar.backgroundColor = .gray
+        navigationBar.tintColor = .white
         let barHeight = navigationBar.frame.height
         
         control.frame = CGRect(x: 0, y: 0, width: barHeight * 0.8*2 * CGFloat(items.count), height: barHeight * 0.6)
@@ -58,8 +61,11 @@ class LeaderBoardNavigation : UINavigationController {
         fatalError("NSCoding not supported!")
     }
     
-    @objc func showDetail(sender: LeaderBoardCell) {
-        print(sender.username)
+    func openUserInfoView(username: String) {
+        let tmp = CGSize(width: size.width, height: size.height - navigationBar.frame.height)
+        let userInfo = UserInfoViewController(tmp, username: username, isPresentedByMainView: false)
+        userInfo.additionalSafeAreaInsets.top += navigationBar.frame.height
+        pushViewController(userInfo, animated: true)
     }
 }
 

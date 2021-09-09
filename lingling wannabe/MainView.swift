@@ -19,6 +19,7 @@ class MainView: UIView, MSCircularSliderDelegate {
     weak var controller: UIViewController?
     let start: UIButton
     let username: UIButton
+    let leaderboard: UIButton
     
     
     let question: UIImageView
@@ -31,9 +32,10 @@ class MainView: UIView, MSCircularSliderDelegate {
     let text = UITextView()
     
     
-    public convenience init(frame: CGRect, controller: UIViewController) {
+    public convenience init(frame: CGRect, user: String, controller: UIViewController) {
         self.init(frame: frame)
         self.controller = controller
+        username.setTitle(user, for: .normal)
     }
     
     public override init(frame: CGRect) {
@@ -42,6 +44,7 @@ class MainView: UIView, MSCircularSliderDelegate {
         buttonScale = min(frame.width/350, 1.5)
         start = UIButton(frame: CGRect(x: 0, y: 0, width: 103.5*buttonScale, height: 64*buttonScale))
         username = UIButton(frame: CGRect(x: 0, y: 0, width: frame.width/2, height: 20*buttonScale))
+        leaderboard = UIButton(frame: CGRect(x: frame.width - 100, y: 0, width: 100, height: 20*buttonScale))
         rect = CAShapeLayer()
         rect.path = UIBezierPath(rect: frame).cgPath
         rect.fillColor = UIColor(white: 0.4, alpha: 1).cgColor
@@ -57,6 +60,7 @@ class MainView: UIView, MSCircularSliderDelegate {
     override func safeAreaInsetsDidChange() {
         super.safeAreaInsetsDidChange()
         username.center.y += safeAreaInsets.top
+        leaderboard.center.y += safeAreaInsets.top
     }
     
     private func setUp() {
@@ -85,11 +89,16 @@ class MainView: UIView, MSCircularSliderDelegate {
         
         loadNote(filename: "semiquaver")
         
+        username.contentHorizontalAlignment = .left
         username.titleLabel?.font = UIFont(name: "AmericanTypewriter", size: 16*buttonScale)
         username.setTitleColor(.black, for: .normal)
-        username.setTitle("abcdefjhijklmnopqrstuvwxyz0123456789", for: .normal)
         username.addTarget(controller, action: #selector(MainViewController.showUserInfo), for: .touchUpInside)
         addSubview(username)
+        
+        leaderboard.setTitle("leaderboard", for: .normal)
+        leaderboard.setTitleColor(.black, for: .normal)
+        leaderboard.addTarget(controller, action: #selector(MainViewController.showLeaderBoard), for: .touchUpInside)
+        addSubview(leaderboard)
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(touchHandler))
         addGestureRecognizer(tap)
@@ -139,7 +148,6 @@ class MainView: UIView, MSCircularSliderDelegate {
         } else {
             reward = pdf(filename: currSymbol+"_rest", scale: noteScale*2)
             rewardPath = svg(filename: currSymbol+"_rest", scale: noteScale*2)!
-            print(currSymbol)
         }
         
         reward.center = self.center

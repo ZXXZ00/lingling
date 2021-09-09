@@ -28,16 +28,6 @@ class ResultDelegate {
         
     }
     
-    func handleResult(duration: Double, assetName: String) {
-        guard let username = UserDefaults.standard.string(forKey: "username") else { return }
-        var span = duration
-        var asset = assetName
-        if musicPercentage(cutoff: ResultDelegate.cutoff) < ResultDelegate.percentage {
-            span = -duration
-            asset = "rest" // using Asset enum
-        }
-    }
-    
     func musicPercentage(cutoff: Double) -> Double {
         var total = 0.0
         var music = 0.0

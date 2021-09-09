@@ -69,14 +69,13 @@ func postJSON(url: URL, json: [String: Any],
         data, response, err in
         if let err = err {
             failure(err)
-            //return
+            return
         }
-        do {
-            let res = try response as! HTTPURLResponse
-            let d = try data!
+        if let res = response as? HTTPURLResponse, let d = data {
             success(d, res)
-        } catch {
-            failure(error)
+        } else {
+            print("failed to cast response and data")
+            // TODO: failed to cast
         }
         print("data")
         if let d = data {
@@ -113,19 +112,22 @@ func getJSON(url: URL, success: @escaping (_: Any) -> Void, failure: @escaping (
         data, response, err in
         if let err = err {
             failure(err)
-            //return
+            return
         }
         print("\ndata")
         do {
-            let json = try JSONSerialization.jsonObject(with: data!)
-            print(json)
-            success(json)
+            if let d = data {
+                let json = try JSONSerialization.jsonObject(with: data!)
+                //print(json)
+                success(json)
+                //print(d)
+            } else {
+                print("no data")
+                // TODO: no data
+            }
         } catch {
             print(error.localizedDescription)
             failure(error)
-        }
-        if let d = data {
-            print(d)
         }
         print("\nresponse")
         if let res = response as? HTTPURLResponse {

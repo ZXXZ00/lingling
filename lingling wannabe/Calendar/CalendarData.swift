@@ -9,16 +9,20 @@ import UIKit
 
 class CalendarData : NSObject, UICollectionViewDataSource {
     
+    static var cache = [String:[String:[String]]]()
+    static var cacheReady = false
     let formatter = DateFormatter()
     let startYear = 2021
     let startMonth = 2 // startMonth is 0 based. 0 is Jan
     let startDay = 1 // start is always the first of the month
     let start : Date
     let calendar = Calendar.current
+    let user: String
     
-    override init() {
+    init(username: String) {
         formatter.dateFormat = "yyyy-MM-dd"
         start = formatter.date(from: "\(startYear)-\(startMonth+1)-\(startDay)")!
+        user = username
         super.init()
     }
 
@@ -76,7 +80,10 @@ class CalendarData : NSObject, UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CalendarCell", for: indexPath) as! CalendarCell
         if let date = indexPathToDate(indexPath) {
             cell.dayLabel.text = String(calendar.component(.day, from: date))
-            cell.addAsset(filenames: ["whole", "semiquaver", "half", "quaver", "crotchet", "whole", "quaver", "half", "whole", "crotchet"])
+            //cell.addAsset(filenames: ["whole", "semiquaver", "half", "quaver", "crotchet", "whole", "quaver", "half", "whole", "crotchet"])
+            if let assets = CalendarData.cache[user]?[formatter.string(from: date)] {
+                cell.addAsset(filenames: assets)
+            }
         } else {
             cell.dayLabel.text = ""
         }
