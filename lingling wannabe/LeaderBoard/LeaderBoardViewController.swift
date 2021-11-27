@@ -32,7 +32,7 @@ class LeaderBoardViewController : UIViewController {
     
     func populate() {
         let intervals: [Interval] = [.day, .week, .month, .year]
-        for i in 0..<4 {
+        for i in 0..<3 {
             let table = LeaderBoardTableViewController(interval: intervals[i], delegate: delegate)
             table.view.backgroundColor = .white
             tables.append(table)

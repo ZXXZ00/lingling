@@ -141,40 +141,27 @@ class MainView: UIView, MSCircularSliderDelegate {
     
     func reveal() {
         question.removeFromSuperview()
-        
+        let duration: Double = 10
         if ResultDelegate.shared.musicPercentage(cutoff: ResultDelegate.cutoff) > ResultDelegate.percentage {
             reward = pdf(filename: currSymbol, scale: noteScale*2)
-            rewardPath = svg(filename: currSymbol, scale: noteScale*2)!
+            rewardPath = createAnimation(name: currSymbol, duration: duration)
         } else {
             reward = pdf(filename: currSymbol+"_rest", scale: noteScale*2)
-            rewardPath = svg(filename: currSymbol+"_rest", scale: noteScale*2)!
+            rewardPath = createAnimation(name: currSymbol+"_rest", duration: duration)
         }
-        
-        reward.center = self.center
+        rewardPath.transform = CATransform3DMakeScale(noteScale*2, noteScale*2, 1)
         rewardPath.bounds = CGRect(x: 0, y: 0, width: 300, height: 300)
+        reward.center = self.center
         rewardPath.position = self.center
-        if let sublayers = rewardPath.sublayers {
-            let animation = CABasicAnimation(keyPath: "strokeEnd")
-            animation.fromValue = 0
-            animation.toValue = 1
-            animation.duration = 10
-            for sublayer in sublayers {
-                guard let layer = sublayer as? CAShapeLayer else {
-                    return
-                }
-                //print(layer.path)
-                layer.fillColor = UIColor.clear.cgColor
-                layer.strokeColor = UIColor.black.cgColor
-                layer.lineWidth = 1
-                layer.add(animation, forKey: nil)
-            }
-        }
+        
         self.layer.addSublayer(rewardPath)
         reward.alpha = 0
         addSubview(reward)
-        UIView.animate(withDuration: 1, delay: 10, animations: {
+        UIView.animate(withDuration: 1, delay: duration, animations: {
             self.reward.alpha = 1
-        }, completion: { finished in self.touchCount += 1 })
+        }, completion: { finished in
+            self.touchCount += 1
+        })
     }
     
     func dismissResult() {

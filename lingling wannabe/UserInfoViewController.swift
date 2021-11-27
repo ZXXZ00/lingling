@@ -85,6 +85,8 @@ class UserInfoViewController : UIViewController {
             calendarData = CalendarData(username: username)
             calendarView.dataSource = calendarData
             dataDidLoad()
+        } else if username == "guest" {
+            dataDidLoad()
         } else {
             var url = URLComponents(url: baseURL, resolvingAgainstBaseURL: true)
             url?.query = "username=\(username)"
@@ -127,10 +129,6 @@ class UserInfoViewController : UIViewController {
             }
         }
         
-    }
-    
-    override func viewDidLoad() {
-        loadData()
     }
 }
 

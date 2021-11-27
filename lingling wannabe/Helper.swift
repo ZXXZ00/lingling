@@ -141,3 +141,52 @@ func getJSON(url: URL, success: @escaping (_: Any) -> Void, failure: @escaping (
     task.resume()
 }
 
+func addCache(username: String, date: Date, asset: String) {
+    let formatter = DateFormatter()
+    formatter.dateFormat = "YYYY-MM-dd"
+    addCache(username: username, key: formatter.string(from: date), asset: asset)
+}
+
+func addCache(username: String, key: String, asset: String) {
+    if CalendarData.cache.keys.contains(username) {
+        if CalendarData.cache[username]!.keys.contains(key) {
+            CalendarData.cache[username]![key]!.append(asset)
+        } else {
+            CalendarData.cache[username]![key] = [asset]
+        }
+    } else {
+        CalendarData.cache[username] = [key:[asset]]
+    }
+}
+
+func parsePoints(json: Data) -> [[String:[Float]]] {
+    do {
+        return try JSONDecoder().decode([[String:[Float]]].self, from: json)
+    } catch {
+        return []
+    }
+}
+
+func loadPoints(filename: String) -> [[String:[Float]]] {
+    do {
+        if let path = Bundle.main.path(forResource: filename, ofType: "json"),
+           let json = try String(contentsOfFile: path).data(using: .utf8) {
+            return parsePoints(json: json)
+        }
+    } catch {
+        return []
+    }
+    return []
+}
+
+func createAnimation(name: String, position: CGPoint = .zero, duration: Double = 10) -> CALayer {
+    let paths = loadPoints(filename: name)
+    let ret = CALayer()
+    for path in paths {
+        let f = FourierSeries(real: path["x"]!, imag: path["y"]!, position: position, duration: duration, repeatCount: 1)
+        f.addTrace()
+        ret.addSublayer(f.layer)
+        
+    }
+    return ret
+}

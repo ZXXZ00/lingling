@@ -7,6 +7,7 @@
 
 import Foundation
 import SQLite
+import CoreImage
 
 
 // This is the structure for each entry in the database
@@ -44,7 +45,6 @@ struct Record {
         }
         return ret
     }
-    
 }
 
 class DataManager {
@@ -52,16 +52,30 @@ class DataManager {
     
     let dbURL = URL(string: "https://j7by90n61a.execute-api.us-east-1.amazonaws.com/record")!
     
+    // the db is a connection to data.db which stores the record
     private var db: Connection!
+    // the err is a connection to error.db which stores the error
+    // there are two types of error: network and local, each is a table
+    private var err: Connection!
+    
+    var initialized = false
     
     private init() {
         do {
-            let path = getDocumentDirectory().appendingPathComponent("data.db")
-            db = try Connection(path.absoluteString)
+            let dir = getDocumentDirectory()
+            db = try Connection(dir.appendingPathComponent("data.db").absoluteString)
             try db.run("CREATE TABLE IF NOT EXISTS records(username TEXT, time INTEGER, duration INTEGER NOT NULL, asset TEXT NOT NULL, attributes TEXT, PRIMARY KEY (username, time))")
+            err = try Connection(dir.appendingPathComponent("error.db").absoluteString)
+            try err.run("CREATE TABLE IF NOT EXISTS network(time REAL PRIMARY KEY, message TEXT)")
+            try err.run("CREATE TABLE IF NOT EXISTS local(time REAL PRIMARY KEY, message TEXT)")
+            initialized = true
         } catch {
             print(error)
         }
+    }
+    
+    func isInitialized() -> Bool {
+        return initialized
     }
     
     private func cast(_ x: Binding?) -> Any? {
@@ -92,6 +106,17 @@ class DataManager {
         return nil
     }
     
+    func insertErrorMessage(isNetwork: Bool, message: String) {
+        let timestamp = Date().timeIntervalSince1970
+        if isNetwork {
+            do {
+                try err.run("INSERT INTO network VALUES (?, ?)", timestamp, message)
+            } catch {
+                print("failed to insert into error database")
+            }
+        }
+    }
+    
     // Check if there could be any conflict with database
     // return 0: OK
     // return 1: Overlapping session
@@ -99,30 +124,14 @@ class DataManager {
     func checkAndLoad(username: String, time: Double) -> Int {
         let records = DataManager.shared.getRecord(username: username)
         if records.count == 0 { return 0 }
-        let formatter = DateFormatter()
-        formatter.dateFormat = "YYYY-MM-dd"
         for i in 0..<records.count-1 {
             if records[i].time + abs(records[i].duration) > records[i+1].time {
-                print("CONFLICT") // TODO: add warning to user
+                print("CONFLICT")
                 return 1
             }
             
             let date = Date(timeIntervalSince1970: Double(records[i].time))
-            let key = formatter.string(from: date)
-            //if CalendarData.cache[key] != nil {
-            //    CalendarData.cache[key]!.append(records[i].asset)
-            //} else {
-            //    CalendarData.cache[key] = [records[i].asset]
-            //}
-            if CalendarData.cache.keys.contains(username) {
-                if CalendarData.cache[username]!.keys.contains(key) {
-                    CalendarData.cache[username]![key]!.append(records[i].asset)
-                } else {
-                    CalendarData.cache[username]![key] = [records[i].asset]
-                }
-            } else {
-                CalendarData.cache[username] = [key:[records[i].asset]]
-            }
+            addCache(username: username, date: date, asset: records[i].asset)
         }
         if let last = records.last {
             if Double(last.time + abs(last.duration)) > Date().timeIntervalSince1970 {
@@ -135,34 +144,30 @@ class DataManager {
             }
             
             let date = Date(timeIntervalSince1970: Double(last.time))
-            let key = formatter.string(from: date)
-            //if CalendarData.cache[key] != nil {
-            //    CalendarData.cache[key]!.append(last.asset)
-            //} else {
-            //    CalendarData.cache[key] = [last.asset]
-            //}
-            if CalendarData.cache.keys.contains(username) {
-                if CalendarData.cache[username]!.keys.contains(key) {
-                    CalendarData.cache[username]![key]!.append(last.asset)
-                } else {
-                    CalendarData.cache[username]![key] = [last.asset]
-                }
-            } else {
-                CalendarData.cache[username] = [key:[last.asset]]
-            }
+            addCache(username: username, date: date, asset: last.asset)
         }
         return 0
     }
     
-    func addRecord(username: String, time: Int, duration: Int, assset: String) {
+    func addRecord(username: String, time: Int, duration: Int, asset: String) {
         do {
-            try db.run("INSERT INTO records (username, time, duration, asset) VALUES (?, ?, ?, ?)", username, time, duration, assset)
+            try db.run("INSERT INTO records (username, time, duration, asset) VALUES (?, ?, ?, ?)", username, time, duration, asset)
         } catch {
             print(error)
         }
-        let json = ["username": username, "records": ["start_time": time, "duration": duration, "asset": assset]] as [String : Any]
+        let date = Date(timeIntervalSince1970: Double(time))
+        addCache(username: username, date: date, asset: asset)
         if username == "guest" { return }
-        postJSON(url: dbURL, json: json, success: {_, _ in }, failure: {error in print(error)})
+        let json = ["username": username, "records": [["start_time": time, "duration": duration, "asset": asset]]] as [String : Any]
+        postJSON(url: dbURL, json: json, success: { data, response in
+            if response.statusCode == 200 {
+                UserDefaults.standard.set(time+duration, forKey: "last_synced")
+            } else {
+                self.insertErrorMessage(isNetwork: true, message: "Failed to insert (\(username), \(time), \(duration))\nstatusCode: \(response.statusCode)")
+            }
+        }, failure: { e in
+            self.insertErrorMessage(isNetwork: false, message: e.localizedDescription)
+        })
     }
     
     func getRecord(username: String) -> [Record]{
@@ -208,8 +213,13 @@ class DataManager {
     }
     
     func sync() {
-        let username = "lingling"
-        let batch = getRecord(username: username, start: 0, end: 2147483646)
+        guard let username = UserDefaults.standard.string(forKey: "username") else { return }
+        if username == "guest" { return }
+        let last = UserDefaults.standard.integer(forKey: "last_synced")
+        let batch = getRecord(username: username, start: last+1, end: 2147483646)
+        if batch.count == 0 {
+            return
+        }
         var json: [String:Any] = ["username": username, "records": batch.map({ $0.toDict(withUsername: false) })]
         postJSON(url: dbURL, json: json, success: {_,_ in }, failure: {_ in})
     }

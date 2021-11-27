@@ -91,7 +91,10 @@ class LeaderBoardTableViewController : UITableViewController {
         }
         guard let u = url?.url  else { return }
         getJSON(url: u, success: { json in
-            guard let ranks = json as? [[Any]] else { print("failed to get ranks"); return }
+            guard let ranks = json as? [[Any]] else {
+                DataManager.shared.insertErrorMessage(isNetwork: true, message: "LeaderBoard JSON could not be parsed into [[Any]]")
+                return
+            }
             LeaderBoardTableViewController.cacheTime[self.interval] = Date().timeIntervalSince1970
             var tmp = 0
             for rank in ranks {
@@ -115,7 +118,9 @@ class LeaderBoardTableViewController : UITableViewController {
                     closure()
                 }
             }
-        }, failure: {err in print("gg")})
+        }, failure: { err in
+            DataManager.shared.insertErrorMessage(isNetwork: false, message: err.localizedDescription)
+        })
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {

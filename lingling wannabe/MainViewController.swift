@@ -11,9 +11,10 @@ import PocketSVG
 
 class MainViewController: UIViewController {
     
-    let practiceQueue = DispatchQueue(label: "practicing")
+    let serialQueue = DispatchQueue(label: "MainView", qos: .userInteractive)
     var nav: LeaderBoardNavigation!
     var username = UserDefaults.standard.string(forKey: "username") ?? "guest"
+    var dataStatus = 0
     
     override func loadView() {
         let mainView = MainView(frame: UIScreen.main.bounds, user: username, controller: self)
@@ -26,20 +27,46 @@ class MainViewController: UIViewController {
     }
     
     override func viewDidLoad() {
-        if DataManager.shared.checkAndLoad(username: username, time: Date().timeIntervalSince1970) != 0 {
-            // TODO: show user warning
-            return
-        }
-        //DataManager.shared.test()
-        //print(DataManager.shared.getRecord(username: "lingling"))
-        //print(CalendarData.cache)
-        //DataManager.shared.sync()
         // TODO: Add intro animation and dismiss it after a delay
+        serialQueue.async {
+            self.dataStatus = DataManager.shared.checkAndLoad(username: self.username, time: Date().timeIntervalSince1970)
+            if self.dataStatus == 0 {
+                DataManager.shared.sync()
+            }
+        }
         
+        //let tmp = loadPoints(filename: "whole")
+        //
+        //for m in tmp {
+        //    let f = FourierSeries(real: m["x"]!, imag: m["y"]!, position: CGPoint(x: 0, y: 50))
+        //    f.addTrace()
+        //    view.layer.addSublayer(f.layer)
+        //}
+        //let anim = createAnimation(name: "whole")
+        //anim.position = CGPoint(x: view.center.x - 150, y: view.center.y-150)
+        //view.layer.addSublayer(anim)
+
+    }
+    
+    func checkData() {
+        serialQueue.async {
+            DispatchQueue.main.async {
+                if self.dataStatus == 1 {
+                    let alert = UIAlertController(title: "Warning", message: "There is a data corruption!", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+                    self.present(alert, animated: true)
+                } else if self.dataStatus == 2 {
+                    // it is possible the system time is not right
+                    // TODO: check time with server then notify the user if there is a data corruption or time is off
+                    let alert = UIAlertController(title: "Warning", message: "Data corruption or inaccurate time!", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+                    self.present(alert, animated: true)
+                }
+            }
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        print("hi")
         if let user = UserDefaults.standard.string(forKey: "username") {
             username = user
             if let mainView = view as? MainView {
@@ -49,27 +76,10 @@ class MainViewController: UIViewController {
             let signup = LoginViewController(CGSize(width: view.frame.width, height: view.frame.height), isFullScreen: true)
             present(signup, animated: false)
         }
+        
+        checkData()
     }
 
-    func loadTestView() {
-        let start = UIButton(type: .system)
-        start.setTitle("start", for: .normal)
-        start.addTarget(AudioStreamAnalyzer.shared, action: #selector(AudioStreamAnalyzer.analyze), for: .touchUpInside)
-        start.frame = CGRect(x:view.center.x, y:view.center.y-50, width:100, height: 50)
-        let stop = UIButton(type: .system)
-        stop.setTitle("stop", for: .normal)
-        stop.addTarget(AudioStreamAnalyzer.shared, action: #selector(AudioStreamAnalyzer.stop), for: .touchUpInside)
-        stop.frame = CGRect(x:view.center.x, y: view.center.y+50, width: 100, height: 50)
-        let test = UIButton(type: .system)
-        test.setTitle("print", for: .normal)
-        test.addTarget(ResultDelegate.shared, action: #selector(ResultDelegate.print_), for: .touchUpInside)
-        test.frame = CGRect(x: view.center.x, y: view.center.y, width: 100, height: 50)
-        test.center = view.center
-        view.addSubview(start)
-        view.addSubview(stop)
-        view.addSubview(test)
-    }
-    
     private func openSetting(alert: UIAlertAction) {
         if let url = URL.init(string: UIApplication.openSettingsURLString) {
                 UIApplication.shared.open(url, options: [:], completionHandler: nil)
@@ -112,7 +122,7 @@ class MainViewController: UIViewController {
             span = -duration
             asset = assetName + "_rest"
         }
-        DataManager.shared.addRecord(username: username, time: start, duration: span, assset: asset)
+        DataManager.shared.addRecord(username: username, time: start, duration: span, asset: asset)
     }
     
     @objc func startAnalyze() {
@@ -149,8 +159,14 @@ class MainViewController: UIViewController {
         // 42 * 7 + 6 = 300, so the cell can all fit into a week with 1 being the margin between
         let itemWidth = (42 * view.frame.width / 360).rounded()
         let width = itemWidth*7+6
+        print(username)
         let userinfoView = UserInfoViewController(CGSize(width: width, height: width*4/3), username: username)
         present(userinfoView, animated: true, completion: nil)
+        serialQueue.async {
+            DispatchQueue.main.async {
+                userinfoView.loadData()
+            }
+        }
         //let nav = LeaderBoardNavigation(size: CGSize(width: width, height: width*4/2.5))
         //nav.isToolbarHidden = true
         //present(nav, animated: true, completion: nil)

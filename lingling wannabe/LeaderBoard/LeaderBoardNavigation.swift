@@ -18,7 +18,7 @@ class LeaderBoardNavigation : UINavigationController {
     
     let size : CGSize
     let floatViewDelegate : FloatView
-    let items = ["day", "week", "month", "year"]
+    let items = ["day", "week", "month"]
     let control : UISegmentedControl
     let lb: LeaderBoardViewController
     
@@ -65,6 +65,7 @@ class LeaderBoardNavigation : UINavigationController {
         let tmp = CGSize(width: size.width, height: size.height - navigationBar.frame.height)
         let userInfo = UserInfoViewController(tmp, username: username, isPresentedByMainView: false)
         userInfo.additionalSafeAreaInsets.top += navigationBar.frame.height
+        userInfo.loadData()
         pushViewController(userInfo, animated: true)
     }
 }
