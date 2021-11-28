@@ -71,8 +71,8 @@ class LeaderBoardTableViewController : UITableViewController {
         let now = Date().timeIntervalSince1970
         if now > LeaderBoardTableViewController.cacheTime[interval]! + 900 {
             // cache is valid for 15 minutes
-            loadDataHelper() {
-                self.tableView.scrollToRow(at: IndexPath(row: self.anchor, section: 0), at: .middle, animated: false)
+            loadDataHelper(lo: 0, hi: 100) {
+                //self.tableView.scrollToRow(at: IndexPath(row: self.anchor, section: 0), at: .middle, animated: false)
             }
         }
     }
@@ -103,15 +103,16 @@ class LeaderBoardTableViewController : UITableViewController {
                    let hours = rank[2] as? Double {
                     LeaderBoardTableViewController.cache[self.interval]![r] = Player(username: user, hours: hours)
                     
-                    if user == self.username {
-                        self.rank = r
-                        self.anchor = tmp
-                    }
+                    //if user == self.username {
+                    //    self.rank = r
+                    //    self.anchor = tmp
+                    //}
                     tmp += 1
                 }
             }
             DispatchQueue.main.async {
-                self.addData(tmp, atTop: atTop)
+                //self.addData(tmp, atTop: atTop)
+                self.insert(tmp)
                 self.loading.stopAnimating()
                 LeaderBoardTableViewController.isLoading[self.interval] = false
                 if let closure = didLoad {
@@ -152,23 +153,23 @@ class LeaderBoardTableViewController : UITableViewController {
         }
     }
     
-    override func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        guard let visible = tableView.indexPathsForVisibleRows else { return }
-        for idx in visible {
-            if idx.row == count - 1 {
-                let start = rank + count - anchor
-                loadDataHelper(atTop: false, lo: start, hi: start + 128)
-                break
-            }
-            if idx.row == 0 {
-                let start = rank - anchor - 1
-                if start > 0 {
-                    loadDataHelper(atTop: true, lo: max(0, start-128), hi: start)
-                }
-                break
-            }
-        }
-    }
+    //override func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+    //    guard let visible = tableView.indexPathsForVisibleRows else { return }
+    //    for idx in visible {
+    //        if idx.row == count - 1 {
+    //            let start = rank + count - anchor
+    //            loadDataHelper(atTop: false, lo: start, hi: start + 128)
+    //            break
+    //        }
+    //        if idx.row == 0 {
+    //            let start = rank - anchor - 1
+    //            if start > 0 {
+    //                loadDataHelper(atTop: true, lo: max(0, start-128), hi: start)
+    //            }
+    //            break
+    //        }
+    //    }
+    //}
     
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         // + 44 to offset inital contentOffset
@@ -178,6 +179,15 @@ class LeaderBoardTableViewController : UITableViewController {
             loading.center.y = scrollView.contentOffset.y + tmp.size.height/2
         }
         
+    }
+    
+    private func insert(_ batchSize: Int) {
+        var idxs = [IndexPath]()
+        for _ in count..<count+batchSize {
+            idxs.append(IndexPath(row: count, section: 0))
+            count += 1
+        }
+        tableView.insertRows(at: idxs, with: .automatic)
     }
     
     private func addData(_ batchSize: Int, atTop: Bool) {

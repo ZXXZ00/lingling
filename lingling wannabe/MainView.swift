@@ -44,10 +44,10 @@ class MainView: UIView, MSCircularSliderDelegate {
         buttonScale = min(frame.width/350, 1.5)
         start = UIButton(frame: CGRect(x: 0, y: 0, width: 103.5*buttonScale, height: 64*buttonScale))
         username = UIButton(frame: CGRect(x: 0, y: 0, width: frame.width/2, height: 20*buttonScale))
-        leaderboard = UIButton(frame: CGRect(x: frame.width - 100, y: 0, width: 100, height: 20*buttonScale))
+        leaderboard = UIButton(frame: CGRect(x: frame.width - 60*buttonScale, y: -16*buttonScale, width: 60*buttonScale, height: 60*buttonScale))
         rect = CAShapeLayer()
         rect.path = UIBezierPath(rect: frame).cgPath
-        rect.fillColor = UIColor(white: 0.4, alpha: 1).cgColor
+        rect.fillColor = UIColor(white: 1, alpha: 1).cgColor
         question = pdf(filename: "question", scale: noteScale*2)
         super.init(frame: frame)
         setUp()
@@ -95,8 +95,8 @@ class MainView: UIView, MSCircularSliderDelegate {
         username.addTarget(controller, action: #selector(MainViewController.showUserInfo), for: .touchUpInside)
         addSubview(username)
         
-        leaderboard.setTitle("leaderboard", for: .normal)
-        leaderboard.setTitleColor(.black, for: .normal)
+        leaderboard.contentMode = .scaleAspectFit
+        leaderboard.setImage(UIImage(named: "leaderboard.pdf"), for: .normal)
         leaderboard.addTarget(controller, action: #selector(MainViewController.showLeaderBoard), for: .touchUpInside)
         addSubview(leaderboard)
         
@@ -144,10 +144,10 @@ class MainView: UIView, MSCircularSliderDelegate {
         let duration: Double = 10
         if ResultDelegate.shared.musicPercentage(cutoff: ResultDelegate.cutoff) > ResultDelegate.percentage {
             reward = pdf(filename: currSymbol, scale: noteScale*2)
-            rewardPath = createAnimation(name: currSymbol, duration: duration)
+            rewardPath = drawAnimate(name: currSymbol, duration: duration)
         } else {
             reward = pdf(filename: currSymbol+"_rest", scale: noteScale*2)
-            rewardPath = createAnimation(name: currSymbol+"_rest", duration: duration)
+            rewardPath = drawAnimate(name: currSymbol+"_rest", duration: duration)
         }
         rewardPath.transform = CATransform3DMakeScale(noteScale*2, noteScale*2, 1)
         rewardPath.bounds = CGRect(x: 0, y: 0, width: 300, height: 300)
@@ -167,11 +167,25 @@ class MainView: UIView, MSCircularSliderDelegate {
     func dismissResult() {
         touchCount = 0
         rect.removeFromSuperlayer()
-        reward.removeFromSuperview()
         rewardPath.removeFromSuperlayer()
         start.alpha = 1
         isShowingResult = false
         text.removeFromSuperview()
+        let path = UIBezierPath()
+        path.move(to: self.center)
+        path.addLine(to: CGPoint(x: 40, y: 40)) // 40 magic
+        let animation = CAKeyframeAnimation(keyPath: #keyPath(CALayer.position))
+        animation.duration = 1
+        animation.repeatCount = 1
+        animation.path = path.cgPath
+        animation.isRemovedOnCompletion = false
+        animation.fillMode = .forwards
+        reward.layer.add(animation, forKey: nil)
+        UIView.animate(withDuration: 1, delay: 0, animations: {
+            self.reward.transform = CGAffineTransform(scaleX: 0.05, y: 0.05)
+        }, completion: { finished in
+            self.reward.removeFromSuperview()
+        })
     }
     
     @objc func touchHandler() {
@@ -182,12 +196,12 @@ class MainView: UIView, MSCircularSliderDelegate {
                 reveal()
             } else if touchCount == 2 {
                 rewardPath.removeAllAnimations()
-                if let sublayers = rewardPath.sublayers {
-                    for sublayer in sublayers {
-                        sublayer.removeAllAnimations()
-                        (sublayer as! CAShapeLayer).strokeEnd = 1
-                    }
-                }
+                rewardPath.removeFromSuperlayer()
+                //if let sublayers = rewardPath.sublayers {
+                //    for sublayer in sublayers {
+                //        sublayer.removeAllAnimations()
+                //    }
+                //}
                 reward.layer.removeAllAnimations()
                 reward.alpha = 1
             } else {

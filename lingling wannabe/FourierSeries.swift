@@ -30,7 +30,7 @@ public class FourierSeries: NSObject, CAAnimationDelegate {
     
     let pathLayer = CAShapeLayer()
     
-    var cutoff: CGFloat = 1
+    var cutoff: CGFloat = 0.1
     
     var repeatCount: Float
     
@@ -172,7 +172,7 @@ public class FourierSeries: NSObject, CAAnimationDelegate {
         }
     }
     
-    func addTrace() {
+    func addTrace(drawn: Bool, tracked: Bool) {
         let path = UIBezierPath()
         path.move(to: CGPoint(x: CGFloat(real[0]), y: CGFloat(-imag[0])))
         for i in 1..<real.count {
@@ -182,12 +182,27 @@ public class FourierSeries: NSObject, CAAnimationDelegate {
         pathLayer.path = path.cgPath
         pathLayer.strokeColor = UIColor.black.cgColor
         pathLayer.fillColor = .none
-        let animation = CABasicAnimation(keyPath: "strokeEnd")
-        animation.fromValue = 0
-        animation.toValue = 1
-        animation.duration = duration
-        animation.repeatCount = repeatCount
-        pathLayer.add(animation, forKey: nil)
+        if drawn {
+            let animation = CABasicAnimation(keyPath: "strokeEnd")
+            animation.fromValue = 0
+            animation.toValue = 1
+            animation.duration = duration
+            animation.repeatCount = repeatCount
+            pathLayer.add(animation, forKey: nil)
+        }
+        if tracked {
+            let animation = CAKeyframeAnimation(keyPath: #keyPath(CALayer.position))
+            animation.duration = duration
+            animation.repeatCount = repeatCount
+            animation.path = path.cgPath
+            
+            let dot = CAShapeLayer()
+            dot.path = UIBezierPath(arcCenter: .zero, radius: 2, startAngle: 0, endAngle: .pi*2, clockwise: true).cgPath
+            dot.fillColor = UIColor(red: 240/255, green: 160/255, blue: 40/255, alpha: 0.69).cgColor
+            dot.add(animation, forKey: nil)
+            dot.zPosition = 40 // magic number in spirit of lingling 40
+            layer.addSublayer(dot)
+        }
         layer.addSublayer(pathLayer)
     }
     

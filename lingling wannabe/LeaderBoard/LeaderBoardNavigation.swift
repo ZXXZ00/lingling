@@ -29,12 +29,6 @@ class LeaderBoardNavigation : UINavigationController {
         control = UISegmentedControl(items: items)
         lb.control = control
         super.init(rootViewController: lb)
-        //let root = UserInfoViewController()
-        //super.init(rootViewController: root)
-        // change of size and additionalSafeAreaInsets is based on the assumption
-        // that loadView will be called after the this initilization finishs
-        //root.size = CGSize(width: size.width, height: size.height - navigationBar.frame.height)
-        //root.additionalSafeAreaInsets.top = navigationBar.frame.height
         lb.delegate = self
 
         

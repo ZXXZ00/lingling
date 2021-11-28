@@ -179,14 +179,28 @@ func loadPoints(filename: String) -> [[String:[Float]]] {
     return []
 }
 
-func createAnimation(name: String, position: CGPoint = .zero, duration: Double = 10) -> CALayer {
+// create fourier drawing animation, the path will be drawn out
+func drawAnimate(name: String, position: CGPoint = .zero, duration: Double = 10) -> CALayer {
     let paths = loadPoints(filename: name)
     let ret = CALayer()
     for path in paths {
         let f = FourierSeries(real: path["x"]!, imag: path["y"]!, position: position, duration: duration, repeatCount: 1)
-        f.addTrace()
+        f.addTrace(drawn: true, tracked: false)
         ret.addSublayer(f.layer)
         
     }
+    return ret
+}
+
+// create fourier drawing animation with highligh on path
+func highlightAnimate(name: String, position: CGPoint = .zero, duration: Double = 10) -> CALayer {
+    let paths = loadPoints(filename: name)
+    let ret = CALayer()
+    for path in paths {
+        let f = FourierSeries(real: path["x"]!, imag: path["y"]!, position: position, duration: duration, repeatCount: .infinity)
+        f.addTrace(drawn: false, tracked: true)
+        ret.addSublayer(f.layer)
+    }
+    
     return ret
 }

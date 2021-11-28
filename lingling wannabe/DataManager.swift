@@ -149,16 +149,16 @@ class DataManager {
         return 0
     }
     
-    func addRecord(username: String, time: Int, duration: Int, asset: String) {
+    func addRecord(username: String, time: Int, duration: Int, asset: String, attributes: String) {
         do {
-            try db.run("INSERT INTO records (username, time, duration, asset) VALUES (?, ?, ?, ?)", username, time, duration, asset)
+            try db.run("INSERT INTO records (username, time, duration, asset, attributes) VALUES (?, ?, ?, ?, ?)", username, time, duration, asset, attributes)
         } catch {
             print(error)
         }
         let date = Date(timeIntervalSince1970: Double(time))
         addCache(username: username, date: date, asset: asset)
         if username == "guest" { return }
-        let json = ["username": username, "records": [["start_time": time, "duration": duration, "asset": asset]]] as [String : Any]
+        let json = ["username": username, "records": [["start_time": time, "duration": duration, "asset": asset, "attributes": attributes]]] as [String : Any]
         postJSON(url: dbURL, json: json, success: { data, response in
             if response.statusCode == 200 {
                 UserDefaults.standard.set(time+duration, forKey: "last_synced")

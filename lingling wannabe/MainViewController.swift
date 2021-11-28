@@ -27,25 +27,40 @@ class MainViewController: UIViewController {
     }
     
     override func viewDidLoad() {
-        // TODO: Add intro animation and dismiss it after a delay
+        let intro = CALayer()
+        intro.backgroundColor = UIColor.white.cgColor
+        intro.frame = view.frame
+        let content = highlightAnimate(name: "treble", duration: 19)
+        content.bounds = CGRect(x: 0, y: 0, width: 300, height: 300)
+        content.position = view.center
+        let scale = min(intro.frame.width, intro.frame.height) / 300
+        content.transform = CATransform3DMakeScale(scale, scale, 1)
+        intro.addSublayer(content)
+        view.layer.addSublayer(intro)
         serialQueue.async {
+            let start = Date().timeIntervalSince1970
             self.dataStatus = DataManager.shared.checkAndLoad(username: self.username, time: Date().timeIntervalSince1970)
             if self.dataStatus == 0 {
                 DataManager.shared.sync()
             }
+            let diff = Date().timeIntervalSince1970 - start
+            if diff < 3 {
+                sleep(UInt32(3-diff))
+                let fadeAway = CABasicAnimation(keyPath: "opacity")
+                fadeAway.fromValue = 1
+                fadeAway.toValue = 0
+                fadeAway.duration = 1
+                fadeAway.repeatCount = 1
+                // set isRemovedOnCompletion to false and fill mode to forwards to keep opacity as 0 rather than resetting
+                fadeAway.isRemovedOnCompletion = false
+                fadeAway.fillMode = .forwards
+                fadeAway.delegate = LayerRemover(layer: intro)
+                DispatchQueue.main.async {
+                    intro.add(fadeAway, forKey: nil)
+                    //intro.removeFromSuperlayer()
+                }
+            }
         }
-        
-        //let tmp = loadPoints(filename: "whole")
-        //
-        //for m in tmp {
-        //    let f = FourierSeries(real: m["x"]!, imag: m["y"]!, position: CGPoint(x: 0, y: 50))
-        //    f.addTrace()
-        //    view.layer.addSublayer(f.layer)
-        //}
-        //let anim = createAnimation(name: "whole")
-        //anim.position = CGPoint(x: view.center.x - 150, y: view.center.y-150)
-        //view.layer.addSublayer(anim)
-
     }
     
     func checkData() {
@@ -118,11 +133,12 @@ class MainViewController: UIViewController {
         //guard let username = UserDefaults.standard.string(forKey: "username") else { return }
         var span = duration
         var asset = assetName
-        if ResultDelegate.shared.musicPercentage(cutoff: ResultDelegate.cutoff) < ResultDelegate.percentage {
+        let percentage = ResultDelegate.shared.musicPercentage(cutoff: ResultDelegate.cutoff)
+        if  percentage < ResultDelegate.percentage {
             span = -duration
             asset = assetName + "_rest"
         }
-        DataManager.shared.addRecord(username: username, time: start, duration: span, asset: asset)
+        DataManager.shared.addRecord(username: username, time: start, duration: span, asset: asset, attributes: "{music: \(percentage)}")
     }
     
     @objc func startAnalyze() {
