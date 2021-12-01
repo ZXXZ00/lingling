@@ -27,7 +27,7 @@ struct Record {
         self.attributes = attributes
     }
     
-    func toDict(withUsername: Bool = true) -> [String:Any] {
+    func toDict(withUsername: Bool) -> [String:Any] {
         var ret: [String:Any]
         if withUsername {
             ret = ["username": username, "start_time": time, "duration": duration, "asset": asset]
@@ -36,7 +36,8 @@ struct Record {
         }
         if let attr = attributes {
             do {
-                try ret.merge(JSONSerialization.jsonObject(with: attr.data(using: .utf8)!) as! [String:Any]) {
+                let jsonObject = try JSONSerialization.jsonObject(with: attr.data(using: .utf8)!) as! [String:Any]
+                ret.merge(jsonObject) {
                     (current, _) in current
                 }
             } catch {
@@ -158,7 +159,8 @@ class DataManager {
         let date = Date(timeIntervalSince1970: Double(time))
         addCache(username: username, date: date, asset: asset)
         if username == "guest" { return }
-        let json = ["username": username, "records": [["start_time": time, "duration": duration, "asset": asset, "attributes": attributes]]] as [String : Any]
+        let r = Record(username: username, time: Int64(time), duration: Int64(duration), asset: asset, attributes: attributes)
+        let json = ["username": username, "records": [r.toDict(withUsername: false)]] as [String : Any]
         postJSON(url: dbURL, json: json, success: { data, response in
             if response.statusCode == 200 {
                 UserDefaults.standard.set(time+duration, forKey: "last_synced")

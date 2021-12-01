@@ -27,37 +27,31 @@ class MainViewController: UIViewController {
     }
     
     override func viewDidLoad() {
-        let intro = CALayer()
-        intro.backgroundColor = UIColor.white.cgColor
+        let intro = UIView()
+        intro.backgroundColor = UIColor.white
         intro.frame = view.frame
         let content = highlightAnimate(name: "treble", duration: 19)
         content.bounds = CGRect(x: 0, y: 0, width: 300, height: 300)
         content.position = view.center
         let scale = min(intro.frame.width, intro.frame.height) / 300
         content.transform = CATransform3DMakeScale(scale, scale, 1)
-        intro.addSublayer(content)
-        view.layer.addSublayer(intro)
+        intro.layer.addSublayer(content)
+        view.addSubview(intro)
         serialQueue.async {
             let start = Date().timeIntervalSince1970
             self.dataStatus = DataManager.shared.checkAndLoad(username: self.username, time: Date().timeIntervalSince1970)
             if self.dataStatus == 0 {
                 DataManager.shared.sync()
             }
-            let diff = Date().timeIntervalSince1970 - start
-            if diff < 3 {
-                sleep(UInt32(3-diff))
-                let fadeAway = CABasicAnimation(keyPath: "opacity")
-                fadeAway.fromValue = 1
-                fadeAway.toValue = 0
-                fadeAway.duration = 1
-                fadeAway.repeatCount = 1
-                // set isRemovedOnCompletion to false and fill mode to forwards to keep opacity as 0 rather than resetting
-                fadeAway.isRemovedOnCompletion = false
-                fadeAway.fillMode = .forwards
-                fadeAway.delegate = LayerRemover(layer: intro)
+            let introTime = 2.0
+            let loadingTime = Date().timeIntervalSince1970 - start
+            if loadingTime < introTime {
                 DispatchQueue.main.async {
-                    intro.add(fadeAway, forKey: nil)
-                    //intro.removeFromSuperlayer()
+                    UIView.animate(withDuration: 1, delay: introTime-loadingTime, animations: {
+                        intro.alpha = 0
+                    }, completion: {finished in
+                        intro.removeFromSuperview()
+                    })
                 }
             }
         }
@@ -138,7 +132,7 @@ class MainViewController: UIViewController {
             span = -duration
             asset = assetName + "_rest"
         }
-        DataManager.shared.addRecord(username: username, time: start, duration: span, asset: asset, attributes: "{music: \(percentage)}")
+        DataManager.shared.addRecord(username: username, time: start, duration: span, asset: asset, attributes: "{\"music\": \(percentage)}")
     }
     
     @objc func startAnalyze() {

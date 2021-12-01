@@ -198,7 +198,7 @@ func highlightAnimate(name: String, position: CGPoint = .zero, duration: Double 
     let ret = CALayer()
     for path in paths {
         let f = FourierSeries(real: path["x"]!, imag: path["y"]!, position: position, duration: duration, repeatCount: .infinity)
-        f.addTrace(drawn: false, tracked: true)
+        f.addTrace(drawn: false, tracked: false)
         ret.addSublayer(f.layer)
     }
     

@@ -178,6 +178,7 @@ class MainView: UIView, MSCircularSliderDelegate {
         animation.duration = 1
         animation.repeatCount = 1
         animation.path = path.cgPath
+        // set isRemovedOnCompletion to false and fill mode to forwards to keep opacity as 0 rather than resetting
         animation.isRemovedOnCompletion = false
         animation.fillMode = .forwards
         reward.layer.add(animation, forKey: nil)
