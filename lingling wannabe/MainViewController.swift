@@ -136,6 +136,7 @@ class MainViewController: UIViewController {
     }
     
     @objc func startAnalyze() {
+        ResultDelegate.shared.reset()
         if !checkMicrophone() {
             print("nan")
             return

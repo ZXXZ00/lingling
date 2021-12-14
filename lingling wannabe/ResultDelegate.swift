@@ -11,8 +11,8 @@ import SQLite
 
 class ResultDelegate {
     static let shared = ResultDelegate()
-    static var cutoff = 0.8
-    static var percentage = 0.6
+    static var cutoff = 0.5
+    static var percentage = 0.5
     
     private var tmp: [(start: Double, end: Double, music: Double, background: Double)] = []
     
@@ -76,6 +76,10 @@ class ResultDelegate {
             ret[2].append(startend[i]/startendTotal)
         }
         return ret
+    }
+    
+    func reset() {
+        tmp.removeAll()
     }
     
     @objc func print_() {

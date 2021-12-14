@@ -3,22 +3,66 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1B21DB6B7B42098E49B07648 /* Pods_lingling_wannabe.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A01D71EAA010F97058EA8B8 /* Pods_lingling_wannabe.framework */; };
+		660C84F3274EDC09005370E0 /* quaver_rest.json in Resources */ = {isa = PBXBuildFile; fileRef = 660C84E9274EDC08005370E0 /* quaver_rest.json */; };
+		660C84F4274EDC09005370E0 /* semiquaver_rest.json in Resources */ = {isa = PBXBuildFile; fileRef = 660C84EA274EDC08005370E0 /* semiquaver_rest.json */; };
+		660C84F5274EDC09005370E0 /* half_rest.json in Resources */ = {isa = PBXBuildFile; fileRef = 660C84EB274EDC08005370E0 /* half_rest.json */; };
+		660C84F6274EDC09005370E0 /* crotchet.json in Resources */ = {isa = PBXBuildFile; fileRef = 660C84EC274EDC08005370E0 /* crotchet.json */; };
+		660C84F7274EDC09005370E0 /* whole_rest.json in Resources */ = {isa = PBXBuildFile; fileRef = 660C84ED274EDC08005370E0 /* whole_rest.json */; };
+		660C84F8274EDC09005370E0 /* whole.json in Resources */ = {isa = PBXBuildFile; fileRef = 660C84EE274EDC08005370E0 /* whole.json */; };
+		660C84F9274EDC09005370E0 /* quaver.json in Resources */ = {isa = PBXBuildFile; fileRef = 660C84EF274EDC09005370E0 /* quaver.json */; };
+		660C84FA274EDC09005370E0 /* crotchet_rest.json in Resources */ = {isa = PBXBuildFile; fileRef = 660C84F0274EDC09005370E0 /* crotchet_rest.json */; };
+		660C84FB274EDC09005370E0 /* half.json in Resources */ = {isa = PBXBuildFile; fileRef = 660C84F1274EDC09005370E0 /* half.json */; };
+		660C84FC274EDC09005370E0 /* semiquaver.json in Resources */ = {isa = PBXBuildFile; fileRef = 660C84F2274EDC09005370E0 /* semiquaver.json */; };
+		660C84FE2752A881005370E0 /* treble.svg in Resources */ = {isa = PBXBuildFile; fileRef = 660C84FD2752A881005370E0 /* treble.svg */; };
+		660C85002752A892005370E0 /* treble.json in Resources */ = {isa = PBXBuildFile; fileRef = 660C84FF2752A892005370E0 /* treble.json */; };
+		6614E767269E2A61007C75A5 /* FourierSeries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6614E766269E2A61007C75A5 /* FourierSeries.swift */; };
+		6620FA4C2652BD65009E9D86 /* FloatViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6620FA4B2652BD65009E9D86 /* FloatViewDelegate.swift */; };
+		662904F826A8932000342E3D /* whole.svg in Resources */ = {isa = PBXBuildFile; fileRef = 662904F326A8932000342E3D /* whole.svg */; };
+		662904F926A8932000342E3D /* crotchet.svg in Resources */ = {isa = PBXBuildFile; fileRef = 662904F426A8932000342E3D /* crotchet.svg */; };
+		662904FA26A8932000342E3D /* half.svg in Resources */ = {isa = PBXBuildFile; fileRef = 662904F526A8932000342E3D /* half.svg */; };
+		662904FB26A8932000342E3D /* semiquaver.svg in Resources */ = {isa = PBXBuildFile; fileRef = 662904F626A8932000342E3D /* semiquaver.svg */; };
+		662904FC26A8932000342E3D /* quaver.svg in Resources */ = {isa = PBXBuildFile; fileRef = 662904F726A8932000342E3D /* quaver.svg */; };
+		663EBA0C2695137900046D63 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663EBA0B2695137900046D63 /* LoginView.swift */; };
 		664C2C442610D0B3002301A0 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664C2C432610D0B3002301A0 /* MainView.swift */; };
+		666C30F526652506003DCAB6 /* LeaderBoardNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 666C30F426652506003DCAB6 /* LeaderBoardNavigation.swift */; };
+		668AAFEF265B099C0083CB5B /* UserInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 668AAFEE265B099C0083CB5B /* UserInfoViewController.swift */; };
+		66A42497264738B900F2ADF0 /* SheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A42496264738B900F2ADF0 /* SheetView.swift */; };
+		66A4B1AE269246FA00FA38CB /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A4B1AD269246FA00FA38CB /* LoginViewController.swift */; };
+		66A4F650266035CF002985BA /* CalendarCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A4F64F266035CF002985BA /* CalendarCell.swift */; };
+		66AC52C326B87332005ED27F /* half_rest.svg in Resources */ = {isa = PBXBuildFile; fileRef = 66AC52C126B87332005ED27F /* half_rest.svg */; };
+		66AC52C626B87885005ED27F /* crotchet_rest.svg in Resources */ = {isa = PBXBuildFile; fileRef = 66AC52C526B87885005ED27F /* crotchet_rest.svg */; };
+		66AC52C826B87A49005ED27F /* whole_rest.svg in Resources */ = {isa = PBXBuildFile; fileRef = 66AC52C726B87A49005ED27F /* whole_rest.svg */; };
+		66AC52CE26B89668005ED27F /* semiquaver_rest.svg in Resources */ = {isa = PBXBuildFile; fileRef = 66AC52CC26B89668005ED27F /* semiquaver_rest.svg */; };
 		66ADE5A825BE2B0A004B20C6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ADE5A725BE2B0A004B20C6 /* AppDelegate.swift */; };
 		66ADE5AA25BE2B0A004B20C6 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ADE5A925BE2B0A004B20C6 /* SceneDelegate.swift */; };
-		66ADE5AC25BE2B0A004B20C6 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ADE5AB25BE2B0A004B20C6 /* ViewController.swift */; };
+		66ADE5AC25BE2B0A004B20C6 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ADE5AB25BE2B0A004B20C6 /* MainViewController.swift */; };
 		66ADE5B125BE2B0B004B20C6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 66ADE5B025BE2B0B004B20C6 /* Assets.xcassets */; };
 		66ADE5B425BE2B0B004B20C6 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 66ADE5B225BE2B0B004B20C6 /* LaunchScreen.storyboard */; };
 		66ADE5BF25BE2B0B004B20C6 /* lingling_wannabeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ADE5BE25BE2B0B004B20C6 /* lingling_wannabeTests.swift */; };
 		66ADE5CA25BE2B0B004B20C6 /* lingling_wannabeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ADE5C925BE2B0B004B20C6 /* lingling_wannabeUITests.swift */; };
+		66B6D68326D3FBA80001F6B5 /* Asset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B6D68226D3FBA80001F6B5 /* Asset.swift */; };
+		66B6D68526D54C1D0001F6B5 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B6D68426D54C1D0001F6B5 /* DataManager.swift */; };
+		66B6D68726D5505A0001F6B5 /* data.db in Resources */ = {isa = PBXBuildFile; fileRef = 66B6D68626D54F740001F6B5 /* data.db */; };
+		66B6D68A26D551730001F6B5 /* quaver_rest.svg in Resources */ = {isa = PBXBuildFile; fileRef = 66B6D68926D551730001F6B5 /* quaver_rest.svg */; };
 		66BBDD5D260A85C4008E54EC /* MSCircularSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66BBDD5C260A85C4008E54EC /* MSCircularSlider.swift */; };
 		66BBDD62260A85CB008E54EC /* MSCircularSliderHandle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66BBDD61260A85CB008E54EC /* MSCircularSliderHandle.swift */; };
 		66BBDD67260A85D8008E54EC /* MSDoubleHandleCircularSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66BBDD66260A85D8008E54EC /* MSDoubleHandleCircularSlider.swift */; };
 		66BBDD6C260A85E0008E54EC /* MSGradientCircularSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66BBDD6B260A85E0008E54EC /* MSGradientCircularSlider.swift */; };
+		66C099FB26693AA9008F892D /* LeaderBoardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C099FA26693AA9008F892D /* LeaderBoardViewController.swift */; };
+		66C957E426514D90008C5B7F /* Metronome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C957E326514D90008C5B7F /* Metronome.swift */; };
+		66C957F4265292C4008C5B7F /* tick.wav in Resources */ = {isa = PBXBuildFile; fileRef = 66C957F3265292C4008C5B7F /* tick.wav */; };
+		66D08643266AC76E0089C833 /* LeaderBoardTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D08642266AC76E0089C833 /* LeaderBoardTableViewController.swift */; };
+		66D0864B266C07540089C833 /* LeaderBoardCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D0864A266C07540089C833 /* LeaderBoardCell.swift */; };
+		66E7604D2752E30C00FD0E0F /* LayerRemover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E7604C2752E30C00FD0E0F /* LayerRemover.swift */; };
+		66E7604F2752EB0300FD0E0F /* AnimationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E7604E2752EB0300FD0E0F /* AnimationManager.swift */; };
+		66EA953C26603AA800B59721 /* CalendarData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66EA953B26603AA800B59721 /* CalendarData.swift */; };
+		66EC2F9A263EFF6400F700E5 /* PracticeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66EC2F99263EFF6400F700E5 /* PracticeViewController.swift */; };
+		66F134CF265D7D1500751D23 /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F134CE265D7D1500751D23 /* Helper.swift */; };
 		66FDECE22607CFA300FB9019 /* AudioStreamAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66FDECE12607CFA300FB9019 /* AudioStreamAnalyzer.swift */; };
 		66FDECE72607CFC500FB9019 /* TwoCategory.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 66FDECE62607CFC500FB9019 /* TwoCategory.mlmodel */; };
 		66FDECEC2607D10900FB9019 /* ResultDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66FDECEB2607D10900FB9019 /* ResultDelegate.swift */; };
@@ -42,11 +86,41 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		03C3EC38864936046E0FB754 /* Pods-lingling wannabe.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-lingling wannabe.release.xcconfig"; path = "Target Support Files/Pods-lingling wannabe/Pods-lingling wannabe.release.xcconfig"; sourceTree = "<group>"; };
+		660C84E9274EDC08005370E0 /* quaver_rest.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = quaver_rest.json; sourceTree = "<group>"; };
+		660C84EA274EDC08005370E0 /* semiquaver_rest.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = semiquaver_rest.json; sourceTree = "<group>"; };
+		660C84EB274EDC08005370E0 /* half_rest.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = half_rest.json; sourceTree = "<group>"; };
+		660C84EC274EDC08005370E0 /* crotchet.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = crotchet.json; sourceTree = "<group>"; };
+		660C84ED274EDC08005370E0 /* whole_rest.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = whole_rest.json; sourceTree = "<group>"; };
+		660C84EE274EDC08005370E0 /* whole.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = whole.json; sourceTree = "<group>"; };
+		660C84EF274EDC09005370E0 /* quaver.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = quaver.json; sourceTree = "<group>"; };
+		660C84F0274EDC09005370E0 /* crotchet_rest.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = crotchet_rest.json; sourceTree = "<group>"; };
+		660C84F1274EDC09005370E0 /* half.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = half.json; sourceTree = "<group>"; };
+		660C84F2274EDC09005370E0 /* semiquaver.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = semiquaver.json; sourceTree = "<group>"; };
+		660C84FD2752A881005370E0 /* treble.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = treble.svg; sourceTree = "<group>"; };
+		660C84FF2752A892005370E0 /* treble.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = treble.json; sourceTree = "<group>"; };
+		6614E766269E2A61007C75A5 /* FourierSeries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FourierSeries.swift; sourceTree = "<group>"; };
+		6620FA4B2652BD65009E9D86 /* FloatViewDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FloatViewDelegate.swift; path = "/Users/adam/Documents/lingling wannabe/lingling wannabe/FloatViewDelegate.swift"; sourceTree = "<absolute>"; };
+		662904F326A8932000342E3D /* whole.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = whole.svg; sourceTree = "<group>"; };
+		662904F426A8932000342E3D /* crotchet.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = crotchet.svg; sourceTree = "<group>"; };
+		662904F526A8932000342E3D /* half.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = half.svg; sourceTree = "<group>"; };
+		662904F626A8932000342E3D /* semiquaver.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = semiquaver.svg; sourceTree = "<group>"; };
+		662904F726A8932000342E3D /* quaver.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = quaver.svg; sourceTree = "<group>"; };
+		663EBA0B2695137900046D63 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		664C2C432610D0B3002301A0 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
+		666C30F426652506003DCAB6 /* LeaderBoardNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeaderBoardNavigation.swift; sourceTree = "<group>"; };
+		668AAFEE265B099C0083CB5B /* UserInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInfoViewController.swift; sourceTree = "<group>"; };
+		66A42496264738B900F2ADF0 /* SheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SheetView.swift; sourceTree = "<group>"; };
+		66A4B1AD269246FA00FA38CB /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
+		66A4F64F266035CF002985BA /* CalendarCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarCell.swift; sourceTree = "<group>"; };
+		66AC52C126B87332005ED27F /* half_rest.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = half_rest.svg; sourceTree = "<group>"; };
+		66AC52C526B87885005ED27F /* crotchet_rest.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = crotchet_rest.svg; sourceTree = "<group>"; };
+		66AC52C726B87A49005ED27F /* whole_rest.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = whole_rest.svg; sourceTree = "<group>"; };
+		66AC52CC26B89668005ED27F /* semiquaver_rest.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = semiquaver_rest.svg; sourceTree = "<group>"; };
 		66ADE5A425BE2B0A004B20C6 /* lingling wannabe.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "lingling wannabe.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		66ADE5A725BE2B0A004B20C6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		66ADE5A925BE2B0A004B20C6 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		66ADE5AB25BE2B0A004B20C6 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		66ADE5AB25BE2B0A004B20C6 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		66ADE5B025BE2B0B004B20C6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		66ADE5B325BE2B0B004B20C6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		66ADE5B525BE2B0B004B20C6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -56,13 +130,29 @@
 		66ADE5C525BE2B0B004B20C6 /* lingling wannabeUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "lingling wannabeUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		66ADE5C925BE2B0B004B20C6 /* lingling_wannabeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = lingling_wannabeUITests.swift; sourceTree = "<group>"; };
 		66ADE5CB25BE2B0B004B20C6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		66B6D68226D3FBA80001F6B5 /* Asset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Asset.swift; sourceTree = "<group>"; };
+		66B6D68426D54C1D0001F6B5 /* DataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManager.swift; sourceTree = "<group>"; };
+		66B6D68626D54F740001F6B5 /* data.db */ = {isa = PBXFileReference; lastKnownFileType = file; path = data.db; sourceTree = SOURCE_ROOT; };
+		66B6D68926D551730001F6B5 /* quaver_rest.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = quaver_rest.svg; sourceTree = "<group>"; };
 		66BBDD5C260A85C4008E54EC /* MSCircularSlider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MSCircularSlider.swift; sourceTree = "<group>"; };
 		66BBDD61260A85CB008E54EC /* MSCircularSliderHandle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MSCircularSliderHandle.swift; sourceTree = "<group>"; };
 		66BBDD66260A85D8008E54EC /* MSDoubleHandleCircularSlider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MSDoubleHandleCircularSlider.swift; sourceTree = "<group>"; };
 		66BBDD6B260A85E0008E54EC /* MSGradientCircularSlider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MSGradientCircularSlider.swift; sourceTree = "<group>"; };
+		66C099FA26693AA9008F892D /* LeaderBoardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeaderBoardViewController.swift; sourceTree = "<group>"; };
+		66C957E326514D90008C5B7F /* Metronome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Metronome.swift; sourceTree = "<group>"; };
+		66C957F3265292C4008C5B7F /* tick.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = tick.wav; path = ../../../Downloads/tick.wav; sourceTree = "<group>"; };
+		66D08642266AC76E0089C833 /* LeaderBoardTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeaderBoardTableViewController.swift; sourceTree = "<group>"; };
+		66D0864A266C07540089C833 /* LeaderBoardCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeaderBoardCell.swift; sourceTree = "<group>"; };
+		66E7604C2752E30C00FD0E0F /* LayerRemover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayerRemover.swift; sourceTree = "<group>"; };
+		66E7604E2752EB0300FD0E0F /* AnimationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationManager.swift; sourceTree = "<group>"; };
+		66EA953B26603AA800B59721 /* CalendarData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarData.swift; sourceTree = "<group>"; };
+		66EC2F99263EFF6400F700E5 /* PracticeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PracticeViewController.swift; sourceTree = "<group>"; };
+		66F134CE265D7D1500751D23 /* Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
 		66FDECE12607CFA300FB9019 /* AudioStreamAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioStreamAnalyzer.swift; sourceTree = "<group>"; };
 		66FDECE62607CFC500FB9019 /* TwoCategory.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = TwoCategory.mlmodel; sourceTree = "<group>"; };
 		66FDECEB2607D10900FB9019 /* ResultDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultDelegate.swift; sourceTree = "<group>"; };
+		8A01D71EAA010F97058EA8B8 /* Pods_lingling_wannabe.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_lingling_wannabe.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		93912A5F9E6E89569159941A /* Pods-lingling wannabe.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-lingling wannabe.debug.xcconfig"; path = "Target Support Files/Pods-lingling wannabe/Pods-lingling wannabe.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,6 +160,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1B21DB6B7B42098E49B07648 /* Pods_lingling_wannabe.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -90,6 +181,51 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		660C84E8274EA2EB005370E0 /* Paths */ = {
+			isa = PBXGroup;
+			children = (
+				660C84F0274EDC09005370E0 /* crotchet_rest.json */,
+				660C84EC274EDC08005370E0 /* crotchet.json */,
+				660C84EB274EDC08005370E0 /* half_rest.json */,
+				660C84F1274EDC09005370E0 /* half.json */,
+				660C84E9274EDC08005370E0 /* quaver_rest.json */,
+				660C84EF274EDC09005370E0 /* quaver.json */,
+				660C84EA274EDC08005370E0 /* semiquaver_rest.json */,
+				660C84F2274EDC09005370E0 /* semiquaver.json */,
+				660C84FF2752A892005370E0 /* treble.json */,
+				660C84ED274EDC08005370E0 /* whole_rest.json */,
+				660C84EE274EDC08005370E0 /* whole.json */,
+			);
+			path = Paths;
+			sourceTree = "<group>";
+		};
+		662904F226A8911400342E3D /* Notations */ = {
+			isa = PBXGroup;
+			children = (
+				662904F426A8932000342E3D /* crotchet.svg */,
+				66AC52C526B87885005ED27F /* crotchet_rest.svg */,
+				662904F526A8932000342E3D /* half.svg */,
+				66AC52C126B87332005ED27F /* half_rest.svg */,
+				662904F726A8932000342E3D /* quaver.svg */,
+				66B6D68926D551730001F6B5 /* quaver_rest.svg */,
+				662904F626A8932000342E3D /* semiquaver.svg */,
+				66AC52CC26B89668005ED27F /* semiquaver_rest.svg */,
+				660C84FD2752A881005370E0 /* treble.svg */,
+				662904F326A8932000342E3D /* whole.svg */,
+				66AC52C726B87A49005ED27F /* whole_rest.svg */,
+			);
+			path = Notations;
+			sourceTree = "<group>";
+		};
+		66A4F65726603712002985BA /* Calendar */ = {
+			isa = PBXGroup;
+			children = (
+				66A4F64F266035CF002985BA /* CalendarCell.swift */,
+				66EA953B26603AA800B59721 /* CalendarData.swift */,
+			);
+			path = Calendar;
+			sourceTree = "<group>";
+		};
 		66ADE59B25BE2B0A004B20C6 = {
 			isa = PBXGroup;
 			children = (
@@ -97,6 +233,8 @@
 				66ADE5BD25BE2B0B004B20C6 /* lingling wannabeTests */,
 				66ADE5C825BE2B0B004B20C6 /* lingling wannabeUITests */,
 				66ADE5A525BE2B0A004B20C6 /* Products */,
+				EB6D398464925913D272D969 /* Pods */,
+				895114EE1D2F5116CF963063 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -116,11 +254,30 @@
 				66ADE5A725BE2B0A004B20C6 /* AppDelegate.swift */,
 				66ADE5A925BE2B0A004B20C6 /* SceneDelegate.swift */,
 				66FDECE12607CFA300FB9019 /* AudioStreamAnalyzer.swift */,
+				66E7604E2752EB0300FD0E0F /* AnimationManager.swift */,
+				66B6D68426D54C1D0001F6B5 /* DataManager.swift */,
 				66FDECEB2607D10900FB9019 /* ResultDelegate.swift */,
-				66ADE5AB25BE2B0A004B20C6 /* ViewController.swift */,
+				6620FA4B2652BD65009E9D86 /* FloatViewDelegate.swift */,
+				66D08641266AC69C0089C833 /* LeaderBoard */,
+				668AAFEE265B099C0083CB5B /* UserInfoViewController.swift */,
+				66A4F65726603712002985BA /* Calendar */,
+				66EC2F99263EFF6400F700E5 /* PracticeViewController.swift */,
+				66C957E326514D90008C5B7F /* Metronome.swift */,
+				66ADE5AB25BE2B0A004B20C6 /* MainViewController.swift */,
 				664C2C432610D0B3002301A0 /* MainView.swift */,
+				66A4B1AD269246FA00FA38CB /* LoginViewController.swift */,
+				663EBA0B2695137900046D63 /* LoginView.swift */,
+				66E7604C2752E30C00FD0E0F /* LayerRemover.swift */,
+				66F134CE265D7D1500751D23 /* Helper.swift */,
+				66A42496264738B900F2ADF0 /* SheetView.swift */,
+				6614E766269E2A61007C75A5 /* FourierSeries.swift */,
+				66C957F3265292C4008C5B7F /* tick.wav */,
 				66FDECE62607CFC500FB9019 /* TwoCategory.mlmodel */,
 				66ADE5B025BE2B0B004B20C6 /* Assets.xcassets */,
+				66B6D68226D3FBA80001F6B5 /* Asset.swift */,
+				66B6D68626D54F740001F6B5 /* data.db */,
+				660C84E8274EA2EB005370E0 /* Paths */,
+				662904F226A8911400342E3D /* Notations */,
 				66ADE5B225BE2B0B004B20C6 /* LaunchScreen.storyboard */,
 				66ADE5B525BE2B0B004B20C6 /* Info.plist */,
 				66BBDD5B260A857C008E54EC /* MSCircularSlider */,
@@ -157,6 +314,34 @@
 			path = MSCircularSlider;
 			sourceTree = "<group>";
 		};
+		66D08641266AC69C0089C833 /* LeaderBoard */ = {
+			isa = PBXGroup;
+			children = (
+				666C30F426652506003DCAB6 /* LeaderBoardNavigation.swift */,
+				66C099FA26693AA9008F892D /* LeaderBoardViewController.swift */,
+				66D08642266AC76E0089C833 /* LeaderBoardTableViewController.swift */,
+				66D0864A266C07540089C833 /* LeaderBoardCell.swift */,
+			);
+			path = LeaderBoard;
+			sourceTree = "<group>";
+		};
+		895114EE1D2F5116CF963063 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				8A01D71EAA010F97058EA8B8 /* Pods_lingling_wannabe.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		EB6D398464925913D272D969 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				93912A5F9E6E89569159941A /* Pods-lingling wannabe.debug.xcconfig */,
+				03C3EC38864936046E0FB754 /* Pods-lingling wannabe.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -164,9 +349,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 66ADE5CE25BE2B0B004B20C6 /* Build configuration list for PBXNativeTarget "lingling wannabe" */;
 			buildPhases = (
+				311F55F729110E73D4642987 /* [CP] Check Pods Manifest.lock */,
 				66ADE5A025BE2B0A004B20C6 /* Sources */,
 				66ADE5A125BE2B0A004B20C6 /* Frameworks */,
 				66ADE5A225BE2B0A004B20C6 /* Resources */,
+				56C4327A31B8CB62BD39391E /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -260,8 +447,32 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				66B6D68726D5505A0001F6B5 /* data.db in Resources */,
+				660C84FE2752A881005370E0 /* treble.svg in Resources */,
 				66ADE5B425BE2B0B004B20C6 /* LaunchScreen.storyboard in Resources */,
+				66C957F4265292C4008C5B7F /* tick.wav in Resources */,
 				66ADE5B125BE2B0B004B20C6 /* Assets.xcassets in Resources */,
+				660C84F7274EDC09005370E0 /* whole_rest.json in Resources */,
+				662904F826A8932000342E3D /* whole.svg in Resources */,
+				66AC52C826B87A49005ED27F /* whole_rest.svg in Resources */,
+				662904FA26A8932000342E3D /* half.svg in Resources */,
+				660C84F3274EDC09005370E0 /* quaver_rest.json in Resources */,
+				660C84F8274EDC09005370E0 /* whole.json in Resources */,
+				660C84F5274EDC09005370E0 /* half_rest.json in Resources */,
+				66AC52C326B87332005ED27F /* half_rest.svg in Resources */,
+				660C84F9274EDC09005370E0 /* quaver.json in Resources */,
+				660C84FA274EDC09005370E0 /* crotchet_rest.json in Resources */,
+				662904F926A8932000342E3D /* crotchet.svg in Resources */,
+				660C84FB274EDC09005370E0 /* half.json in Resources */,
+				660C85002752A892005370E0 /* treble.json in Resources */,
+				66AC52C626B87885005ED27F /* crotchet_rest.svg in Resources */,
+				660C84FC274EDC09005370E0 /* semiquaver.json in Resources */,
+				660C84F4274EDC09005370E0 /* semiquaver_rest.json in Resources */,
+				662904FC26A8932000342E3D /* quaver.svg in Resources */,
+				66B6D68A26D551730001F6B5 /* quaver_rest.svg in Resources */,
+				662904FB26A8932000342E3D /* semiquaver.svg in Resources */,
+				66AC52CE26B89668005ED27F /* semiquaver_rest.svg in Resources */,
+				660C84F6274EDC09005370E0 /* crotchet.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -281,20 +492,81 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		311F55F729110E73D4642987 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-lingling wannabe-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		56C4327A31B8CB62BD39391E /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-lingling wannabe/Pods-lingling wannabe-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-lingling wannabe/Pods-lingling wannabe-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-lingling wannabe/Pods-lingling wannabe-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		66ADE5A025BE2B0A004B20C6 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				66B6D68526D54C1D0001F6B5 /* DataManager.swift in Sources */,
 				66FDECE22607CFA300FB9019 /* AudioStreamAnalyzer.swift in Sources */,
-				66ADE5AC25BE2B0A004B20C6 /* ViewController.swift in Sources */,
+				668AAFEF265B099C0083CB5B /* UserInfoViewController.swift in Sources */,
+				66ADE5AC25BE2B0A004B20C6 /* MainViewController.swift in Sources */,
+				66D08643266AC76E0089C833 /* LeaderBoardTableViewController.swift in Sources */,
 				66BBDD67260A85D8008E54EC /* MSDoubleHandleCircularSlider.swift in Sources */,
 				66ADE5A825BE2B0A004B20C6 /* AppDelegate.swift in Sources */,
 				66BBDD62260A85CB008E54EC /* MSCircularSliderHandle.swift in Sources */,
+				66A42497264738B900F2ADF0 /* SheetView.swift in Sources */,
+				66EC2F9A263EFF6400F700E5 /* PracticeViewController.swift in Sources */,
+				66F134CF265D7D1500751D23 /* Helper.swift in Sources */,
+				663EBA0C2695137900046D63 /* LoginView.swift in Sources */,
+				6620FA4C2652BD65009E9D86 /* FloatViewDelegate.swift in Sources */,
 				66ADE5AA25BE2B0A004B20C6 /* SceneDelegate.swift in Sources */,
+				66A4B1AE269246FA00FA38CB /* LoginViewController.swift in Sources */,
 				66BBDD5D260A85C4008E54EC /* MSCircularSlider.swift in Sources */,
 				664C2C442610D0B3002301A0 /* MainView.swift in Sources */,
+				66E7604D2752E30C00FD0E0F /* LayerRemover.swift in Sources */,
+				66C957E426514D90008C5B7F /* Metronome.swift in Sources */,
+				666C30F526652506003DCAB6 /* LeaderBoardNavigation.swift in Sources */,
+				66E7604F2752EB0300FD0E0F /* AnimationManager.swift in Sources */,
+				66A4F650266035CF002985BA /* CalendarCell.swift in Sources */,
 				66BBDD6C260A85E0008E54EC /* MSGradientCircularSlider.swift in Sources */,
+				66EA953C26603AA800B59721 /* CalendarData.swift in Sources */,
+				66B6D68326D3FBA80001F6B5 /* Asset.swift in Sources */,
+				6614E767269E2A61007C75A5 /* FourierSeries.swift in Sources */,
+				66D0864B266C07540089C833 /* LeaderBoardCell.swift in Sources */,
+				66C099FB26693AA9008F892D /* LeaderBoardViewController.swift in Sources */,
 				66FDECE72607CFC500FB9019 /* TwoCategory.mlmodel in Sources */,
 				66FDECEC2607D10900FB9019 /* ResultDelegate.swift in Sources */,
 			);
@@ -461,10 +733,12 @@
 		};
 		66ADE5CF25BE2B0B004B20C6 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 93912A5F9E6E89569159941A /* Pods-lingling wannabe.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = LDB5QZMQ6L;
 				INFOPLIST_FILE = "lingling wannabe/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -480,10 +754,12 @@
 		};
 		66ADE5D025BE2B0B004B20C6 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 03C3EC38864936046E0FB754 /* Pods-lingling wannabe.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = LDB5QZMQ6L;
 				INFOPLIST_FILE = "lingling wannabe/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (

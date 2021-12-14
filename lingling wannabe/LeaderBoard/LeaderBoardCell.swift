@@ -47,6 +47,6 @@ class LeaderBoardCell : UITableViewCell {
     }
 }
 
-protocol LeaderBoardCellDelegate: AnyObject {
+protocol LeaderBoardCellDelegate {
     func openUserInfoView(username: String)
 }

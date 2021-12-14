@@ -14,7 +14,7 @@ enum Interval : String {
     case year = "year"
 }
 
-class LeaderBoardNavigation : UINavigationController {
+class LeaderBoardNavigation : UINavigationController, LeaderBoardCellDelegate {
     
     let size : CGSize
     let floatViewDelegate : FloatView

@@ -35,6 +35,20 @@ class UserInfoViewController : UIViewController {
             modalPresentationStyle = .custom
             transitioningDelegate = floatViewDelegate
         }
+        initCalendarView()
+    }
+    
+    func initCalendarView() {
+        let layout = UICollectionViewFlowLayout()
+        layout.minimumLineSpacing = 1
+        layout.minimumInteritemSpacing = 1
+        layout.sectionInset = UIEdgeInsets(top: 1, left: 0, bottom: 0, right: 0)
+        let itemWidth = (size.width-6) / 7
+        let itemHeight = (itemWidth * 1.618).rounded() // 1.618 golden ratio
+
+        layout.itemSize = CGSize(width: itemWidth, height: itemHeight)
+        
+        calendarView = UICollectionView(frame: .zero, collectionViewLayout: layout)
     }
     
     override func loadView() {
@@ -43,18 +57,8 @@ class UserInfoViewController : UIViewController {
         UserInfoViewController.scale = size.width / 300
         let headerHeight = 40 * UserInfoViewController.scale
         
-        let layout = UICollectionViewFlowLayout()
-        layout.minimumLineSpacing = 1
-        layout.minimumInteritemSpacing = 1
-        layout.sectionInset = UIEdgeInsets(top: 1, left: 0, bottom: 0, right: 0)
-        let itemWidth = (size.width-6) / 7
-        let itemHeight = (itemWidth * 1.618).rounded() // 1.618 golden ratio
-        //print(itemWidth)
-        //print(itemHeight)
-        layout.itemSize = CGSize(width: itemWidth, height: itemHeight)
-        calendarView = UICollectionView(frame: CGRect(x: 0, y: headerHeight+additionalSafeAreaInsets.top, width: size.width, height: size.height - headerHeight), collectionViewLayout: layout)
+        calendarView.frame = CGRect(x: 0, y: headerHeight+additionalSafeAreaInsets.top, width: size.width, height: size.height - headerHeight)
         calendarView.showsVerticalScrollIndicator = false
-        calendarView.collectionViewLayout = layout
         calendarView.backgroundColor = .gray
         calendarView.register(CalendarCell.self, forCellWithReuseIdentifier: "CalendarCell")
         calendarView.dataSource = nil
