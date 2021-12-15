@@ -153,7 +153,8 @@ class LoginViewController: UIViewController {
     
     @objc func asGuest() {
         UserDefaults.standard.set("guest", forKey: "username")
-        dismiss(animated: true)
+        view.removeFromSuperview()
+        removeFromParent()
     }
     
     @objc func register() {
@@ -182,7 +183,7 @@ class LoginViewController: UIViewController {
             view.addSubview(loading)
             loading.startAnimating()
             postJSON(url: url, json: ["username": user, "email": emailAddr, "password": pass], success: { code, res in
-                // Need to do more
+                // TODO: check more status code rather than just != 200
                 if res.statusCode != 200 {
                     DispatchQueue.main.async {
                         self.label.text = "Username or Email Already Exists"
@@ -191,7 +192,8 @@ class LoginViewController: UIViewController {
                 } else {
                     UserDefaults.standard.set(user, forKey: "username")
                     DispatchQueue.main.async {
-                        self.dismiss(animated: true)
+                        self.view.removeFromSuperview()
+                        self.removeFromParent()
                     }
                 }
             }, failure: {err in print("oh no")})

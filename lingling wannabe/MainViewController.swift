@@ -27,6 +27,18 @@ class MainViewController: UIViewController {
     }
     
     override func viewDidLoad() {
+        // TODO: fix the issue when user signs up, the username displayed at top will not immediately change
+        if let user = UserDefaults.standard.string(forKey: "username") {
+            username = user
+            if let mainView = view as? MainView {
+                mainView.username.setTitle(username, for: .normal)
+            }
+        } else {
+            let signup = LoginViewController(CGSize(width: view.frame.width, height: view.frame.height), isFullScreen: true)
+            addChild(signup)
+            view.addSubview(signup.view)
+        }
+        
         let intro = UIView()
         intro.backgroundColor = UIColor.white
         intro.frame = view.frame
@@ -37,6 +49,7 @@ class MainViewController: UIViewController {
         content.transform = CATransform3DMakeScale(scale, scale, 1)
         intro.layer.addSublayer(content)
         view.addSubview(intro)
+        
         serialQueue.async {
             let start = Date().timeIntervalSince1970
             self.dataStatus = DataManager.shared.checkAndLoad(username: self.username, time: Date().timeIntervalSince1970)
@@ -76,16 +89,6 @@ class MainViewController: UIViewController {
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        if let user = UserDefaults.standard.string(forKey: "username") {
-            username = user
-            if let mainView = view as? MainView {
-                mainView.username.setTitle(username, for: .normal)
-            }
-        } else {
-            let signup = LoginViewController(CGSize(width: view.frame.width, height: view.frame.height), isFullScreen: true)
-            present(signup, animated: false)
-        }
-        
         checkData()
     }
 

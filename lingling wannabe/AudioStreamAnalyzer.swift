@@ -45,6 +45,14 @@ class AudioStreamAnalyzer {
         AVNumberOfChannelsKey: 1
         ] as [String : Any]
     
+    let compressedFormatSettings = [
+        AVFormatIDKey: kAudioFormatFLAC,
+        AVSampleRateKey: 44100,
+        AVNumberOfChannelsKey: 1,
+        AVEncoderAudioQualityKey: AVAudioQuality.max.rawValue,
+        AVLinearPCMBitDepthKey: 16
+    ] as [String: Any]
+    
     private init() {
         //model = classifier.model
         inputFormat = audioEngine.inputNode.inputFormat(forBus: inputBus)
@@ -92,7 +100,14 @@ class AudioStreamAnalyzer {
             print(error.localizedDescription)
             return
         }
-        print(inputFormat.sampleRate)
+        print(inputFormat.streamDescription.pointee.mBitsPerChannel)
+        print(inputFormat.streamDescription.pointee.mFormatID)
+        print(inputFormat.streamDescription.pointee.mChannelsPerFrame)
+        print(inputFormat.streamDescription.pointee.mBytesPerFrame)
+        print(inputFormat.streamDescription.pointee.mBytesPerPacket)
+        print(inputFormat.streamDescription.pointee.mSampleRate)
+        print(inputFormat.streamDescription.pointee.mFormatFlags)
+        print(inputFormat.streamDescription.pointee.mFramesPerPacket)
         //let dft = vDSP.DFT(count: 8192, direction: .forward, transformType: .complexReal, ofType: Float.self)
         //var real = [Float](repeating: 0, count: 8192)
         //var imag = [Float](repeating: 0, count: 8192)
@@ -101,6 +116,13 @@ class AudioStreamAnalyzer {
         
         let url = getDocumentDirectory().appendingPathComponent("recording.wav")
         let audioFile = try? AVAudioFile(forWriting: url, settings: outputFormatSettings, commonFormat: AVAudioCommonFormat.pcmFormatFloat32, interleaved: true)
+        // TODO: check convertFormat is not nil
+        //let convertFormat = AVAudioFormat(settings: compressedFormatSettings)!
+        //let converter = AVAudioConverter(from: inputFormat, to: convertFormat)
+        //let compURL = getDocumentDirectory().appendingPathComponent("compressed.flac")
+        //let compFile = try? AVAudioFile(forWriting: compURL, settings: compressedFormatSettings)
+    
+        
         audioEngine.inputNode.installTap(onBus: inputBus, bufferSize: UInt32(buffSize), format: inputFormat) {
             buffer, time in self.analysisQueue.async {
                 //self.ft(buffer.floatChannelData![0])
@@ -110,6 +132,30 @@ class AudioStreamAnalyzer {
                 //dft?.transform(inputReal: bufferPtr, inputImaginary: emptyPtr, outputReal: &real, outputImaginary: &imag)
                 //print(real.reduce(0, +), real.indices.max(by: {real[$0] < real[$1]} ))
                 //print(imag.reduce(0, +), imag.indices.max(by: {imag[$0] < imag[$1]} ))
+                
+                // input block is called when the converter needs input
+                //let inputBlock : AVAudioConverterInputBlock = { (inNumPackets, outStatus) -> AVAudioBuffer? in
+                //    outStatus.pointee = AVAudioConverterInputStatus.haveData;
+                //    return buffer; // fill and return input buffer
+                //}
+                //let compressedBuffer = AVAudioCompressedBuffer(format: convertFormat, packetCapacity: 8, maximumPacketSize: converter!.maximumOutputPacketSize)
+                //var outError: NSError? = nil
+                //converter?.convert(to: compressedBuffer, error: &outError, withInputFrom: inputBlock)
+                //if let oe = outError {
+                //    print("error: \(oe)")
+                //} else {
+                //    let mBuff = compressedBuffer.audioBufferList.pointee.mBuffers
+                //    if let mdata = mBuff.mData {
+                //        let len = Int(mBuff.mDataByteSize)
+                //        let data = Data(bytes: mdata, count: len)
+                //        print(len, data)
+                //        do {
+                //            try data.write(to: compURL)
+                //        } catch {
+                //            print(error.localizedDescription)
+                //        }
+                //    }
+                //}
                 do {
                     try audioFile?.write(from: buffer)
                 } catch {
