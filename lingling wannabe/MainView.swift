@@ -43,7 +43,7 @@ class MainView: UIView, MSCircularSliderDelegate {
         noteScale = frame.width/300 * 0.4 // 300 is the size of note
         buttonScale = min(frame.width/350, 1.5)
         start = UIButton(frame: CGRect(x: 0, y: 0, width: 103.5*buttonScale, height: 64*buttonScale))
-        username = UIButton(frame: CGRect(x: 0, y: 0, width: frame.width/2, height: 20*buttonScale))
+        username = UIButton(frame: CGRect(x: 4*buttonScale, y: 0, width: frame.width/2, height: 20*buttonScale))
         leaderboard = UIButton(frame: CGRect(x: frame.width - 60*buttonScale, y: -16*buttonScale, width: 60*buttonScale, height: 60*buttonScale))
         rect = CAShapeLayer()
         rect.path = UIBezierPath(rect: frame).cgPath

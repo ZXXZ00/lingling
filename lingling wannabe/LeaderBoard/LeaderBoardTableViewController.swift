@@ -28,8 +28,13 @@ class LeaderBoardTableViewController : UITableViewController {
     var rank = 0 // the rank of user
     var anchor = 0 // the index path of user
     
-    let leaderView = UITableView()
+    let toUTCDate = DateFormatter()
+    let toEpoch = DateFormatter()
+    var calendar = Calendar(identifier: .iso8601)
+    let countdown = UILabel()
     let loading = UIActivityIndicatorView(style: .large)
+    
+    var isRefreshing = false
     
     required init?(coder: NSCoder) {
         fatalError("NSCoding not supported")
@@ -46,11 +51,29 @@ class LeaderBoardTableViewController : UITableViewController {
         tableView.bounces = true
         tableView.rowHeight = 44
         
+        //refreshControl = UIRefreshControl()
+        
+        toUTCDate.timeZone = TimeZone(identifier: "UTC")
+        toEpoch.timeZone = TimeZone(identifier: "UTC")
+        toEpoch.dateFormat = "yyyy-MM-dd"
+        toUTCDate.dateFormat = "yyyy-MM-dd"
+        calendar.timeZone = TimeZone(identifier: "UTC")!
+        
+        let context = ["countdown":"\(interval)"]
+        print(context)
+        let timer = Timer(timeInterval: 1.0, target: self, selector: #selector(updateTimer), userInfo: context, repeats: true)
+        timer.tolerance = 0.1
+        RunLoop.current.add(timer, forMode: .common)
+        
         if let tmp = delegate {
             // 44 is the default row height
-            leaderView.frame = CGRect(x: 0, y: 0, width: tmp.size.width, height: 44*3)
-            leaderView.isScrollEnabled = false
-            //view.addSubview(leaderView)
+            countdown.text = ""
+            countdown.textColor = .black
+            countdown.textAlignment = .center
+            countdown.font = UIFont(name: "Arial", size: 8)
+            countdown.frame = CGRect(x: 0, y: -4, width: tmp.size.width, height: 22)
+            countdown.backgroundColor = .clear
+            view.addSubview(countdown)
             
             loading.color = .gray
             loading.center = CGPoint(x: tmp.size.width/2, y: tmp.size.height/2)
@@ -67,20 +90,68 @@ class LeaderBoardTableViewController : UITableViewController {
         //tableView.endUpdates()
     }
     
-    func loadData() {
-        let now = Date().timeIntervalSince1970
-        if now > LeaderBoardTableViewController.cacheTime[interval]! + 900 {
-            // cache is valid for 15 minutes
-            loadDataHelper(lo: 0, hi: 100) {
-                //self.tableView.scrollToRow(at: IndexPath(row: self.anchor, section: 0), at: .middle, animated: false)
+    func updateTimerHelper(timeDiff: TimeInterval) {
+        var diff = timeDiff
+        let hour = Int(diff / 3600)
+        diff -= Double(hour) * 3600.0
+        let minute = Int(diff / 60)
+        diff -= Double(minute) * 60.0
+        let seconds = Int(diff)
+        if minute < 10 {
+            if seconds < 10 {
+                countdown.text = "\(hour):0\(minute):0\(seconds)"
+            } else {
+                countdown.text = "\(hour):0\(minute):\(seconds)"
+            }
+        } else if seconds < 10 {
+            countdown.text = "\(hour):\(minute):0\(seconds)"
+        } else {
+            countdown.text = "\(hour):\(minute):\(seconds)"
+        }
+            
+    }
+    
+    @objc func updateTimer() {
+        let cur = Date()
+        if interval == .week {
+            let curMonday = calendar.dateComponents([.calendar, .yearForWeekOfYear ,.weekOfYear], from: cur).date
+            if var bound = curMonday {
+                bound += 7*24*3600 // increment by a week
+                updateTimerHelper(timeDiff: cur.distance(to: bound))
+            }
+        } else if interval == .month {
+            let nxtMonth = calendar.date(byAdding: .month, value: 1, to: cur)!
+            if let bound = calendar.dateComponents([.calendar, .year, .month], from: nxtMonth).date {
+                updateTimerHelper(timeDiff: cur.distance(to: bound))
+            }
+        } else {
+            let tmp = toUTCDate.string(from: cur)
+            if var bound = toEpoch.date(from: tmp) {
+                bound += 24*3600 // increment by 24 hour
+                updateTimerHelper(timeDiff: cur.distance(to: bound))
             }
         }
     }
     
-    func loadDataHelper(atTop: Bool=false, lo: Int?=nil, hi: Int?=nil, didLoad: (() -> Void)?=nil) {
-        if LeaderBoardTableViewController.isLoading[interval]! {
-            return
+    func loadData() {
+        let now = Date().timeIntervalSince1970
+        if now > LeaderBoardTableViewController.cacheTime[interval]! + 900 {
+            // cache is valid for 15 minutes
+            loadDataHelper(lo: 0, hi: 100) { num in
+                DispatchQueue.main.async {
+                    if !self.isRefreshing {
+                        self.insert(num)
+                        self.isRefreshing = true
+                    } else {
+                        self.tableView.reloadData()
+                    }
+                }
+            }
         }
+    }
+    
+    // didLoad has a parameter which is the number of loaded data entries
+    func loadDataHelper(atTop: Bool=false, lo: Int?=nil, hi: Int?=nil, didLoad: ((_: Int) -> Void)?=nil) {
         loading.startAnimating()
         LeaderBoardTableViewController.isLoading[interval] = true
         var url = URLComponents(url: baseURL, resolvingAgainstBaseURL: true)
@@ -110,15 +181,21 @@ class LeaderBoardTableViewController : UITableViewController {
                     tmp += 1
                 }
             }
-            DispatchQueue.main.async {
-                //self.addData(tmp, atTop: atTop)
-                self.insert(tmp)
-                self.loading.stopAnimating()
-                LeaderBoardTableViewController.isLoading[self.interval] = false
-                if let closure = didLoad {
-                    closure()
-                }
+            if let closure = didLoad {
+                closure(tmp)
             }
+            DispatchQueue.main.async {
+            //    //self.addData(tmp, atTop: atTop)
+            //    if self.count - tmp > 0 {
+            //        self.insert(self.count - tmp)
+            //    }
+                self.loading.stopAnimating()
+            //    LeaderBoardTableViewController.isLoading[self.interval] = false
+            //    if let closure = didLoad {
+            //        closure()
+            //    }
+            }
+            
         }, failure: { err in
             DataManager.shared.insertErrorMessage(isNetwork: false, message: err.localizedDescription)
         })
@@ -153,6 +230,7 @@ class LeaderBoardTableViewController : UITableViewController {
         }
     }
     
+    // legacy function, might be useful if decide to show all ranks
     //override func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
     //    guard let visible = tableView.indexPathsForVisibleRows else { return }
     //    for idx in visible {
@@ -174,13 +252,13 @@ class LeaderBoardTableViewController : UITableViewController {
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         // + 44 to offset inital contentOffset
         // + frame.height/2 becase we are modifying center
-        leaderView.center.y = scrollView.contentOffset.y + 44 + leaderView.frame.height/2
+        //leaderView.center.y = scrollView.contentOffset.y + 44 + leaderView.frame.height/2
         if let tmp = delegate {
             loading.center.y = scrollView.contentOffset.y + tmp.size.height/2
         }
         
     }
-    
+    // legacy function, might be useful if decide to show all ranks
     private func insert(_ batchSize: Int) {
         var idxs = [IndexPath]()
         for _ in count..<count+batchSize {
@@ -189,7 +267,7 @@ class LeaderBoardTableViewController : UITableViewController {
         }
         tableView.insertRows(at: idxs, with: .automatic)
     }
-    
+    // legacy function
     private func addData(_ batchSize: Int, atTop: Bool) {
         var idxs = [IndexPath]()
         if atTop {

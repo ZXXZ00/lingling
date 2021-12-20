@@ -42,7 +42,7 @@ class LeaderBoardCell : UITableViewCell {
         }
         rank.frame = CGRect(x: frame.height*0.04, y: frame.height*0.05, width: frame.width*0.24, height: frame.height*0.9)
         username.frame = CGRect(x: 0, y: frame.height*0.05, width: frame.width*0.6, height: frame.height*0.9)
-        username.center = CGPoint(x: frame.width*0.52, y: frame.height/2)
+        username.center = CGPoint(x: frame.width*0.5, y: frame.height/2)
         hours.frame = CGRect(x: frame.width - frame.width*0.16, y: frame.height*0.05, width: frame.width*0.15, height: frame.height*0.9)
     }
 }

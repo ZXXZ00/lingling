@@ -97,7 +97,9 @@ public class FourierSeries: NSObject, CAAnimationDelegate {
         let line = UIBezierPath()
         line.move(to: CGPoint(x: 0, y: 0))
         line.addLine(to: CGPoint(x: norm+0, y: 0))
-        line.addArc(withCenter: CGPoint(x: 0, y: 0), radius: norm, startAngle: 0, endAngle: 0.001*CGFloat.pi, clockwise: false)
+        if norm > 1 {
+            line.addArc(withCenter: CGPoint(x: 0, y: 0), radius: norm, startAngle: 0, endAngle: 0.001*CGFloat.pi, clockwise: false)
+        }
         ret.path = line.cgPath
         //ret.path = UIBezierPath(rect: CGRect(x: 0, y: 0, width: norm, height: 1)).cgPath
         ret.bounds = CGRect(x: 0, y: 0, width: norm, height: 1)
