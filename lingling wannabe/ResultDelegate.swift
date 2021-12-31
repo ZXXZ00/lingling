@@ -14,28 +14,48 @@ class ResultDelegate {
     static var cutoff = 0.5
     static var percentage = 0.5
     
-    private var tmp: [(start: Double, end: Double, music: Double, background: Double)] = []
+    var isPracticing = false
+    private var musicCounter = 0
+    private var backgroundCounter = 0
+    
+    private var res: [(start: Double, end: Double, music: Double, background: Double)] = []
+    
+    private init() { }
     
     func append(start: Double, end: Double, _ result: [SNClassification]) {
-        //time.append((start, end))
-        //results.append(result)
+        let musicP: Double
         if result[0].identifier == "background" {
-            tmp.append((start, end, result[1].confidence, result[0].confidence))
+            res.append((start, end, result[1].confidence, result[0].confidence))
+            musicP = result[1].confidence
         } else {
-            tmp.append((start, end, result[0].confidence, result[1].confidence))
+            res.append((start, end, result[0].confidence, result[1].confidence))
+            musicP = result[0].confidence
         }
-        //time.append((start, end))
-        
+        if musicP > ResultDelegate.cutoff {
+            musicCounter += 1
+        } else {
+            backgroundCounter += 1
+        }
+        if musicCounter > 2 {
+            musicCounter = 0
+            backgroundCounter = 0
+            isPracticing = true
+        }
+        if backgroundCounter > 20 {
+            musicCounter = 0
+            backgroundCounter = 0
+            isPracticing = false
+        }
     }
     
     func musicPercentage(cutoff: Double) -> Double {
         var total = 0.0
         var music = 0.0
-        for i in 1..<tmp.count {
-            if tmp[i].music > cutoff {
-                music += tmp[i].start - tmp[i-1].start
+        for i in 1..<res.count {
+            if res[i].music > cutoff {
+                music += res[i].start - res[i-1].start
             }
-            total += tmp[i].start - tmp[i-1].start
+            total += res[i].start - res[i-1].start
         }
         return music/total
     }
@@ -50,17 +70,17 @@ class ResultDelegate {
         var startendTotal = 0.0
         var ret: [[Double]] = [[],[],[]]
         for i in 0..<cutoffs.count {
-            if tmp[0].music > cutoffs[i] {
-                startend[i] += tmp[0].end - tmp[0].start
+            if res[0].music > cutoffs[i] {
+                startend[i] += res[0].end - res[0].start
             }
         }
-        startendTotal += tmp[0].end - tmp[0].start
-        for i in 1..<tmp.count {
-            let dstart = tmp[i].start - tmp[i-1].start
-            let dend = tmp[i].end - tmp[i-1].end
-            let dstartend = tmp[i].end - tmp[i].start
+        startendTotal += res[0].end - res[0].start
+        for i in 1..<res.count {
+            let dstart = res[i].start - res[i-1].start
+            let dend = res[i].end - res[i-1].end
+            let dstartend = res[i].end - res[i].start
             for j in 0..<cutoffs.count {
-                if tmp[i].music > cutoffs[j] {
+                if res[i].music > cutoffs[j] {
                     start[j] += dstart
                     end[j] += dend
                     startend[j] += dstartend
@@ -79,11 +99,11 @@ class ResultDelegate {
     }
     
     func reset() {
-        tmp.removeAll()
+        res.removeAll()
     }
     
     @objc func print_() {
-        for t in tmp {
+        for t in res {
             print(t.0, t.1, t.2, t.3, separator: ",")
         }
     }

@@ -12,7 +12,7 @@ class MainView: UIView, MSCircularSliderDelegate {
     
     let slider: MSCircularSlider
     var currSymbol = "null"
-    var minutes : Double = 15
+    var minutes: Int = 15
     var noteView = UIImageView()
     let noteScale: CGFloat
     let buttonScale: CGFloat

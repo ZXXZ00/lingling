@@ -156,7 +156,7 @@ class DataManager {
         return 0
     }
     
-    func addRecord(username: String, time: Int, duration: Int, asset: String, attributes: String, token: String) {
+    func addRecord(username: String, time: Int, duration: Int, asset: String, attributes: String, token: String?) {
         let date = Date(timeIntervalSince1970: Double(time))
         addCache(username: username, date: date, asset: asset)
         if username == "guest" { return }

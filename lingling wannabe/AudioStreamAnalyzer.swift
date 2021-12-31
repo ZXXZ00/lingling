@@ -12,7 +12,6 @@ import SoundAnalysis
 import Accelerate
 
 class AudioStreamAnalyzer {
-    static let shared = AudioStreamAnalyzer()
     
     var model: MLModel!
     
@@ -53,15 +52,15 @@ class AudioStreamAnalyzer {
         AVLinearPCMBitDepthKey: 16
     ] as [String: Any]
     
-    private init() {
+    init() {
         //model = classifier.model
         inputFormat = audioEngine.inputNode.inputFormat(forBus: inputBus)
         streamAnalyzer = SNAudioStreamAnalyzer(format: inputFormat)
         
-        let tmpconf = MLModelConfiguration()
-        tmpconf.computeUnits = .cpuOnly
+        let conf = MLModelConfiguration()
+        conf.computeUnits = .cpuOnly
         do {
-            let tmp = try TwoCategory(configuration: tmpconf)
+            let tmp = try TwoCategory(configuration: conf)
             model = tmp.model
         } catch {
             print("failed to initilize ml model")

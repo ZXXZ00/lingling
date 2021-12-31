@@ -156,6 +156,8 @@ class MainViewController: UIViewController {
         serialQueue.async {
             if let token = CredentialManager.shared.getToken() {
                 DataManager.shared.addRecord(username: self.username, time: start, duration: span, asset: asset, attributes: "{\"music\": \(percentage)}", token: token)
+            } else if self.username == "guest" {
+                DataManager.shared.addRecord(username: self.username, time: start, duration: span, asset: asset, attributes: "{\"music\": \(percentage)}", token: nil)
             } else {
                 // TODO: couldn't get token, need to sign user out
             }
@@ -168,7 +170,7 @@ class MainViewController: UIViewController {
             print("nan")
             return
         }
-        var delay : Double = 15*60
+        var delay: Int = 15*60
         if let mainView = view as? MainView {
             delay = mainView.minutes * 60
         } else {
@@ -176,22 +178,18 @@ class MainViewController: UIViewController {
             return
         }
         let start = Date().timeIntervalSince1970
-        let practiceView = PracticeViewController()
-        practiceView.modalPresentationStyle = .fullScreen
-        practiceView.duration = Int(delay)
-        present(practiceView, animated: true, completion: {
-            AudioStreamAnalyzer.shared.analyze()
-        })
-        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-            AudioStreamAnalyzer.shared.stop()
-            self.dismiss(animated: true, completion: nil)
-            let mainview = self.view as! MainView
-            mainview.showResult()
-            self.handleResult(start: Int(start), duration: Int(delay), assetName: mainview.currSymbol)
-            print(ResultDelegate.shared.test())
-            print("time","end", "music","bg")
-            ResultDelegate.shared.print_()
+        let practiceView = PracticeViewController(duration: delay) {
+            DispatchQueue.main.async {
+                let mainview = self.view as! MainView
+                mainview.showResult()
+                self.handleResult(start: Int(start), duration: Int(delay), assetName: mainview.currSymbol)
+                print(ResultDelegate.shared.test())
+                print("time","end", "music","bg")
+                ResultDelegate.shared.print_()
+            }
         }
+        practiceView.modalPresentationStyle = .fullScreen
+        present(practiceView, animated: true)
     }
     
     @objc func showUserInfo() {
