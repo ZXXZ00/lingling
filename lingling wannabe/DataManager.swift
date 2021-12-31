@@ -115,6 +115,12 @@ class DataManager {
             } catch {
                 print("failed to insert into error database")
             }
+        } else {
+            do {
+                try err.run("INSERT INTO local VALUES (?, ?)", timestamp, message)
+            } catch {
+                print("failed to insert into error database")
+            }
         }
     }
     
@@ -150,18 +156,18 @@ class DataManager {
         return 0
     }
     
-    func addRecord(username: String, time: Int, duration: Int, asset: String, attributes: String) {
+    func addRecord(username: String, time: Int, duration: Int, asset: String, attributes: String, token: String) {
+        let date = Date(timeIntervalSince1970: Double(time))
+        addCache(username: username, date: date, asset: asset)
+        if username == "guest" { return }
         do {
             try db.run("INSERT INTO records (username, time, duration, asset, attributes) VALUES (?, ?, ?, ?, ?)", username, time, duration, asset, attributes)
         } catch {
             print(error)
         }
-        let date = Date(timeIntervalSince1970: Double(time))
-        addCache(username: username, date: date, asset: asset)
-        if username == "guest" { return }
         let r = Record(username: username, time: Int64(time), duration: Int64(duration), asset: asset, attributes: attributes)
         let json = ["username": username, "records": [r.toDict(withUsername: false)]] as [String : Any]
-        postJSON(url: dbURL, json: json, success: { data, response in
+        postJSON(url: dbURL, json: json, token: token, success: { data, response in
             if response.statusCode == 200 {
                 UserDefaults.standard.set(time+duration, forKey: "last_synced")
             } else {
@@ -214,8 +220,7 @@ class DataManager {
         }
     }
     
-    func sync() {
-        guard let username = UserDefaults.standard.string(forKey: "username") else { return }
+    func sync(username: String, token: String) {
         if username == "guest" { return }
         let last = UserDefaults.standard.integer(forKey: "last_synced")
         let batch = getRecord(username: username, start: last+1, end: 2147483646)
@@ -223,7 +228,7 @@ class DataManager {
             return
         }
         var json: [String:Any] = ["username": username, "records": batch.map({ $0.toDict(withUsername: false) })]
-        postJSON(url: dbURL, json: json, success: {_,_ in }, failure: {_ in})
+        postJSON(url: dbURL, json: json, token: token, success: {_,_ in }, failure: {_ in})
     }
     
     func test() {

@@ -70,6 +70,7 @@ class MainView: UIView, MSCircularSliderDelegate {
         slider.lineWidth = 2
         slider.maximumAngle = 270
         slider.delegate = self
+        slider.angle = 40
         addSubview(slider)
         
         start.layer.borderWidth = 1 * buttonScale

@@ -60,7 +60,6 @@ class LeaderBoardTableViewController : UITableViewController {
         calendar.timeZone = TimeZone(identifier: "UTC")!
         
         let context = ["countdown":"\(interval)"]
-        print(context)
         let timer = Timer(timeInterval: 1.0, target: self, selector: #selector(updateTimer), userInfo: context, repeats: true)
         timer.tolerance = 0.1
         RunLoop.current.add(timer, forMode: .common)

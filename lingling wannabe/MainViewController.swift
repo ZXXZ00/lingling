@@ -13,7 +13,7 @@ class MainViewController: UIViewController {
     
     let serialQueue = DispatchQueue(label: "MainView", qos: .userInteractive)
     var nav: LeaderBoardNavigation!
-    var username = UserDefaults.standard.string(forKey: "username") ?? "guest"
+    var username = CredentialManager.shared.getUsername()
     var dataStatus = 0
     
     override func loadView() {
@@ -26,15 +26,21 @@ class MainViewController: UIViewController {
         nav = LeaderBoardNavigation(size: CGSize(width: width, height: view.frame.height*0.8))
     }
     
+    func changeUser(user: String) {
+        username = user
+        DispatchQueue.main.async {
+            if let mainView = self.view as? MainView {
+                mainView.username.setTitle(user, for: .normal)
+            }
+        }
+        // TODO: implement and show a tutorial for user change
+    }
+    
     override func viewDidLoad() {
         // TODO: fix the issue when user signs up, the username displayed at top will not immediately change
-        if let user = UserDefaults.standard.string(forKey: "username") {
-            username = user
-            if let mainView = view as? MainView {
-                mainView.username.setTitle(username, for: .normal)
+        if username == "guest" {
+            let signup = LoginViewController(CGSize(width: view.frame.width, height: view.frame.height), isFullScreen: true) { [weak self] user in self?.changeUser(user: user)
             }
-        } else {
-            let signup = LoginViewController(CGSize(width: view.frame.width, height: view.frame.height), isFullScreen: true)
             addChild(signup)
             view.addSubview(signup.view)
         }
@@ -54,7 +60,11 @@ class MainViewController: UIViewController {
             let start = Date().timeIntervalSince1970
             self.dataStatus = DataManager.shared.checkAndLoad(username: self.username, time: Date().timeIntervalSince1970)
             if self.dataStatus == 0 {
-                DataManager.shared.sync()
+                if let token = CredentialManager.shared.getToken() {
+                    DataManager.shared.sync(username: self.username, token: token)
+                } else {
+                    // TODO: invalid token
+                }
             }
             let introTime = 2.0
             let loadingTime = Date().timeIntervalSince1970 - start
@@ -68,6 +78,15 @@ class MainViewController: UIViewController {
                 }
             }
         }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        print("view will appear")
+        let tmp = CredentialManager.shared.getUsername()
+        if tmp != username {
+            // TODO: sign user out because there is a change in username
+        }
+        changeUser(user: tmp)
     }
     
     func checkData() {
@@ -127,7 +146,6 @@ class MainViewController: UIViewController {
     }
     
     func handleResult(start: Int, duration: Int, assetName: String) {
-        //guard let username = UserDefaults.standard.string(forKey: "username") else { return }
         var span = duration
         var asset = assetName
         let percentage = ResultDelegate.shared.musicPercentage(cutoff: ResultDelegate.cutoff)
@@ -135,7 +153,13 @@ class MainViewController: UIViewController {
             span = -duration
             asset = assetName + "_rest"
         }
-        DataManager.shared.addRecord(username: username, time: start, duration: span, asset: asset, attributes: "{\"music\": \(percentage)}")
+        serialQueue.async {
+            if let token = CredentialManager.shared.getToken() {
+                DataManager.shared.addRecord(username: self.username, time: start, duration: span, asset: asset, attributes: "{\"music\": \(percentage)}", token: token)
+            } else {
+                // TODO: couldn't get token, need to sign user out
+            }
+        }
     }
     
     @objc func startAnalyze() {
@@ -154,6 +178,7 @@ class MainViewController: UIViewController {
         let start = Date().timeIntervalSince1970
         let practiceView = PracticeViewController()
         practiceView.modalPresentationStyle = .fullScreen
+        practiceView.duration = Int(delay)
         present(practiceView, animated: true, completion: {
             AudioStreamAnalyzer.shared.analyze()
         })
@@ -181,11 +206,6 @@ class MainViewController: UIViewController {
                 userinfoView.loadData()
             }
         }
-        //let nav = LeaderBoardNavigation(size: CGSize(width: width, height: width*4/2.5))
-        //nav.isToolbarHidden = true
-        //present(nav, animated: true, completion: nil)
-        //let loginView = LoginViewController(CGSize(width: width, height: width*4/3))
-        //present(loginView, animated: true, completion: nil)
     }
     
     @objc func showLeaderBoard() {

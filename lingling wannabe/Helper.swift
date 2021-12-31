@@ -54,10 +54,13 @@ func pdf(filename: String, scale: CGFloat) -> UIImageView {
     return ret
 }
 
-func postJSON(url: URL, json: [String: Any],
+func postJSON(url: URL, json: [String: Any], token: String?=nil,
               success: @escaping (_: Data, _: HTTPURLResponse) -> Void, failure: @escaping (_: Error) -> Void) {
     var request = URLRequest(url: url)
     request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+    if let tk = token {
+        request.setValue(tk, forHTTPHeaderField: "Authorization")
+    }
     request.httpMethod = "POST"
     request.allowsCellularAccess = true
     do {
@@ -77,23 +80,17 @@ func postJSON(url: URL, json: [String: Any],
             print("failed to cast response and data")
             // TODO: failed to cast
         }
+        print("\nresponse")
+        if let res = response as? HTTPURLResponse {
+            print(res.statusCode)
+            print(res.allHeaderFields)
+            print(res)
+        }
         print("data")
         if let d = data {
             print(String(data: d, encoding: .utf8))
         } else {
             print(data)
-        }
-        print()
-        print("response")
-        if let res = response {
-            if let httpres = res as? HTTPURLResponse {
-                print(httpres.statusCode)
-                print(httpres.allHeaderFields)
-                print(httpres)
-            }
-            print(res)
-        } else {
-            print(response)
         }
         print()
         print("error")
@@ -117,7 +114,7 @@ func getJSON(url: URL, success: @escaping (_: Any) -> Void, failure: @escaping (
         print("\ndata")
         do {
             if let d = data {
-                let json = try JSONSerialization.jsonObject(with: data!)
+                let json = try JSONSerialization.jsonObject(with: d)
                 //print(json)
                 success(json)
                 //print(d)
@@ -143,7 +140,7 @@ func getJSON(url: URL, success: @escaping (_: Any) -> Void, failure: @escaping (
 
 func addCache(username: String, date: Date, asset: String) {
     let formatter = DateFormatter()
-    formatter.dateFormat = "YYYY-MM-dd"
+    formatter.dateFormat = "yyyy-MM-dd"
     addCache(username: username, key: formatter.string(from: date), asset: asset)
 }
 

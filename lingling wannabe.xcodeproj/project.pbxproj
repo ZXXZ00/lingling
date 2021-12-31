@@ -21,6 +21,7 @@
 		660C84FE2752A881005370E0 /* treble.svg in Resources */ = {isa = PBXBuildFile; fileRef = 660C84FD2752A881005370E0 /* treble.svg */; };
 		660C85002752A892005370E0 /* treble.json in Resources */ = {isa = PBXBuildFile; fileRef = 660C84FF2752A892005370E0 /* treble.json */; };
 		6614E767269E2A61007C75A5 /* FourierSeries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6614E766269E2A61007C75A5 /* FourierSeries.swift */; };
+		661F81772773B7AC00FC0A64 /* CredentialManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 661F81762773B7AC00FC0A64 /* CredentialManager.swift */; };
 		6620FA4C2652BD65009E9D86 /* FloatViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6620FA4B2652BD65009E9D86 /* FloatViewDelegate.swift */; };
 		662904F826A8932000342E3D /* whole.svg in Resources */ = {isa = PBXBuildFile; fileRef = 662904F326A8932000342E3D /* whole.svg */; };
 		662904F926A8932000342E3D /* crotchet.svg in Resources */ = {isa = PBXBuildFile; fileRef = 662904F426A8932000342E3D /* crotchet.svg */; };
@@ -31,7 +32,6 @@
 		664C2C442610D0B3002301A0 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664C2C432610D0B3002301A0 /* MainView.swift */; };
 		666C30F526652506003DCAB6 /* LeaderBoardNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 666C30F426652506003DCAB6 /* LeaderBoardNavigation.swift */; };
 		668AAFEF265B099C0083CB5B /* UserInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 668AAFEE265B099C0083CB5B /* UserInfoViewController.swift */; };
-		66A42497264738B900F2ADF0 /* SheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A42496264738B900F2ADF0 /* SheetView.swift */; };
 		66A4B1AE269246FA00FA38CB /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A4B1AD269246FA00FA38CB /* LoginViewController.swift */; };
 		66A4F650266035CF002985BA /* CalendarCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A4F64F266035CF002985BA /* CalendarCell.swift */; };
 		66AC52C326B87332005ED27F /* half_rest.svg in Resources */ = {isa = PBXBuildFile; fileRef = 66AC52C126B87332005ED27F /* half_rest.svg */; };
@@ -59,7 +59,6 @@
 		66D08643266AC76E0089C833 /* LeaderBoardTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D08642266AC76E0089C833 /* LeaderBoardTableViewController.swift */; };
 		66D0864B266C07540089C833 /* LeaderBoardCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D0864A266C07540089C833 /* LeaderBoardCell.swift */; };
 		66E7604D2752E30C00FD0E0F /* LayerRemover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E7604C2752E30C00FD0E0F /* LayerRemover.swift */; };
-		66E7604F2752EB0300FD0E0F /* AnimationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E7604E2752EB0300FD0E0F /* AnimationManager.swift */; };
 		66EA953C26603AA800B59721 /* CalendarData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66EA953B26603AA800B59721 /* CalendarData.swift */; };
 		66EC2F9A263EFF6400F700E5 /* PracticeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66EC2F99263EFF6400F700E5 /* PracticeViewController.swift */; };
 		66F134CF265D7D1500751D23 /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F134CE265D7D1500751D23 /* Helper.swift */; };
@@ -100,6 +99,7 @@
 		660C84FD2752A881005370E0 /* treble.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = treble.svg; sourceTree = "<group>"; };
 		660C84FF2752A892005370E0 /* treble.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = treble.json; sourceTree = "<group>"; };
 		6614E766269E2A61007C75A5 /* FourierSeries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FourierSeries.swift; sourceTree = "<group>"; };
+		661F81762773B7AC00FC0A64 /* CredentialManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialManager.swift; sourceTree = "<group>"; };
 		6620FA4B2652BD65009E9D86 /* FloatViewDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FloatViewDelegate.swift; path = "/Users/adam/Documents/lingling wannabe/lingling wannabe/FloatViewDelegate.swift"; sourceTree = "<absolute>"; };
 		662904F326A8932000342E3D /* whole.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = whole.svg; sourceTree = "<group>"; };
 		662904F426A8932000342E3D /* crotchet.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = crotchet.svg; sourceTree = "<group>"; };
@@ -110,7 +110,6 @@
 		664C2C432610D0B3002301A0 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		666C30F426652506003DCAB6 /* LeaderBoardNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeaderBoardNavigation.swift; sourceTree = "<group>"; };
 		668AAFEE265B099C0083CB5B /* UserInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInfoViewController.swift; sourceTree = "<group>"; };
-		66A42496264738B900F2ADF0 /* SheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SheetView.swift; sourceTree = "<group>"; };
 		66A4B1AD269246FA00FA38CB /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		66A4F64F266035CF002985BA /* CalendarCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarCell.swift; sourceTree = "<group>"; };
 		66AC52C126B87332005ED27F /* half_rest.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = half_rest.svg; sourceTree = "<group>"; };
@@ -144,7 +143,6 @@
 		66D08642266AC76E0089C833 /* LeaderBoardTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeaderBoardTableViewController.swift; sourceTree = "<group>"; };
 		66D0864A266C07540089C833 /* LeaderBoardCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeaderBoardCell.swift; sourceTree = "<group>"; };
 		66E7604C2752E30C00FD0E0F /* LayerRemover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayerRemover.swift; sourceTree = "<group>"; };
-		66E7604E2752EB0300FD0E0F /* AnimationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationManager.swift; sourceTree = "<group>"; };
 		66EA953B26603AA800B59721 /* CalendarData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarData.swift; sourceTree = "<group>"; };
 		66EC2F99263EFF6400F700E5 /* PracticeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PracticeViewController.swift; sourceTree = "<group>"; };
 		66F134CE265D7D1500751D23 /* Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
@@ -254,7 +252,7 @@
 				66ADE5A725BE2B0A004B20C6 /* AppDelegate.swift */,
 				66ADE5A925BE2B0A004B20C6 /* SceneDelegate.swift */,
 				66FDECE12607CFA300FB9019 /* AudioStreamAnalyzer.swift */,
-				66E7604E2752EB0300FD0E0F /* AnimationManager.swift */,
+				661F81762773B7AC00FC0A64 /* CredentialManager.swift */,
 				66B6D68426D54C1D0001F6B5 /* DataManager.swift */,
 				66FDECEB2607D10900FB9019 /* ResultDelegate.swift */,
 				6620FA4B2652BD65009E9D86 /* FloatViewDelegate.swift */,
@@ -269,7 +267,6 @@
 				663EBA0B2695137900046D63 /* LoginView.swift */,
 				66E7604C2752E30C00FD0E0F /* LayerRemover.swift */,
 				66F134CE265D7D1500751D23 /* Helper.swift */,
-				66A42496264738B900F2ADF0 /* SheetView.swift */,
 				6614E766269E2A61007C75A5 /* FourierSeries.swift */,
 				66C957F3265292C4008C5B7F /* tick.wav */,
 				66FDECE62607CFC500FB9019 /* TwoCategory.mlmodel */,
@@ -547,7 +544,6 @@
 				66BBDD67260A85D8008E54EC /* MSDoubleHandleCircularSlider.swift in Sources */,
 				66ADE5A825BE2B0A004B20C6 /* AppDelegate.swift in Sources */,
 				66BBDD62260A85CB008E54EC /* MSCircularSliderHandle.swift in Sources */,
-				66A42497264738B900F2ADF0 /* SheetView.swift in Sources */,
 				66EC2F9A263EFF6400F700E5 /* PracticeViewController.swift in Sources */,
 				66F134CF265D7D1500751D23 /* Helper.swift in Sources */,
 				663EBA0C2695137900046D63 /* LoginView.swift in Sources */,
@@ -559,13 +555,13 @@
 				66E7604D2752E30C00FD0E0F /* LayerRemover.swift in Sources */,
 				66C957E426514D90008C5B7F /* Metronome.swift in Sources */,
 				666C30F526652506003DCAB6 /* LeaderBoardNavigation.swift in Sources */,
-				66E7604F2752EB0300FD0E0F /* AnimationManager.swift in Sources */,
 				66A4F650266035CF002985BA /* CalendarCell.swift in Sources */,
 				66BBDD6C260A85E0008E54EC /* MSGradientCircularSlider.swift in Sources */,
 				66EA953C26603AA800B59721 /* CalendarData.swift in Sources */,
 				66B6D68326D3FBA80001F6B5 /* Asset.swift in Sources */,
 				6614E767269E2A61007C75A5 /* FourierSeries.swift in Sources */,
 				66D0864B266C07540089C833 /* LeaderBoardCell.swift in Sources */,
+				661F81772773B7AC00FC0A64 /* CredentialManager.swift in Sources */,
 				66C099FB26693AA9008F892D /* LeaderBoardViewController.swift in Sources */,
 				66FDECE72607CFC500FB9019 /* TwoCategory.mlmodel in Sources */,
 				66FDECEC2607D10900FB9019 /* ResultDelegate.swift in Sources */,
@@ -738,7 +734,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = LDB5QZMQ6L;
 				INFOPLIST_FILE = "lingling wannabe/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -759,7 +755,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = LDB5QZMQ6L;
 				INFOPLIST_FILE = "lingling wannabe/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (

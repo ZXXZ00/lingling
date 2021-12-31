@@ -81,7 +81,7 @@ class UserInfoViewController : UIViewController {
         view.addSubview(loading)
         
         self.view = view
-        formatter.dateFormat = "YYYY-MM"
+        formatter.dateFormat = "yyyy-MM"
     }
     
     func loadData() {
@@ -99,7 +99,7 @@ class UserInfoViewController : UIViewController {
                 if let assests = json as? [[String:Any]] {
                     let user = self.username
                     let formatter = DateFormatter()
-                    formatter.dateFormat = "YYYY-MM-dd"
+                    formatter.dateFormat = "yyyy-MM-dd"
                     CalendarData.cache[user] = [:]
                     for asset in assests {
                         if let start = asset["start_time"] as? Double,
