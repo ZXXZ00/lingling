@@ -56,7 +56,7 @@ class PracticeViewController : UIViewController {
         
         label.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 60)
         label.textAlignment = .center
-        label.font = UIFont(name: "AmericanTypewriter", size: 24)
+        label.font = UIFont(name: "AmericanTypewriter", size: 20)
         label.textColor = UIColor(white: 0.5, alpha: 1)
         label.center = view.center
         
@@ -87,15 +87,15 @@ class PracticeViewController : UIViewController {
         
         let context = ["countdown":"practice"]
         timer = Timer(timeInterval: 1.0, target: self, selector: #selector(updateTimer), userInfo: context, repeats: true)
-        timer!.tolerance = 0.1
+        timer!.tolerance = 0.01
         RunLoop.current.add(timer!, forMode: .common)
     }
     
     @objc func updateTimer() {
         if ResultDelegate.shared.isPracticing {
-            label.text = nil
+            label.text = "\(ResultDelegate.shared.debugP)\n"
         } else {
-            label.text = "Sounds too quiet. Go practice!"
+            label.text = "\(ResultDelegate.shared.debugP)\nSounds like you are not practicing!"
         }
         remaining -= 1
         if remaining < 0 {

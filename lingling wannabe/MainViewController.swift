@@ -37,7 +37,6 @@ class MainViewController: UIViewController {
     }
     
     override func viewDidLoad() {
-        // TODO: fix the issue when user signs up, the username displayed at top will not immediately change
         if username == "guest" {
             let signup = LoginViewController(CGSize(width: view.frame.width, height: view.frame.height), isFullScreen: true) { [weak self] user in self?.changeUser(user: user)
             }
@@ -58,35 +57,33 @@ class MainViewController: UIViewController {
         
         serialQueue.async {
             let start = Date().timeIntervalSince1970
-            self.dataStatus = DataManager.shared.checkAndLoad(username: self.username, time: Date().timeIntervalSince1970)
-            if self.dataStatus == 0 {
-                if let token = CredentialManager.shared.getToken() {
-                    DataManager.shared.sync(username: self.username, token: token)
-                } else {
-                    // TODO: invalid token
-                }
-            }
+            let token = CredentialManager.shared.getToken()
+            self.dataStatus = DataManager.shared.checkAndLoad(username: self.username, time: Date().timeIntervalSince1970, token: token)
             let introTime = 2.0
             let loadingTime = Date().timeIntervalSince1970 - start
+            var delay = 0.0
             if loadingTime < introTime {
-                DispatchQueue.main.async {
-                    UIView.animate(withDuration: 1, delay: introTime-loadingTime, animations: {
-                        intro.alpha = 0
-                    }, completion: {finished in
-                        intro.removeFromSuperview()
-                    })
-                }
+                delay = introTime - loadingTime
+            }
+            DispatchQueue.main.async {
+                UIView.animate(withDuration: 1, delay: delay, animations: {
+                    intro.alpha = 0
+                }, completion: {finished in
+                    intro.removeFromSuperview()
+                })
             }
         }
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        print("view will appear")
         let tmp = CredentialManager.shared.getUsername()
         if tmp != username {
             // TODO: sign user out because there is a change in username
         }
         changeUser(user: tmp)
+        let cs = computeCheckSum(start: 4326, duration: 900)
+        print(cs)
+        print(verifyCheckSum(start: 4326, duration: 900, checksum: cs))
     }
     
     func checkData() {
@@ -155,10 +152,13 @@ class MainViewController: UIViewController {
         }
         serialQueue.async {
             if let token = CredentialManager.shared.getToken() {
+                print("add record with token")
                 DataManager.shared.addRecord(username: self.username, time: start, duration: span, asset: asset, attributes: "{\"music\": \(percentage)}", token: token)
             } else if self.username == "guest" {
+                print("add record as guest")
                 DataManager.shared.addRecord(username: self.username, time: start, duration: span, asset: asset, attributes: "{\"music\": \(percentage)}", token: nil)
             } else {
+                print("nothing")
                 // TODO: couldn't get token, need to sign user out
             }
         }
@@ -209,6 +209,12 @@ class MainViewController: UIViewController {
     @objc func showLeaderBoard() {
         nav.isToolbarHidden = true
         present(nav, animated: true, completion: nil)
+    }
+    
+    @objc func showDebug() {
+        let debugV = DebugViewController()
+        debugV.modalPresentationStyle = .formSheet
+        present(debugV, animated: true)
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {

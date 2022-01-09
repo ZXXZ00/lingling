@@ -51,6 +51,7 @@ class MainView: UIView, MSCircularSliderDelegate {
         question = pdf(filename: "question", scale: noteScale*2)
         super.init(frame: frame)
         setUp()
+        addDebugButton()
     }
     
     public required init?(coder: NSCoder) {
@@ -61,6 +62,14 @@ class MainView: UIView, MSCircularSliderDelegate {
         super.safeAreaInsetsDidChange()
         username.center.y += safeAreaInsets.top
         leaderboard.center.y += safeAreaInsets.top
+    }
+    
+    private func addDebugButton() {
+        let debugB = UIButton(frame: CGRect(x: 200, y: 20, width: 80, height: 40))
+        debugB.setTitle("debug", for: .normal)
+        debugB.setTitleColor(.black, for: .normal)
+        debugB.addTarget(controller, action: #selector(MainViewController.showDebug), for: .touchUpInside)
+        addSubview(debugB)
     }
     
     private func setUp() {

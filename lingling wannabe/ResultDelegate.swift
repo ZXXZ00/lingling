@@ -14,6 +14,8 @@ class ResultDelegate {
     static var cutoff = 0.5
     static var percentage = 0.5
     
+    var debugP = 0.0
+    
     var isPracticing = false
     private var musicCounter = 0
     private var backgroundCounter = 0
@@ -36,6 +38,7 @@ class ResultDelegate {
         } else {
             backgroundCounter += 1
         }
+        debugP = musicP
         if musicCounter > 2 {
             musicCounter = 0
             backgroundCounter = 0

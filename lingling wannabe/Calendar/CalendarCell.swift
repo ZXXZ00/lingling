@@ -43,6 +43,7 @@ class CalendarCell : UICollectionViewCell {
     }
     
     func addAsset(filenames: [String]) {
+        var counter = 0
         let scale = UserInfoViewController.scale
         let assetScale = scale * 0.045
         // 300 is the standard size of cavnas
@@ -57,6 +58,13 @@ class CalendarCell : UICollectionViewCell {
                 position.x = 300/2 * assetScale
                 position.y += 300*assetScale
             }
+            counter += 1
+            if counter == 12 { break }
+        }
+        if filenames.count - counter > 0 {
+            // increment x position once again
+            position.x += 300*assetScale
+            // TODO: add ... asset to it
         }
     }
 }

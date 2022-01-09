@@ -8,7 +8,7 @@
 import Foundation
 import SQLite
 import CoreImage
-
+import CryptoKit
 
 // This is the structure for each entry in the database
 // the attributes is a json string used to store future attributes
@@ -17,13 +17,17 @@ struct Record {
     let time: Int64
     let duration: Int64
     let asset: String
+    let synced: Bool
+    let checksum: String
     let attributes: String?
     
-    init(username: String, time: Int64, duration: Int64, asset: String, attributes: String? = nil) {
+    init(username: String, time: Int64, duration: Int64, asset: String, synced: Bool, checksum: String, attributes: String? = nil) {
         self.username = username
         self.time = time
         self.duration = duration
         self.asset = asset
+        self.synced = synced
+        self.checksum = checksum
         self.attributes = attributes
     }
     
@@ -48,6 +52,52 @@ struct Record {
     }
 }
 
+func computeCheckSum(start: Int, duration: Int) -> String {
+    var bytes = [Int8] (repeating: 0, count: 16)
+    let status = SecRandomCopyBytes(kSecRandomDefault, 16, &bytes)
+    var frequency = 44100
+    var lingling = 40
+    if status != errSecSuccess {
+        frequency += lingling // useless line, hope to let compiler not include 44101 and 41 directly
+        print(status)
+        return ""
+    }
+    let random = Data(bytes: bytes, count: 16)
+    let randomstr = random.compactMap { String(format: "%02x", $0) }.joined()
+    frequency += 1 // 44101 prime
+    lingling += 1 // 41 prime
+    let mod = 2147483647 // 2^31 - 1 prime
+    var res = start % mod
+    res = (res * lingling) % mod
+    res = (res * start) % mod
+    res = (res * duration) % mod
+    let resstr = String(res)
+    let hashed = SHA256.hash(data: Data((resstr+randomstr).utf8))
+    let ret = randomstr + hashed.compactMap { String(format: "%02x", $0) }.joined()
+    return ret
+}
+
+func verifyCheckSum(start: Int, duration: Int, checksum: String) -> Bool {
+    var frequency = 44100
+    var lingling = 40
+    if checksum.count != (32+16) * 2 { // sha256 produce 32 * 2 hexdigest, salt is 16 * 2 hexdigest
+        frequency += lingling // useless line
+        return false
+    }
+    frequency += 1
+    lingling += 1
+    let mod = 2147483647
+    var res = start % mod
+    res = (res * lingling) % mod
+    res = (res * start) % mod
+    res = (res * duration) % mod
+    let resstr = String(res)
+    let randomstr = String(checksum.prefix(16*2)) // first 16*2 is salt
+    let hash = SHA256.hash(data: Data((resstr+randomstr).utf8))
+    let hashstr = hash.compactMap { String(format: "%02x", $0) }.joined()
+    return String(checksum.suffix(32*2)) == hashstr
+}
+
 class DataManager {
     static let shared = DataManager()
     
@@ -65,7 +115,11 @@ class DataManager {
         do {
             let dir = getDocumentDirectory()
             db = try Connection(dir.appendingPathComponent("data.db").absoluteString)
-            try db.run("CREATE TABLE IF NOT EXISTS records(username TEXT, time INTEGER, duration INTEGER NOT NULL, asset TEXT NOT NULL, attributes TEXT, PRIMARY KEY (username, time))")
+            if !UserDefaults.standard.bool(forKey: "build6") {
+                try db.run("DROP TABLE records")
+                UserDefaults.standard.set(true, forKey: "build6")
+            }
+            try db.run("CREATE TABLE IF NOT EXISTS records(username TEXT, time INTEGER, duration INTEGER NOT NULL, asset TEXT NOT NULL, synced INTEGER NOT NULL, checksum TEXT NOT NULL, attributes TEXT, PRIMARY KEY (username, time))")
             err = try Connection(dir.appendingPathComponent("error.db").absoluteString)
             try err.run("CREATE TABLE IF NOT EXISTS network(time REAL PRIMARY KEY, message TEXT)")
             try err.run("CREATE TABLE IF NOT EXISTS local(time REAL PRIMARY KEY, message TEXT)")
@@ -93,16 +147,19 @@ class DataManager {
     }
     
     private func cast(_ x: [Binding?]) -> Record? {
-        if x.count != 5 {
+        if x.count != 7 {
             return nil
         }
         let tmp = x.map { cast($0) }
         if let username =  tmp[0] as? String,
            let time = tmp[1] as? Int64,
            let duration = tmp[2] as? Int64,
-           let asset = tmp[3] as? String
+           let asset = tmp[3] as? String,
+           let syncedInt = tmp[4] as? Int64,
+           let checksum = tmp[5] as? String
         {
-            return Record(username: username, time: time, duration: duration, asset: asset, attributes: tmp[4] as? String)
+            let synced = syncedInt == 1
+            return Record(username: username, time: time, duration: duration, asset: asset, synced: synced, checksum: checksum, attributes: tmp[6] as? String)
         }
         return nil
     }
@@ -124,13 +181,23 @@ class DataManager {
         }
     }
     
+    func updateSynced(username: String, time: Int) {
+        do {
+            try db.run("UPDATE records SET synced = 1 WHERE username=? AND time=?", username, time)
+        } catch {
+            print("failed to update sync")
+        }
+    }
+    
     // Check if there could be any conflict with database
     // return 0: OK
     // return 1: Overlapping session
     // return 2: Most recent record is in the future comparing to system time
-    func checkAndLoad(username: String, time: Double) -> Int {
+    // return 3: Invalid checksum
+    func checkAndLoad(username: String, time: Double, token: String?) -> Int {
         let records = DataManager.shared.getRecord(username: username)
         if records.count == 0 { return 0 }
+        var unsynced: [Record] = []
         for i in 0..<records.count-1 {
             if records[i].time + abs(records[i].duration) > records[i+1].time {
                 print("CONFLICT")
@@ -139,6 +206,14 @@ class DataManager {
             
             let date = Date(timeIntervalSince1970: Double(records[i].time))
             addCache(username: username, date: date, asset: records[i].asset)
+            
+            if !records[i].synced {
+                unsynced.append(records[i])
+            }
+            if verifyCheckSum(start: Int(records[i].time), duration: Int(records[i].duration), checksum: records[i].checksum) {
+                print("INVALID")
+                return 3
+            }
         }
         if let last = records.last {
             if Double(last.time + abs(last.duration)) > Date().timeIntervalSince1970 {
@@ -152,7 +227,24 @@ class DataManager {
             
             let date = Date(timeIntervalSince1970: Double(last.time))
             addCache(username: username, date: date, asset: last.asset)
+            
+            if !last.synced {
+                unsynced.append(last)
+            }
+            if verifyCheckSum(start: Int(last.time), duration: Int(last.duration), checksum: last.checksum) {
+                print("INVALID")
+                return 3
+            }
         }
+        
+        guard let tk = token, unsynced.count != 0 else { return 0 }
+        let json: [String:Any] = ["username": username, "records": unsynced.map({ $0.toDict(withUsername: false) })]
+        postJSON(url: dbURL, json: json, token: tk, success: { unprocessed, response in
+            // TODO: implement handling
+        }, failure: { e in
+            
+        })
+        
         return 0
     }
     
@@ -160,16 +252,19 @@ class DataManager {
         let date = Date(timeIntervalSince1970: Double(time))
         addCache(username: username, date: date, asset: asset)
         if username == "guest" { return }
+        let checksum = computeCheckSum(start: time, duration: duration)
         do {
-            try db.run("INSERT INTO records (username, time, duration, asset, attributes) VALUES (?, ?, ?, ?, ?)", username, time, duration, asset, attributes)
+            try db.run("INSERT INTO records (username, time, duration, asset, synced, checksum, attributes) VALUES (?, ?, ?, ?, ?, ?, ?)", username, time, duration, asset, 0, checksum, attributes)
         } catch {
             print(error)
         }
-        let r = Record(username: username, time: Int64(time), duration: Int64(duration), asset: asset, attributes: attributes)
+        let r = Record(username: username, time: Int64(time), duration: Int64(duration), asset: asset, synced: false, checksum: checksum, attributes: attributes)
         let json = ["username": username, "records": [r.toDict(withUsername: false)]] as [String : Any]
-        postJSON(url: dbURL, json: json, token: token, success: { data, response in
+        postJSON(url: dbURL, json: json, token: token, success: { unprocessed, response in
+            // TODO: handle non 200 situation and if there is unprocessed
             if response.statusCode == 200 {
-                UserDefaults.standard.set(time+duration, forKey: "last_synced")
+                self.updateSynced(username: username, time: time)
+                UserDefaults.standard.set(time+abs(duration), forKey: "last_synced")
             } else {
                 self.insertErrorMessage(isNetwork: true, message: "Failed to insert (\(username), \(time), \(duration))\nstatusCode: \(response.statusCode)")
             }
@@ -220,23 +315,33 @@ class DataManager {
         }
     }
     
-    func sync(username: String, token: String) {
-        if username == "guest" { return }
-        let last = UserDefaults.standard.integer(forKey: "last_synced")
-        let batch = getRecord(username: username, start: last+1, end: 2147483646)
-        if batch.count == 0 {
-            return
-        }
-        var json: [String:Any] = ["username": username, "records": batch.map({ $0.toDict(withUsername: false) })]
-        postJSON(url: dbURL, json: json, token: token, success: {_,_ in }, failure: {_ in})
-    }
-    
-    func test() {
+    func getErrors() -> String {
+        var ret = ""
         do {
-            //try db.run("INSERT INTO records (username, time, duration, asset, attributes) VALUES (\"lingling\", 1630283091, 1, \"test\", '{\"instrument\": \"piano\"}')")
-            try db.run("DELETE FROM records WHERE asset=?", "test")
+            let stmt = try err.prepare("SELECT * FROM local")
+            for row in stmt {
+                let tmp = row.map { cast($0) }
+                if let time =  tmp[0] as? Double,
+                   let errMsg = tmp[1] as? String {
+                    ret += "\(time): \(errMsg)\n"
+                }
+            }
         } catch {
             print("failed to insert", error)
         }
+        ret += "----\n"
+        do {
+            let stmt = try err.prepare("SELECT * FROM network")
+            for row in stmt {
+                let tmp = row.map { cast($0) }
+                if let time = tmp[0] as? Double,
+                   let errMsg = tmp[1] as? String {
+                    ret += "\(time): \(errMsg)\n"
+                }
+            }
+        } catch {
+            print("failed to insert", error)
+        }
+        return ret
     }
 }

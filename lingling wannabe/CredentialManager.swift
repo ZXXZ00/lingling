@@ -61,7 +61,8 @@ class CredentialManager {
         let attrs = [kSecClass: kSecClassGenericPassword,
                kSecAttrService: tokenType,
                kSecAttrAccount: "com.zxxz",
-                 kSecValueData: Data(token.utf8)] as CFDictionary
+                 kSecValueData: Data(token.utf8),
+            kSecAttrAccessible: kSecAttrAccessibleAfterFirstUnlock] as CFDictionary
         let status = SecItemAdd(attrs, nil)
         if status != errSecSuccess {
             if status == errSecDuplicateItem {
@@ -96,6 +97,7 @@ class CredentialManager {
             if let access = self.getAccessToken() {
                 ret = String(data: access, encoding: .utf8)
             } else {
+                print("didn't get access token, attempt to refresh")
                 guard let refreshD = self.getRefreshToken() else { return }
                 guard let refresh = String(data: refreshD, encoding: .utf8) else { return }
                 let semaphore = DispatchSemaphore(value: 0)

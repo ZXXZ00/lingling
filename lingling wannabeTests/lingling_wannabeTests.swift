@@ -17,6 +17,23 @@ class lingling_wannabeTests: XCTestCase {
     override func tearDownWithError() throws {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
+    
+    func testCheckSum() throws {
+        for _ in 0..<100 {
+            let start = Int.random(in: 0..<2147483647)
+            let duration = Int.random(in: 1..<10000)
+            let checksum = computeCheckSum(start: start, duration: duration)
+            let entropy1 = Int.random(in: 1..<827349507)
+            let entropy2 = Int.random(in: 1..<238478734)
+            let wrong = computeCheckSum(start: start+entropy1, duration: duration+entropy2)
+            XCTAssert(verifyCheckSum(start: start, duration: duration, checksum: checksum))
+            XCTAssert(verifyCheckSum(start: start+entropy1, duration: duration+entropy2, checksum: wrong))
+            XCTAssert(!verifyCheckSum(start: start, duration: duration, checksum: wrong))
+            XCTAssert(!verifyCheckSum(start: start+entropy1, duration: duration+entropy2, checksum: checksum))
+            XCTAssert(!verifyCheckSum(start: start+entropy1, duration: duration, checksum: checksum))
+            XCTAssert(!verifyCheckSum(start: start, duration: duration+entropy2, checksum: checksum))
+        }
+    }
 
     func testExample() throws {
         // This is an example of a functional test case.
