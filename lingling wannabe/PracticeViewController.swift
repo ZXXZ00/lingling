@@ -18,10 +18,13 @@ class PracticeViewController : UIViewController {
     let pauseImage = UIImage(named: "pause")
     let countdown = UILabel()
     let label = UILabel()
+    let abortButton = UIButton()
+    let abortCountdown = UILabel()
     
     var completion: (() -> Void)? = nil
     var remaining: Int
     var timer: Timer? = nil
+    var abortRemaining = 30
     
     let analyzer = AudioStreamAnalyzer()
     
@@ -54,8 +57,9 @@ class PracticeViewController : UIViewController {
         speed.textColor = UIColor(white: 0.5, alpha: 1)
         speed.center = CGPoint(x: view.center.x/2, y: view.center.y/2-45)
         
-        label.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 60)
+        label.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 80)
         label.textAlignment = .center
+        label.numberOfLines = 2
         label.font = UIFont(name: "AmericanTypewriter", size: 20)
         label.textColor = UIColor(white: 0.5, alpha: 1)
         label.center = view.center
@@ -74,6 +78,31 @@ class PracticeViewController : UIViewController {
         countdown.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20).isActive = true
         countdown.widthAnchor.constraint(equalToConstant: 80).isActive = true
         countdown.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        
+        abortButton.setTitle("Abort", for: .normal)
+        abortButton.titleLabel?.font = UIFont(name: "AmericanTypewriter", size: 20)
+        abortButton.setTitleColor(UIColor(white: 0.6, alpha: 1), for: .normal)
+        abortButton.layer.borderWidth = 1
+        abortButton.layer.cornerRadius = 10
+        abortButton.layer.borderColor = UIColor(white: 0.6, alpha: 1).cgColor
+        view.addSubview(abortButton)
+        abortButton.translatesAutoresizingMaskIntoConstraints = false
+        abortButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        abortButton.centerYAnchor.constraint(equalTo: view.bottomAnchor, constant: -100).isActive = true
+        abortButton.widthAnchor.constraint(equalToConstant: 100).isActive = true
+        abortButton.heightAnchor.constraint(equalToConstant: 64).isActive = true
+        abortButton.addTarget(self, action: #selector(abortWarning), for: .touchUpInside)
+        
+        abortCountdown.textAlignment = .center
+        abortCountdown.font = UIFont(name: "AmericanTypewriter", size: 15)
+        abortCountdown.textColor = UIColor(white: 0.6, alpha: 1)
+        abortButton.addSubview(abortCountdown)
+        abortCountdown.translatesAutoresizingMaskIntoConstraints = false
+        abortCountdown.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        abortCountdown.centerYAnchor.constraint(equalTo: abortButton.topAnchor, constant: 12).isActive = true
+        abortCountdown.widthAnchor.constraint(equalToConstant: 100).isActive = true
+        abortCountdown.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        
         
         view.addSubview(slider)
         view.addSubview(speed)
@@ -94,10 +123,22 @@ class PracticeViewController : UIViewController {
     @objc func updateTimer() {
         if ResultDelegate.shared.isPracticing {
             label.text = "\(ResultDelegate.shared.debugP)\n"
+            //label.text = ""
         } else {
             label.text = "\(ResultDelegate.shared.debugP)\nSounds like you are not practicing!"
+            //label.text = "Sounds like you are not practicing!"
         }
         remaining -= 1
+        if abortRemaining > 0 {
+            abortRemaining -= 1
+            if abortRemaining > 9 {
+                abortCountdown.text = "00:\(abortRemaining)"
+            } else {
+                abortCountdown.text = "00:0\(abortRemaining)"
+            }
+        } else if abortRemaining == 0 {
+            abortButton.removeFromSuperview()
+        }
         if remaining < 0 {
             timer?.invalidate()
             timer = nil
@@ -115,6 +156,16 @@ class PracticeViewController : UIViewController {
         } else {
             countdown.text = "\(minutes):\(seconds)"
         }
+    }
+    
+    @objc func abortWarning() {
+        let alert = UIAlertController(title: "Abort Session", message: "Are you sure you want to abort current session?", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: nil))
+        alert.addAction(UIAlertAction(title: "Abort", style: .default) { _ in
+            self.analyzer.stop()
+            self.dismiss(animated: true)
+        })
+        self.present(alert, animated: true)
     }
     
     override func viewDidAppear(_ animated: Bool) {

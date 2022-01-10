@@ -210,7 +210,7 @@ class DataManager {
             if !records[i].synced {
                 unsynced.append(records[i])
             }
-            if verifyCheckSum(start: Int(records[i].time), duration: Int(records[i].duration), checksum: records[i].checksum) {
+            if !verifyCheckSum(start: Int(records[i].time), duration: Int(records[i].duration), checksum: records[i].checksum) {
                 print("INVALID")
                 return 3
             }
@@ -231,7 +231,7 @@ class DataManager {
             if !last.synced {
                 unsynced.append(last)
             }
-            if verifyCheckSum(start: Int(last.time), duration: Int(last.duration), checksum: last.checksum) {
+            if !verifyCheckSum(start: Int(last.time), duration: Int(last.duration), checksum: last.checksum) {
                 print("INVALID")
                 return 3
             }
@@ -262,9 +262,12 @@ class DataManager {
         let json = ["username": username, "records": [r.toDict(withUsername: false)]] as [String : Any]
         postJSON(url: dbURL, json: json, token: token, success: { unprocessed, response in
             // TODO: handle non 200 situation and if there is unprocessed
+            print("add record status: \(response.statusCode)")
             if response.statusCode == 200 {
+                print("status 200, upload success")
                 self.updateSynced(username: username, time: time)
                 UserDefaults.standard.set(time+abs(duration), forKey: "last_synced")
+                print("status 200 finished client handling")
             } else {
                 self.insertErrorMessage(isNetwork: true, message: "Failed to insert (\(username), \(time), \(duration))\nstatusCode: \(response.statusCode)")
             }

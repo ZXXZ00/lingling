@@ -54,25 +54,18 @@ class MainViewController: UIViewController {
         content.transform = CATransform3DMakeScale(scale, scale, 1)
         intro.layer.addSublayer(content)
         view.addSubview(intro)
+        let introTime = 2.0
         
         serialQueue.async {
-            let start = Date().timeIntervalSince1970
             let token = CredentialManager.shared.getToken()
             self.dataStatus = DataManager.shared.checkAndLoad(username: self.username, time: Date().timeIntervalSince1970, token: token)
-            let introTime = 2.0
-            let loadingTime = Date().timeIntervalSince1970 - start
-            var delay = 0.0
-            if loadingTime < introTime {
-                delay = introTime - loadingTime
-            }
-            DispatchQueue.main.async {
-                UIView.animate(withDuration: 1, delay: delay, animations: {
-                    intro.alpha = 0
-                }, completion: {finished in
-                    intro.removeFromSuperview()
-                })
-            }
         }
+        UIView.animate(withDuration: 1, delay: introTime, animations: {
+            intro.alpha = 0
+        }, completion: {finished in
+            intro.removeFromSuperview()
+        })
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -151,16 +144,8 @@ class MainViewController: UIViewController {
             asset = assetName + "_rest"
         }
         serialQueue.async {
-            if let token = CredentialManager.shared.getToken() {
-                print("add record with token")
-                DataManager.shared.addRecord(username: self.username, time: start, duration: span, asset: asset, attributes: "{\"music\": \(percentage)}", token: token)
-            } else if self.username == "guest" {
-                print("add record as guest")
-                DataManager.shared.addRecord(username: self.username, time: start, duration: span, asset: asset, attributes: "{\"music\": \(percentage)}", token: nil)
-            } else {
-                print("nothing")
-                // TODO: couldn't get token, need to sign user out
-            }
+            let token = CredentialManager.shared.getToken()
+            DataManager.shared.addRecord(username: self.username, time: start, duration: span, asset: asset, attributes: "{\"music\": \(percentage)}", token: token)
         }
     }
     

@@ -128,6 +128,7 @@ class CredentialManager {
                     semaphore.signal()
                 }, failure: { err in
                     print(err.localizedDescription)
+                    semaphore.signal()
                 })
                 semaphore.wait()
             }
