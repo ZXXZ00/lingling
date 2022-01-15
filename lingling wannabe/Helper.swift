@@ -79,6 +79,7 @@ func postJSON(url: URL, json: [String: Any], token: String?=nil,
         } else {
             print("failed to cast response and data")
             // TODO: failed to cast
+            DataManager.shared.insertErrorMessage(isNetwork: true, message: "failed to case response from post")
         }
         print("\nresponse")
         if let res = response as? HTTPURLResponse {
@@ -100,6 +101,7 @@ func postJSON(url: URL, json: [String: Any], token: String?=nil,
     task.resume()
 }
 
+// TODO: Implement getJSON with response 
 func getJSON(url: URL, success: @escaping (_: Any) -> Void, failure: @escaping (_: Error) -> Void) {
     var request = URLRequest(url: url)
     request.setValue("application/json", forHTTPHeaderField: "Content-Type")

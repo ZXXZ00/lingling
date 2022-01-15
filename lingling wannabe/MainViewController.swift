@@ -37,6 +37,7 @@ class MainViewController: UIViewController {
     }
     
     override func viewDidLoad() {
+        super.viewDidLoad()
         if username == "guest" {
             let signup = LoginViewController(CGSize(width: view.frame.width, height: view.frame.height), isFullScreen: true) { [weak self] user in self?.changeUser(user: user)
             }
@@ -69,14 +70,14 @@ class MainViewController: UIViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         let tmp = CredentialManager.shared.getUsername()
         if tmp != username {
             // TODO: sign user out because there is a change in username
         }
+        print("view will appear")
         changeUser(user: tmp)
-        let cs = computeCheckSum(start: 4326, duration: 900)
-        print(cs)
-        print(verifyCheckSum(start: 4326, duration: 900, checksum: cs))
+        DataManager.shared.sync(username: username)
     }
     
     func checkData() {
@@ -98,6 +99,7 @@ class MainViewController: UIViewController {
     }
     
     override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         checkData()
     }
 
@@ -144,8 +146,7 @@ class MainViewController: UIViewController {
             asset = assetName + "_rest"
         }
         serialQueue.async {
-            let token = CredentialManager.shared.getToken()
-            DataManager.shared.addRecord(username: self.username, time: start, duration: span, asset: asset, attributes: "{\"music\": \(percentage)}", token: token)
+            DataManager.shared.addRecord(username: self.username, time: start, duration: span, asset: asset, attributes: "{\"music\": \(percentage)}", upload: true)
         }
     }
     
@@ -185,6 +186,7 @@ class MainViewController: UIViewController {
         let userinfoView = UserInfoViewController(CGSize(width: width, height: width*4/3), username: username)
         present(userinfoView, animated: true, completion: nil)
         serialQueue.async {
+            DataManager.shared.sync(username: self.username)
             DispatchQueue.main.async {
                 userinfoView.loadData()
             }

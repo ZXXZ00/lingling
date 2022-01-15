@@ -13,13 +13,13 @@ import CryptoKit
 // This is the structure for each entry in the database
 // the attributes is a json string used to store future attributes
 struct Record {
-    let username: String
-    let time: Int64
-    let duration: Int64
-    let asset: String
-    let synced: Bool
-    let checksum: String
-    let attributes: String?
+    var username: String
+    var time: Int64
+    var duration: Int64
+    var asset: String
+    var synced: Bool
+    var checksum: String
+    var attributes: String?
     
     init(username: String, time: Int64, duration: Int64, asset: String, synced: Bool, checksum: String, attributes: String? = nil) {
         self.username = username
@@ -34,9 +34,9 @@ struct Record {
     func toDict(withUsername: Bool) -> [String:Any] {
         var ret: [String:Any]
         if withUsername {
-            ret = ["username": username, "start_time": time, "duration": duration, "asset": asset]
+            ret = ["username": username, "start_time": time, "duration": duration, "checksum": checksum, "asset": asset]
         } else {
-            ret = ["start_time": time, "duration": duration, "asset": asset]
+            ret = ["start_time": time, "duration": duration, "checksum": checksum, "asset": asset]
         }
         if let attr = attributes {
             do {
@@ -69,7 +69,7 @@ func computeCheckSum(start: Int, duration: Int) -> String {
     let mod = 2147483647 // 2^31 - 1 prime
     var res = start % mod
     res = (res * lingling) % mod
-    res = (res * start) % mod
+    res = (res * frequency) % mod
     res = (res * duration) % mod
     let resstr = String(res)
     let hashed = SHA256.hash(data: Data((resstr+randomstr).utf8))
@@ -89,7 +89,7 @@ func verifyCheckSum(start: Int, duration: Int, checksum: String) -> Bool {
     let mod = 2147483647
     var res = start % mod
     res = (res * lingling) % mod
-    res = (res * start) % mod
+    res = (res * frequency) % mod
     res = (res * duration) % mod
     let resstr = String(res)
     let randomstr = String(checksum.prefix(16*2)) // first 16*2 is salt
@@ -115,9 +115,9 @@ class DataManager {
         do {
             let dir = getDocumentDirectory()
             db = try Connection(dir.appendingPathComponent("data.db").absoluteString)
-            if !UserDefaults.standard.bool(forKey: "build6") {
-                try db.run("DROP TABLE records")
-                UserDefaults.standard.set(true, forKey: "build6")
+            if !UserDefaults.standard.bool(forKey: "build6db") {
+                try db.run("DROP TABLE IF EXISTS records")
+                UserDefaults.standard.set(true, forKey: "build6db")
             }
             try db.run("CREATE TABLE IF NOT EXISTS records(username TEXT, time INTEGER, duration INTEGER NOT NULL, asset TEXT NOT NULL, synced INTEGER NOT NULL, checksum TEXT NOT NULL, attributes TEXT, PRIMARY KEY (username, time))")
             err = try Connection(dir.appendingPathComponent("error.db").absoluteString)
@@ -194,6 +194,7 @@ class DataManager {
     // return 1: Overlapping session
     // return 2: Most recent record is in the future comparing to system time
     // return 3: Invalid checksum
+    // TODO: this function handles the token and return -1 if auth failed
     func checkAndLoad(username: String, time: Double, token: String?) -> Int {
         let records = DataManager.shared.getRecord(username: username)
         if records.count == 0 { return 0 }
@@ -236,37 +237,70 @@ class DataManager {
                 return 3
             }
         }
-        
-        guard let tk = token, unsynced.count != 0 else { return 0 }
+        if unsynced.count == 0 { return 0 }
+        guard let tk = token else { return -1 } // failed to get token
         let json: [String:Any] = ["username": username, "records": unsynced.map({ $0.toDict(withUsername: false) })]
         postJSON(url: dbURL, json: json, token: tk, success: { unprocessed, response in
             // TODO: implement handling
+            if response.statusCode == 200 {
+                var unprocessedSet = Set<Int>()
+                do {
+                    let jsonobj = try JSONSerialization.jsonObject(with: unprocessed)
+                    guard let arr = jsonobj as? [[String:Any]] else {
+                        self.insertErrorMessage(isNetwork: true, message: "Failed to cast unprocessed as [[String:Any]]")
+                        print("unprocessed fail")
+                        return
+                    }
+                    for rec in arr {
+                        if let st = rec["start_time"] as? Int {
+                            unprocessedSet.insert(st)
+                        }
+                    }
+                } catch {
+                    self.insertErrorMessage(isNetwork: true, message: "Failed to read unprocessed \(error.localizedDescription)")
+                    print("failed to cast unprocessed")
+                    return
+                }
+                for r in unsynced {
+                    if unprocessedSet.contains(Int(r.time)) { continue }
+                    self.updateSynced(username: username, time: Int(r.time))
+                }
+            } else {
+                self.insertErrorMessage(isNetwork: true, message: "failed to upload unsynced part, status code \(response.statusCode)")
+            }
         }, failure: { e in
-            
+            self.insertErrorMessage(isNetwork: false, message: e.localizedDescription )
         })
         
         return 0
     }
     
-    func addRecord(username: String, time: Int, duration: Int, asset: String, attributes: String, token: String?) {
+    // return -1 if failed to get token
+    func addRecord(username: String, time: Int, duration: Int, asset: String, attributes: String?, upload: Bool) -> Int {
         let date = Date(timeIntervalSince1970: Double(time))
         addCache(username: username, date: date, asset: asset)
-        if username == "guest" { return }
+        if username == "guest" { return 0 }
         let checksum = computeCheckSum(start: time, duration: duration)
         do {
-            try db.run("INSERT INTO records (username, time, duration, asset, synced, checksum, attributes) VALUES (?, ?, ?, ?, ?, ?, ?)", username, time, duration, asset, 0, checksum, attributes)
+            if let attr = attributes {
+                try db.run("INSERT INTO records (username, time, duration, asset, synced, checksum, attributes) VALUES (?, ?, ?, ?, ?, ?, ?)", username, time, duration, asset, 0, checksum, attr)
+            } else {
+                try db.run("INSERT INTO records (username, time, duration, asset, synced, checksum) VALUES (?, ?, ?, ?, ?, ?)", username, time, duration, asset, 0, checksum)
+            }
         } catch {
             print(error)
         }
         let r = Record(username: username, time: Int64(time), duration: Int64(duration), asset: asset, synced: false, checksum: checksum, attributes: attributes)
+        if !upload { return 0 }
+        guard let token = CredentialManager.shared.getToken() else { return -1 }
         let json = ["username": username, "records": [r.toDict(withUsername: false)]] as [String : Any]
+        // TODO: implement semaphore to wait, maybe no need for semaphore
         postJSON(url: dbURL, json: json, token: token, success: { unprocessed, response in
             // TODO: handle non 200 situation and if there is unprocessed
             print("add record status: \(response.statusCode)")
             if response.statusCode == 200 {
                 print("status 200, upload success")
                 self.updateSynced(username: username, time: time)
-                UserDefaults.standard.set(time+abs(duration), forKey: "last_synced")
                 print("status 200 finished client handling")
             } else {
                 self.insertErrorMessage(isNetwork: true, message: "Failed to insert (\(username), \(time), \(duration))\nstatusCode: \(response.statusCode)")
@@ -274,6 +308,7 @@ class DataManager {
         }, failure: { e in
             self.insertErrorMessage(isNetwork: false, message: e.localizedDescription)
         })
+        return 0
     }
     
     func getRecord(username: String) -> [Record]{
@@ -308,6 +343,54 @@ class DataManager {
             print(error)
         }
         return ret
+    }
+    
+    func downloadRecord(username: String, start: Int?=nil, end: Int?=nil) {
+        var url = URLComponents(url: dbURL, resolvingAgainstBaseURL: true)
+        if let s = start, let e = end {
+            url?.query = "username=\(username)&start_t=\(s)&end_t=\(e)"
+        } else {
+            url?.query = "username=\(username)"
+        }
+        guard let u = url?.url else { return }
+        getJSON(url: u, success: { json in
+            print(json)
+            guard let arr = json as? [[String:Any]] else { return }
+            for r in arr {
+                if let st = r["start_time"] as? Int,
+                   let duration = r["duration"] as? Int,
+                   let asset = r["asset"] as? String {
+                    self.addRecord(username: username, time: st, duration: duration, asset: asset, attributes: nil, upload: false)
+                    self.updateSynced(username: username, time: st)
+                } else {
+                    print("failed to cast downloaded records", r)
+                }
+            }
+        }, failure: { _ in }) // TODO: implement failure
+    }
+    
+    func getLast() -> Record? {
+        do {
+            let stmt = try db.prepare("SELECT * FROM records ORDER BY time DESC LIMIT 1")
+            for row in stmt {
+                return cast(row)
+            }
+        } catch {
+            print(error)
+        }
+        return nil
+    }
+    
+    func sync(username: String) {
+        if username == "guest" { return }
+        if let last = getLast() {
+            let current = Int(Date().timeIntervalSince1970)
+            // only sync after 15 minutes has passed since the end of last practice session
+            if current - Int(last.time+last.duration) < 900 { return }
+            downloadRecord(username: username, start: Int(last.time+last.duration), end: current)
+        } else {
+            downloadRecord(username: username)
+        }
     }
     
     func clear() {

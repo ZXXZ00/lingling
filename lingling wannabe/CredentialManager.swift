@@ -23,6 +23,10 @@ class CredentialManager {
     let url = URL(string: "https://0j6a9nvvx3.execute-api.us-east-1.amazonaws.com/refresh")!
     
     private init() {
+        if !UserDefaults.standard.bool(forKey: "build6c") {
+            delete()
+            UserDefaults.standard.set(true, forKey: "build6c")
+        }
         pthread_rwlock_init(&lock, nil)
         if let token = getRefreshToken() {
             do {
@@ -170,7 +174,7 @@ class CredentialManager {
         return res as? Data
     }
     
-    private func delete() {
+    func delete() {
         let refresh = [kSecClass: kSecClassGenericPassword,
                  kSecAttrService: "refresh",
                  kSecAttrAccount: "com.zxxz"] as CFDictionary
