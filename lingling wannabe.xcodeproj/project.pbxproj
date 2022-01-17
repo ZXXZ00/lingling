@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1B21DB6B7B42098E49B07648 /* Pods_lingling_wannabe.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A01D71EAA010F97058EA8B8 /* Pods_lingling_wannabe.framework */; };
 		660C84F3274EDC09005370E0 /* quaver_rest.json in Resources */ = {isa = PBXBuildFile; fileRef = 660C84E9274EDC08005370E0 /* quaver_rest.json */; };
 		660C84F4274EDC09005370E0 /* semiquaver_rest.json in Resources */ = {isa = PBXBuildFile; fileRef = 660C84EA274EDC08005370E0 /* semiquaver_rest.json */; };
 		660C84F5274EDC09005370E0 /* half_rest.json in Resources */ = {isa = PBXBuildFile; fileRef = 660C84EB274EDC08005370E0 /* half_rest.json */; };
@@ -66,6 +65,7 @@
 		66FDECE22607CFA300FB9019 /* AudioStreamAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66FDECE12607CFA300FB9019 /* AudioStreamAnalyzer.swift */; };
 		66FDECE72607CFC500FB9019 /* TwoCategory.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 66FDECE62607CFC500FB9019 /* TwoCategory.mlmodel */; };
 		66FDECEC2607D10900FB9019 /* ResultDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66FDECEB2607D10900FB9019 /* ResultDelegate.swift */; };
+		A948108B89948C5A3CE6D423 /* Pods_lingling_wannabe.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B9109EB472831329D990D3AB /* Pods_lingling_wannabe.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -86,7 +86,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		03C3EC38864936046E0FB754 /* Pods-lingling wannabe.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-lingling wannabe.release.xcconfig"; path = "Target Support Files/Pods-lingling wannabe/Pods-lingling wannabe.release.xcconfig"; sourceTree = "<group>"; };
 		660C84E9274EDC08005370E0 /* quaver_rest.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = quaver_rest.json; sourceTree = "<group>"; };
 		660C84EA274EDC08005370E0 /* semiquaver_rest.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = semiquaver_rest.json; sourceTree = "<group>"; };
 		660C84EB274EDC08005370E0 /* half_rest.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = half_rest.json; sourceTree = "<group>"; };
@@ -152,8 +151,9 @@
 		66FDECE12607CFA300FB9019 /* AudioStreamAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioStreamAnalyzer.swift; sourceTree = "<group>"; };
 		66FDECE62607CFC500FB9019 /* TwoCategory.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = TwoCategory.mlmodel; sourceTree = "<group>"; };
 		66FDECEB2607D10900FB9019 /* ResultDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultDelegate.swift; sourceTree = "<group>"; };
-		8A01D71EAA010F97058EA8B8 /* Pods_lingling_wannabe.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_lingling_wannabe.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		93912A5F9E6E89569159941A /* Pods-lingling wannabe.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-lingling wannabe.debug.xcconfig"; path = "Target Support Files/Pods-lingling wannabe/Pods-lingling wannabe.debug.xcconfig"; sourceTree = "<group>"; };
+		A799DCDDF0CF2823F4980E80 /* Pods-lingling wannabe.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-lingling wannabe.debug.xcconfig"; path = "Target Support Files/Pods-lingling wannabe/Pods-lingling wannabe.debug.xcconfig"; sourceTree = "<group>"; };
+		B1C4BD008F0A0FADD58092A0 /* Pods-lingling wannabe.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-lingling wannabe.release.xcconfig"; path = "Target Support Files/Pods-lingling wannabe/Pods-lingling wannabe.release.xcconfig"; sourceTree = "<group>"; };
+		B9109EB472831329D990D3AB /* Pods_lingling_wannabe.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_lingling_wannabe.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -161,7 +161,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1B21DB6B7B42098E49B07648 /* Pods_lingling_wannabe.framework in Frameworks */,
+				A948108B89948C5A3CE6D423 /* Pods_lingling_wannabe.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -330,7 +330,7 @@
 			isa = PBXGroup;
 			children = (
 				6650B723278CEE7100E420D5 /* xcframework.mk */,
-				8A01D71EAA010F97058EA8B8 /* Pods_lingling_wannabe.framework */,
+				B9109EB472831329D990D3AB /* Pods_lingling_wannabe.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -338,8 +338,8 @@
 		EB6D398464925913D272D969 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				93912A5F9E6E89569159941A /* Pods-lingling wannabe.debug.xcconfig */,
-				03C3EC38864936046E0FB754 /* Pods-lingling wannabe.release.xcconfig */,
+				A799DCDDF0CF2823F4980E80 /* Pods-lingling wannabe.debug.xcconfig */,
+				B1C4BD008F0A0FADD58092A0 /* Pods-lingling wannabe.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -351,11 +351,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 66ADE5CE25BE2B0B004B20C6 /* Build configuration list for PBXNativeTarget "lingling wannabe" */;
 			buildPhases = (
-				311F55F729110E73D4642987 /* [CP] Check Pods Manifest.lock */,
+				82391084AE847DAAC7645FBC /* [CP] Check Pods Manifest.lock */,
 				66ADE5A025BE2B0A004B20C6 /* Sources */,
 				66ADE5A125BE2B0A004B20C6 /* Frameworks */,
 				66ADE5A225BE2B0A004B20C6 /* Resources */,
-				56C4327A31B8CB62BD39391E /* [CP] Embed Pods Frameworks */,
+				60899B7DD8B181BBF8468DBE /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -495,7 +495,24 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		311F55F729110E73D4642987 /* [CP] Check Pods Manifest.lock */ = {
+		60899B7DD8B181BBF8468DBE /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-lingling wannabe/Pods-lingling wannabe-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-lingling wannabe/Pods-lingling wannabe-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-lingling wannabe/Pods-lingling wannabe-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		82391084AE847DAAC7645FBC /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -515,23 +532,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		56C4327A31B8CB62BD39391E /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-lingling wannabe/Pods-lingling wannabe-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-lingling wannabe/Pods-lingling wannabe-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-lingling wannabe/Pods-lingling wannabe-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -735,7 +735,7 @@
 		};
 		66ADE5CF25BE2B0B004B20C6 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 93912A5F9E6E89569159941A /* Pods-lingling wannabe.debug.xcconfig */;
+			baseConfigurationReference = A799DCDDF0CF2823F4980E80 /* Pods-lingling wannabe.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -756,7 +756,7 @@
 		};
 		66ADE5D025BE2B0B004B20C6 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 03C3EC38864936046E0FB754 /* Pods-lingling wannabe.release.xcconfig */;
+			baseConfigurationReference = B1C4BD008F0A0FADD58092A0 /* Pods-lingling wannabe.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
