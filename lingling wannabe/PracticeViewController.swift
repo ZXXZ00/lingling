@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import AVFAudio
 
 class PracticeViewController : UIViewController {
     
@@ -22,7 +23,7 @@ class PracticeViewController : UIViewController {
     let abortCountdown = UILabel()
     
     var completion: (() -> Void)? = nil
-    var remaining: Int
+    var duration: Int
     var timer: Timer? = nil
     var abortRemaining = 30
     
@@ -30,8 +31,9 @@ class PracticeViewController : UIViewController {
     
     init(duration: Int, block: (() -> Void)? = nil) {
         completion = block
-        remaining = duration
+        self.duration = duration
         super.init(nibName: nil, bundle: nil)
+        registerForNotifications()
     }
     
     required init?(coder: NSCoder) {
@@ -116,7 +118,7 @@ class PracticeViewController : UIViewController {
         
         let context = ["countdown":"practice"]
         timer = Timer(timeInterval: 1.0, target: self, selector: #selector(updateTimer), userInfo: context, repeats: true)
-        timer!.tolerance = 0.01
+        timer?.tolerance = 0.1
         RunLoop.current.add(timer!, forMode: .common)
     }
     
@@ -128,7 +130,7 @@ class PracticeViewController : UIViewController {
             label.text = "\(ResultDelegate.shared.debugP)\nSounds like you are not practicing!"
             //label.text = "Sounds like you are not practicing!"
         }
-        remaining -= 1
+        let remaining = duration - Int(analyzer.timeElapsed)
         if abortRemaining > 0 {
             abortRemaining -= 1
             if abortRemaining > 9 {
@@ -168,8 +170,38 @@ class PracticeViewController : UIViewController {
         self.present(alert, animated: true)
     }
     
+    func registerForNotifications(){
+        NotificationCenter.default.addObserver(forName: AVAudioSession.interruptionNotification, object: nil, queue: nil) {
+            [weak self] (notification) in
+            guard let weakself = self,
+                  let userInfo = notification.userInfo,
+                  let interruptionTypeValue: UInt = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
+                  let interruptionType = AVAudioSession.InterruptionType(rawValue: interruptionTypeValue)
+            else { return }
+            
+            switch interruptionType {
+            case .began:
+                print("interruption started")
+                weakself.analyzer.pause()
+            case .ended:
+                print("interruption ended")
+                do {
+                    try weakself.analyzer.startAudioEngine()
+                } catch {
+                    print(error.localizedDescription)
+                }
+            @unknown default:
+                break
+            }
+        }
+    }
+    
     override func viewDidAppear(_ animated: Bool) {
-        analyzer.analyze()
+        do {
+            try analyzer.analyze()
+        } catch {
+            print(error.localizedDescription)
+        }
     }
     
     override func viewWillDisappear(_ animated: Bool) {

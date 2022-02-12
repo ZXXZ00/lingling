@@ -21,7 +21,7 @@ class lingling_wannabeTests: XCTestCase {
     func testCheckSum() throws {
         for _ in 0..<100 {
             let start = Int.random(in: 0..<2147483647)
-            let duration = Int.random(in: 1..<10000)
+            let duration = Int.random(in: -10000..<10000)
             let checksum = computeCheckSum(start: start, duration: duration)
             let entropy1 = Int.random(in: 1..<827349507)
             let entropy2 = Int.random(in: 1..<238478734)
@@ -32,24 +32,17 @@ class lingling_wannabeTests: XCTestCase {
             XCTAssert(!verifyCheckSum(start: start+entropy1, duration: duration+entropy2, checksum: checksum))
             XCTAssert(!verifyCheckSum(start: start+entropy1, duration: duration, checksum: checksum))
             XCTAssert(!verifyCheckSum(start: start, duration: duration+entropy2, checksum: checksum))
+            print("[", start, ",", duration+entropy2, ",", "\""+checksum+"\"", "],")
         }
     }
     
-    //func testAddRecord() throws {
-    //    // this testcase suppose there is no authorization on the server side
-    //    var start = 1640476710
-    //    let token = CredentialManager.shared.getToken()
-    //    for _ in 0..<5 {
-    //        DataManager.shared.addRecord(username: "dddd", time: start, duration: 900, asset: "semiquaver", attributes: "{\"music\": \(0.8)}", token: token)
-    //        sleep(10)
-    //        let res = DataManager.shared.getRecord(username: "dddd", start: start-1, end: start+1)
-    //        XCTAssertEqual(res[0].username, "dddd")
-    //        XCTAssertEqual(res[0].time, Int64(start))
-    //        XCTAssert(res[0].synced)
-    //        start += 901
-    //    }
-    //    print("next start: \(start+1)")
-    //}
+    func testAddRecord() throws {
+        var start = 1642379563
+        for _ in 0..<30 {
+            DataManager.shared.addRecord(username: "iPad", time: start, duration: 900, asset: "semiquaver", attributes: nil, upload: false)
+            start += 901
+        }
+    }
 
     func testExample() throws {
         // This is an example of a functional test case.

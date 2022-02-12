@@ -12,6 +12,7 @@ import CryptoKit
 
 // This is the structure for each entry in the database
 // the attributes is a json string used to store future attributes
+// 0: unsynced, 1: synced
 struct Record {
     var username: String
     var time: Int64
@@ -52,11 +53,18 @@ struct Record {
     }
 }
 
+enum DataStatus: Int {
+    case success = 0
+    case tokenError = -1
+    case insertError = -2
+}
+
 func computeCheckSum(start: Int, duration: Int) -> String {
     var bytes = [Int8] (repeating: 0, count: 16)
     let status = SecRandomCopyBytes(kSecRandomDefault, 16, &bytes)
     var frequency = 44100
     var lingling = 40
+    
     if status != errSecSuccess {
         frequency += lingling // useless line, hope to let compiler not include 44101 and 41 directly
         print(status)
@@ -70,7 +78,7 @@ func computeCheckSum(start: Int, duration: Int) -> String {
     var res = start % mod
     res = (res * lingling) % mod
     res = (res * frequency) % mod
-    res = (res * duration) % mod
+    res = (res * abs(duration)) % mod
     let resstr = String(res)
     let hashed = SHA256.hash(data: Data((resstr+randomstr).utf8))
     let ret = randomstr + hashed.compactMap { String(format: "%02x", $0) }.joined()
@@ -90,7 +98,7 @@ func verifyCheckSum(start: Int, duration: Int, checksum: String) -> Bool {
     var res = start % mod
     res = (res * lingling) % mod
     res = (res * frequency) % mod
-    res = (res * duration) % mod
+    res = (res * abs(duration)) % mod
     let resstr = String(res)
     let randomstr = String(checksum.prefix(16*2)) // first 16*2 is salt
     let hash = SHA256.hash(data: Data((resstr+randomstr).utf8))
@@ -274,12 +282,11 @@ class DataManager {
         
         return 0
     }
-    
-    // return -1 if failed to get token
+
     func addRecord(username: String, time: Int, duration: Int, asset: String, attributes: String?, upload: Bool) -> Int {
         let date = Date(timeIntervalSince1970: Double(time))
         addCache(username: username, date: date, asset: asset)
-        if username == "guest" { return 0 }
+        if username == "guest" { return DataStatus.success.rawValue }
         let checksum = computeCheckSum(start: time, duration: duration)
         do {
             if let attr = attributes {
@@ -289,10 +296,11 @@ class DataManager {
             }
         } catch {
             print(error)
+            return DataStatus.insertError.rawValue
         }
         let r = Record(username: username, time: Int64(time), duration: Int64(duration), asset: asset, synced: false, checksum: checksum, attributes: attributes)
-        if !upload { return 0 }
-        guard let token = CredentialManager.shared.getToken() else { return -1 }
+        if !upload { return DataStatus.success.rawValue }
+        guard let token = CredentialManager.shared.getToken() else { return DataStatus.tokenError.rawValue }
         let json = ["username": username, "records": [r.toDict(withUsername: false)]] as [String : Any]
         // TODO: implement semaphore to wait, maybe no need for semaphore
         postJSON(url: dbURL, json: json, token: token, success: { unprocessed, response in
@@ -308,7 +316,7 @@ class DataManager {
         }, failure: { e in
             self.insertErrorMessage(isNetwork: false, message: e.localizedDescription)
         })
-        return 0
+        return DataStatus.success.rawValue
     }
     
     func getRecord(username: String) -> [Record]{
@@ -354,7 +362,6 @@ class DataManager {
         }
         guard let u = url?.url else { return }
         getJSON(url: u, success: { json in
-            print(json)
             guard let arr = json as? [[String:Any]] else { return }
             for r in arr {
                 if let st = r["start_time"] as? Int,
@@ -366,36 +373,30 @@ class DataManager {
                     print("failed to cast downloaded records", r)
                 }
             }
+            UserDefaults.standard.set(Int(Date().timeIntervalSince1970), forKey: "LastSync")
         }, failure: { _ in }) // TODO: implement failure
-    }
-    
-    func getLast() -> Record? {
-        do {
-            let stmt = try db.prepare("SELECT * FROM records ORDER BY time DESC LIMIT 1")
-            for row in stmt {
-                return cast(row)
-            }
-        } catch {
-            print(error)
-        }
-        return nil
     }
     
     func sync(username: String) {
         if username == "guest" { return }
-        if let last = getLast() {
-            let current = Int(Date().timeIntervalSince1970)
-            // only sync after 15 minutes has passed since the end of last practice session
-            if current - Int(last.time+last.duration) < 900 { return }
-            downloadRecord(username: username, start: Int(last.time+last.duration), end: current)
-        } else {
-            downloadRecord(username: username)
-        }
+        // only sync after 15 minutes has passed since last sync
+        let current = Int(Date().timeIntervalSince1970)
+        let lastSync = UserDefaults.standard.integer(forKey: "LastSync")
+        if (lastSync + 900 > current) { return }
+        downloadRecord(username: username, start: lastSync, end: current)
     }
     
     func clear() {
         do {
             try db.run("DELETE FROM records")
+        } catch {
+            print(error)
+        }
+    }
+    
+    func delete(username: String, time: Int) {
+        do {
+            try db.run("DELETE FROM records WHERE username=? AND time=?", username, time)
         } catch {
             print(error)
         }

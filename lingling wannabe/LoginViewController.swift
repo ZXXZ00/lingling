@@ -201,12 +201,10 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
     @objc func showHidePassword(sender: UIButton) {
         sender.isSelected.toggle()
         password.isSecureTextEntry.toggle()
-        print("bef: \(password.text)")
         if let text = password.text, password.isSecureTextEntry {
             password.text?.removeAll()
             password.insertText(text)
         }
-        print("aft: \(password.text)")
     }
     
     @objc func guestWarning() {
@@ -294,6 +292,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
             } else {
                 self.succeed(user: user, token: data)
             }
+            self.isSending = false
         }, failure: { err in
             print("opps!")
             self.isSending = false

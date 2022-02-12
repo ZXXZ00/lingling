@@ -12,6 +12,7 @@ import SoundAnalysis
 import Accelerate
 import AudioToolbox
 import CoreAudio
+import ffmpegkit
 
 class AudioStreamAnalyzer {
     
@@ -37,6 +38,8 @@ class AudioStreamAnalyzer {
     let resultsObserver = ResultsObserver()
     let analysisQueue = DispatchQueue(label: "com.zxxz.AnalysisQueue")
     
+    var timeElapsed = 0.0
+    
     let outputFormatSettings = [
         AVFormatIDKey:kAudioFormatLinearPCM,
         AVLinearPCMBitDepthKey:32,
@@ -46,20 +49,7 @@ class AudioStreamAnalyzer {
         AVNumberOfChannelsKey: 1
         ] as [String : Any]
     
-    let compressedFormatSettings = [
-        AVFormatIDKey: kAudioFormatFLAC,
-        AVSampleRateKey: 44100,
-        AVNumberOfChannelsKey: 1,
-        AVEncoderAudioQualityKey: AVAudioQuality.max.rawValue,
-        AVLinearPCMBitDepthKey: 16
-    ] as [String: Any]
-    
-    let convertFormat: AVAudioFormat
-    let converter: AVAudioConverter?
-    var outRef: ExtAudioFileRef?
-    
     init() {
-        //model = classifier.model
         inputFormat = audioEngine.inputNode.inputFormat(forBus: inputBus)
         streamAnalyzer = SNAudioStreamAnalyzer(format: inputFormat)
         
@@ -71,22 +61,11 @@ class AudioStreamAnalyzer {
         } catch {
             print("failed to initilize ml model")
         }
-        
-        // TODO: check convertFormat is not nil
-        convertFormat = AVAudioFormat(settings: compressedFormatSettings)!
-        converter = AVAudioConverter(from: inputFormat, to: convertFormat)
-        //let compURL = getDocumentDirectory().appendingPathComponent("compressed.flac")
-        //ExtAudioFileCreateWithURL(compURL as CFURL, kAudioFileCAFType, convertFormat.streamDescription, convertFormat.channelLayout?.layout, AudioFileFlags.eraseFile.rawValue, &outRef)
-        //ExtAudioFileSetProperty(outRef!, kExtAudioFileProperty_ClientDataFormat, UInt32(MemoryLayout.size(ofValue: inputFormat.streamDescription.pointee)), inputFormat.streamDescription)
-        //print(outRef)
     }
 
-    func startAudioEngine() {
-        do {
-            try audioEngine.start()
-        } catch {
-            print(error.localizedDescription)
-        }
+    func startAudioEngine() throws {
+        try AVAudioSession.sharedInstance().setActive(true, options: .notifyOthersOnDeactivation)
+        try audioEngine.start()
     }
     
     func joint(_ buffer: UnsafeMutablePointer<Float>, tick: Int) {
@@ -104,15 +83,11 @@ class AudioStreamAnalyzer {
         dft?.transform(inputReal: realIn, inputImaginary: imagIn, outputReal: &realOut, outputImaginary: &imagOut)
     }
     
-    @objc func analyze() {
-        print("start analyze")
-        do {
-            let request = try SNClassifySoundRequest(mlModel: model)
-            try streamAnalyzer.add(request, withObserver: resultsObserver)
-        } catch {
-            print(error.localizedDescription)
-            return
-        }
+    @objc func analyze() throws {
+        timeElapsed = 0.0
+        let request = try SNClassifySoundRequest(mlModel: model)
+        try streamAnalyzer.add(request, withObserver: resultsObserver)
+        
         print(inputFormat.streamDescription.pointee.mBitsPerChannel)
         print(inputFormat.streamDescription.pointee.mFormatID)
         print(inputFormat.streamDescription.pointee.mChannelsPerFrame)
@@ -130,7 +105,7 @@ class AudioStreamAnalyzer {
         let url = getDocumentDirectory().appendingPathComponent("recording.wav")
         let audioFile = try? AVAudioFile(forWriting: url, settings: outputFormatSettings, commonFormat: AVAudioCommonFormat.pcmFormatFloat32, interleaved: true)
         
-        
+        var startTime = -1.0
         audioEngine.inputNode.installTap(onBus: inputBus, bufferSize: UInt32(buffSize), format: inputFormat) {
             buffer, time in self.analysisQueue.async {
                 //self.ft(buffer.floatChannelData![0])
@@ -141,47 +116,32 @@ class AudioStreamAnalyzer {
                 //print(real.reduce(0, +), real.indices.max(by: {real[$0] < real[$1]} ))
                 //print(imag.reduce(0, +), imag.indices.max(by: {imag[$0] < imag[$1]} ))
                 
-                // input block is called when the converter needs input
-                //let inputBlock : AVAudioConverterInputBlock = { (inNumPackets, outStatus) -> AVAudioBuffer? in
-                //    outStatus.pointee = AVAudioConverterInputStatus.haveData;
-                //    return buffer; // fill and return input buffer
-                //}
-                //let compressedBuffer = AVAudioCompressedBuffer(format: self.convertFormat, packetCapacity: 8, maximumPacketSize: self.converter!.maximumOutputPacketSize)
-                //var outError: NSError? = nil
-                //self.converter?.convert(to: compressedBuffer, error: &outError, withInputFrom: inputBlock)
-                //if let oe = outError {
-                //    print("error: \(oe)")
-                //} else {
-                    //let mBuff = compressedBuffer.audioBufferList.pointee.mBuffers
-                    //if let mdata = mBuff.mData {
-                    //    let len = Int(mBuff.mDataByteSize)
-                    //    let data = Data(bytes: mdata, count: len)
-                    //    print(len, data)
-                    //    do {
-                    //        try data.write(to: compURL)
-                    //    } catch {
-                    //        print(error.localizedDescription)
-                    //    }
-                    //}
-
-                    //ExtAudioFileWrite(self.outRef!, 16, compressedBuffer.audioBufferList)
-                //}
                 do {
                     try audioFile?.write(from: buffer)
                 } catch {
                     print(error.localizedDescription)
                 }
+                if startTime < 0 {
+                    startTime = AVAudioTime.seconds(forHostTime: time.hostTime)
+                } else {
+                    self.timeElapsed = AVAudioTime.seconds(forHostTime: time.hostTime) - startTime
+                }
+                
                 self.streamAnalyzer.analyze(buffer, atAudioFramePosition: time.sampleTime)
             }
         }
-        startAudioEngine()
+        try startAudioEngine()
     }
     
     @objc func stop() {
         streamAnalyzer.completeAnalysis()
         audioEngine.inputNode.removeTap(onBus: inputBus)
         audioEngine.stop()
-        //ExtAudioFileDispose(outRef!)
+        FilesManager.shared.convert2FLAC()
+    }
+    
+    func pause() {
+        audioEngine.pause()
     }
 }
 

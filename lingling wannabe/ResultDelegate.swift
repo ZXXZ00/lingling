@@ -54,11 +54,17 @@ class ResultDelegate {
     func musicPercentage(cutoff: Double) -> Double {
         var total = 0.0
         var music = 0.0
-        for i in 1..<res.count {
-            if res[i].music > cutoff {
-                music += res[i].start - res[i-1].start
+//        for i in 1..<res.count {
+//            if res[i].music > cutoff {
+//                music += res[i].start - res[i-1].start
+//            }
+//            total += res[i].start - res[i-1].start
+//        }
+        for r in res {
+            if r.music > cutoff {
+                music += r.end - r.start
             }
-            total += res[i].start - res[i-1].start
+            total += r.end - r.start
         }
         return music/total
     }
