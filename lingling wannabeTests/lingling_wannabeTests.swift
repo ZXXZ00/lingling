@@ -19,7 +19,7 @@ class lingling_wannabeTests: XCTestCase {
     }
     
     func testCheckSum() throws {
-        for _ in 0..<100 {
+        for _ in 0..<10000 {
             let start = Int.random(in: 0..<2147483647)
             let duration = Int.random(in: -10000..<10000)
             let checksum = computeCheckSum(start: start, duration: duration)
@@ -32,12 +32,12 @@ class lingling_wannabeTests: XCTestCase {
             XCTAssert(!verifyCheckSum(start: start+entropy1, duration: duration+entropy2, checksum: checksum))
             XCTAssert(!verifyCheckSum(start: start+entropy1, duration: duration, checksum: checksum))
             XCTAssert(!verifyCheckSum(start: start, duration: duration+entropy2, checksum: checksum))
-            print("[", start, ",", duration+entropy2, ",", "\""+checksum+"\"", "],")
+            //print("[", start, ",", duration+entropy2, ",", "\""+checksum+"\"", "],")
         }
     }
     
     func testAddRecord() throws {
-        var start = 1642379563
+        var start = 1642489563
         for _ in 0..<30 {
             DataManager.shared.addRecord(username: "iPad", time: start, duration: 900, asset: "semiquaver", attributes: nil, upload: false)
             start += 901

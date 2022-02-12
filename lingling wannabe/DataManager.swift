@@ -62,22 +62,19 @@ enum DataStatus: Int {
 func computeCheckSum(start: Int, duration: Int) -> String {
     var bytes = [Int8] (repeating: 0, count: 16)
     let status = SecRandomCopyBytes(kSecRandomDefault, 16, &bytes)
-    var frequency = 44100
-    var lingling = 40
+    let frequency = 44100
+    let lingling = 40
     
     if status != errSecSuccess {
-        frequency += lingling // useless line, hope to let compiler not include 44101 and 41 directly
         print(status)
         return ""
     }
     let random = Data(bytes: bytes, count: 16)
     let randomstr = random.compactMap { String(format: "%02x", $0) }.joined()
-    frequency += 1 // 44101 prime
-    lingling += 1 // 41 prime
     let mod = 2147483647 // 2^31 - 1 prime
     var res = start % mod
-    res = (res * lingling) % mod
-    res = (res * frequency) % mod
+    res = ((res * lingling) % mod + res) % mod // res * 41 where 41 is a prime
+    res = ((res * frequency) % mod + res) % mod// res * 44101 where 44101
     res = (res * abs(duration)) % mod
     let resstr = String(res)
     let hashed = SHA256.hash(data: Data((resstr+randomstr).utf8))
@@ -86,18 +83,15 @@ func computeCheckSum(start: Int, duration: Int) -> String {
 }
 
 func verifyCheckSum(start: Int, duration: Int, checksum: String) -> Bool {
-    var frequency = 44100
-    var lingling = 40
+    let frequency = 44100
+    let lingling = 40
     if checksum.count != (32+16) * 2 { // sha256 produce 32 * 2 hexdigest, salt is 16 * 2 hexdigest
-        frequency += lingling // useless line
         return false
     }
-    frequency += 1
-    lingling += 1
     let mod = 2147483647
     var res = start % mod
-    res = (res * lingling) % mod
-    res = (res * frequency) % mod
+    res = ((res * lingling) % mod + res) % mod // res * 41 where 41 is a prime
+    res = ((res * frequency) % mod + res) % mod // res * 44101 where 44101
     res = (res * abs(duration)) % mod
     let resstr = String(res)
     let randomstr = String(checksum.prefix(16*2)) // first 16*2 is salt
