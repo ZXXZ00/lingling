@@ -31,7 +31,6 @@ class MainView: UIView, MSCircularSliderDelegate {
     
     let text = UITextView()
     
-    
     public convenience init(frame: CGRect, user: String, controller: UIViewController) {
         self.init(frame: frame)
         self.controller = controller
@@ -221,11 +220,58 @@ class MainView: UIView, MSCircularSliderDelegate {
         }
     }
     
+    func addTutorialView() {
+        let hole1 = CGRect(x: slider.frame.minX - 20 * buttonScale, y: slider.frame.minY - 20 * buttonScale, width: slider.frame.width + 40 * buttonScale, height: start.frame.maxY - slider.frame.minY + 40 * buttonScale)
+        let sliderTutorial = TutorialView(frame: frame, holeRect: hole1)
+        sliderTutorial.interactive = CGRect(x: slider.frame.minX - 20, y: slider.frame.minY, width: slider.frame.width + 40, height: slider.frame.height)
+        let sliderInstruction = UILabel()
+        sliderInstruction.text = "slide to change practice duration"
+        sliderInstruction.textAlignment = .center
+        sliderInstruction.font = UIFont(name: "AmericanTypewriter", size: 14*buttonScale)
+        sliderInstruction.textColor = .black
+        sliderInstruction.frame = CGRect(x: slider.frame.minX, y: slider.frame.maxY - 40, width: slider.frame.width, height: 40)
+        sliderTutorial.addSubview(sliderInstruction)
+        
+        sliderTutorial.nextButton.bounds = CGRect(x: 0, y: 0, width: 100 * buttonScale, height: frame.maxY - hole1.maxY)
+        sliderTutorial.nextButton.center = CGPoint(x: center.x, y: (frame.maxY + hole1.maxY) / 2)
+        sliderTutorial.nextButton.setTitleColor(.white, for: .normal)
+        sliderTutorial.nextButton.titleLabel?.font = UIFont(name: "AmericanTypewriter", size: 20*buttonScale)
+        sliderTutorial.nextButton.setTitle("  next >", for: .normal)
+        
+        UIView.animate(withDuration: 0.7, delay: 0, options: [.autoreverse, .repeat, .allowUserInteraction], animations: {
+            self.slider.layer.opacity = 0.3
+        }, completion: { _ in self.slider.layer.opacity = 1.0 })
+        
+        let hole2 = CGRect(x: hole1.minX, y: start.frame.minY - 10 * buttonScale, width: hole1.width, height: start.frame.height + 40 * buttonScale)
+        let startTutorial = TutorialView(frame: frame, holeRect: hole2)
+        startTutorial.interactive = .zero
+        let startInstruction = UILabel()
+        startInstruction.text = "when you are ready, tap to start!"
+        startInstruction.font = UIFont(name: "AmericanTypewriter", size: 14*buttonScale)
+        startInstruction.textAlignment = .center
+        startInstruction.textColor = .black
+        startInstruction.frame = CGRect(x: hole2.minX, y: start.frame.maxY, width: hole2.width, height: 40)
+        startTutorial.addSubview(startInstruction)
+        
+        startTutorial.nextButton.bounds = frame
+        startTutorial.nextButton.center = CGPoint(x: center.x, y: (frame.maxY + hole2.maxY) / 2)
+        startTutorial.nextButton.setTitleColor(.white, for: .normal)
+        startTutorial.nextButton.titleLabel?.font = UIFont(name: "AmericanTypewriter", size: 20*buttonScale)
+        startTutorial.nextButton.setTitle("got it!", for: .normal)
+        
+        sliderTutorial.completion = { self.slider.layer.removeAllAnimations() }
+        
+        sliderTutorial.parentView = self
+        sliderTutorial.nextView = startTutorial
+        addSubview(sliderTutorial)
+    }
+    
     // 15, 30, 60, 120, 240 minutes are the interval corresponding to
     // semiquaver, quaver, crotchet, half, whole
     // the value for circular slider ranges from 0 to 100
     // each inteval has equal spacing on the slider
     func circularSlider(_ slider: MSCircularSlider, valueChangedTo value: Double, fromUser: Bool) {
+        slider.layer.removeAllAnimations()
         if (value < 20) {
             minutes = 15
             loadNote(filename: "semiquaver")

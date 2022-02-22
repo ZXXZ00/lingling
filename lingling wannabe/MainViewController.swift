@@ -41,6 +41,7 @@ class MainViewController: UIViewController {
         if username == "guest" {
             let signup = LoginViewController(CGSize(width: view.frame.width, height: view.frame.height), isFullScreen: true) { [weak self] user in self?.changeUser(user: user)
                 DataManager.shared.sync(username: user)
+                (self?.view as? MainView)?.addTutorialView()
             }
             addChild(signup)
             view.addSubview(signup.view)
