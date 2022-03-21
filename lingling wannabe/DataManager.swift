@@ -100,7 +100,7 @@ func verifyCheckSum(start: Int, duration: Int, checksum: String) -> Bool {
     return String(checksum.suffix(32*2)) == hashstr
 }
 
-class DataManager {
+final class DataManager {
     static let shared = DataManager()
     
     let dbURL = URL(string: "https://j7by90n61a.execute-api.us-east-1.amazonaws.com/record")!
@@ -367,7 +367,7 @@ class DataManager {
                     print("failed to cast downloaded records", r)
                 }
             }
-            UserDefaults.standard.set(Int(Date().timeIntervalSince1970), forKey: "LastSync")
+            UserDefaults.standard.set(Int(Date().timeIntervalSince1970), forKey: "LastSync_"+username)
         }, failure: { _ in }) // TODO: implement failure
     }
     
@@ -375,7 +375,7 @@ class DataManager {
         if username == "guest" { return }
         // only sync after 15 minutes has passed since last sync
         let current = Int(Date().timeIntervalSince1970)
-        let lastSync = UserDefaults.standard.integer(forKey: "LastSync")
+        let lastSync = UserDefaults.standard.integer(forKey: "LastSync_"+username)
         if (lastSync + 900 > current) { return }
         downloadRecord(username: username, start: lastSync, end: current)
     }
