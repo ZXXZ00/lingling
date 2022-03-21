@@ -21,6 +21,7 @@ class MainView: UIView, MSCircularSliderDelegate {
     let username: UIButton
     let leaderboard: UIButton
     
+    lazy var tap = UITapGestureRecognizer(target: self, action: #selector(touchHandler))
     
     let question: UIImageView
     let rect: CAShapeLayer
@@ -108,9 +109,6 @@ class MainView: UIView, MSCircularSliderDelegate {
         leaderboard.setImage(UIImage(named: "leaderboard.pdf"), for: .normal)
         leaderboard.addTarget(controller, action: #selector(MainViewController.showLeaderBoard), for: .touchUpInside)
         addSubview(leaderboard)
-        
-        let tap = UITapGestureRecognizer(target: self, action: #selector(touchHandler))
-        addGestureRecognizer(tap)
     }
     
     private func loadNote(filename: String) {
@@ -131,6 +129,8 @@ class MainView: UIView, MSCircularSliderDelegate {
         touchCount = 0
         question.center = self.center
         addSubview(question)
+        
+        addGestureRecognizer(tap)
         
         let res = ResultDelegate.shared.test()
         text.frame = CGRect(x: 40, y: 40, width: 250, height: 400)
@@ -175,6 +175,7 @@ class MainView: UIView, MSCircularSliderDelegate {
     
     func dismissResult() {
         touchCount = 0
+        removeGestureRecognizer(tap)
         rect.removeFromSuperlayer()
         rewardPath.removeFromSuperlayer()
         start.alpha = 1
@@ -207,11 +208,6 @@ class MainView: UIView, MSCircularSliderDelegate {
             } else if touchCount == 2 {
                 rewardPath.removeAllAnimations()
                 rewardPath.removeFromSuperlayer()
-                //if let sublayers = rewardPath.sublayers {
-                //    for sublayer in sublayers {
-                //        sublayer.removeAllAnimations()
-                //    }
-                //}
                 reward.layer.removeAllAnimations()
                 reward.alpha = 1
             } else {
@@ -229,7 +225,7 @@ class MainView: UIView, MSCircularSliderDelegate {
         sliderInstruction.textAlignment = .center
         sliderInstruction.font = UIFont(name: "AmericanTypewriter", size: 14*buttonScale)
         sliderInstruction.textColor = .black
-        sliderInstruction.frame = CGRect(x: slider.frame.minX, y: slider.frame.maxY - 40, width: slider.frame.width, height: 40)
+        sliderInstruction.frame = CGRect(x: slider.frame.minX, y: slider.frame.maxY - 80 * buttonScale, width: slider.frame.width, height: 40)
         sliderTutorial.addSubview(sliderInstruction)
         
         sliderTutorial.nextButton.bounds = CGRect(x: 0, y: 0, width: 100 * buttonScale, height: frame.maxY - hole1.maxY)

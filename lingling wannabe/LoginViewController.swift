@@ -27,16 +27,18 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
     let signin = URL(string: "https://0j6a9nvvx3.execute-api.us-east-1.amazonaws.com/login")!
     var isSending = false
     
-    var didSucceeded: ((_: String) -> Void)?
+    var didLogin: ((_: String) -> Void)?
+    var didRegister: ((_: String) -> Void)?
     
     required init?(coder: NSCoder) {
         fatalError("NSCoding not supported")
     }
     
-    init(_ size: CGSize, isFullScreen: Bool=false, didSucceeded: ((_: String) -> Void)? = nil) {
+    init(_ size: CGSize, isFullScreen: Bool=false, didRegister: ((_: String) -> Void)? = nil, didLogin: ((_: String) -> Void)? = nil) {
         self.size = size
         floatViewDelegate = FloatView(size)
-        self.didSucceeded = didSucceeded
+        self.didLogin = didLogin
+        self.didRegister = didRegister
         super.init(nibName: nil, bundle: nil)
         if isFullScreen {
             modalPresentationStyle = .fullScreen
@@ -255,7 +257,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
         }
     }
     
-    private func succeed(user: String, token: Data) {
+    private func succeed(user: String, token: Data, didSucceeded: ((_: String) -> Void)?) {
         do {
             let tokens = try JSONDecoder().decode(Tokens.self, from: token)
             CredentialManager.shared.saveToKeyChain(token: tokens)
@@ -263,7 +265,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
                 self.view.removeFromSuperview()
                 self.removeFromParent()
             }
-            if let f = self.didSucceeded {
+            if let f = didSucceeded {
                 f(user)
             }
         } catch {
@@ -290,7 +292,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
             if res.statusCode != 200 {
                 self.updateLabelAndFinishLoading(text: "Wrong Password")
             } else {
-                self.succeed(user: user, token: data)
+                self.succeed(user: user, token: data, didSucceeded: self.didLogin)
             }
             self.isSending = false
         }, failure: { err in
@@ -323,7 +325,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
                 if res.statusCode != 200 {
                     self.updateLabelAndFinishLoading(text: "Username or Email Already Exists")
                 } else {
-                    self.succeed(user: user, token: data)
+                    self.succeed(user: user, token: data, didSucceeded: self.didRegister)
                 }
             }, failure: { err in
                 print("oh no")

@@ -56,7 +56,7 @@ class UserInfoViewController : UIViewController {
         view.backgroundColor = .white
         UserInfoViewController.scale = size.width / 300
         let headerHeight = 40 * UserInfoViewController.scale
-        
+        // the additionalSafeAreaInsets is used when displayed on navigation viewcontroller
         calendarView.frame = CGRect(x: 0, y: headerHeight+additionalSafeAreaInsets.top, width: size.width, height: size.height - headerHeight)
         calendarView.showsVerticalScrollIndicator = false
         calendarView.backgroundColor = .gray

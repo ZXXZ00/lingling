@@ -39,12 +39,34 @@ class MainViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         if username == "guest" {
-            let signup = LoginViewController(CGSize(width: view.frame.width, height: view.frame.height), isFullScreen: true) { [weak self] user in self?.changeUser(user: user)
+            let signup = LoginViewController(CGSize(width: view.frame.width, height: view.frame.height), isFullScreen: true, didRegister: {
+                [weak self] user in self?.changeUser(user: user)
                 DataManager.shared.sync(username: user)
-                (self?.view as? MainView)?.addTutorialView()
-            }
+                DispatchQueue.main.async {
+                    let instruments = InstrumentSelectionViewController(style: .plain)
+                    instruments.didSelected = {
+                        DispatchQueue.main.async {
+                            (self?.view as? MainView)?.addTutorialView()
+                        }
+                    }
+                    self?.addChild(instruments)
+                    self?.view.addSubview(instruments.view)
+                    if let layoutGuide = self?.view.safeAreaLayoutGuide {
+                        instruments.view.translatesAutoresizingMaskIntoConstraints = false
+                        instruments.view.centerXAnchor.constraint(equalTo: layoutGuide.centerXAnchor).isActive = true
+                        instruments.view.centerYAnchor.constraint(equalTo: layoutGuide.centerYAnchor).isActive = true
+                        instruments.view.widthAnchor.constraint(equalTo: layoutGuide.widthAnchor).isActive = true
+                        instruments.view.heightAnchor.constraint(equalTo: layoutGuide.heightAnchor).isActive = true
+                    }
+                    instruments.didMove(toParent: self)
+                }
+            }, didLogin: {
+                [weak self] user in self?.changeUser(user: user)
+                DataManager.shared.sync(username: user)
+            })
             addChild(signup)
             view.addSubview(signup.view)
+            signup.didMove(toParent: self)
         }
         
         let intro = UIView()
@@ -67,6 +89,8 @@ class MainViewController: UIViewController {
             intro.alpha = 0
         }, completion: {finished in
             intro.removeFromSuperview()
+            //let test = AudioRecorder(size: CGSize(width: 400, height: 400))
+            //self.present(test, animated: true)
         })
         
     }
@@ -77,7 +101,6 @@ class MainViewController: UIViewController {
         if tmp != username {
             // TODO: sign user out because there is a change in username
         }
-        print("view will appear")
         changeUser(user: tmp)
         DataManager.shared.sync(username: username)
     }
