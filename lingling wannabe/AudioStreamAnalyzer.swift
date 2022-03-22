@@ -12,7 +12,6 @@ import SoundAnalysis
 import Accelerate
 import AudioToolbox
 import CoreAudio
-import ffmpegkit
 
 class AudioStreamAnalyzer {
     
@@ -40,18 +39,20 @@ class AudioStreamAnalyzer {
     
     var timeElapsed = 0.0
     
-    let outputFormatSettings = [
-        AVFormatIDKey:kAudioFormatLinearPCM,
-        AVLinearPCMBitDepthKey:32,
-        AVLinearPCMIsFloatKey: true,
-        //  AVLinearPCMIsBigEndianKey: false,
-        AVSampleRateKey: Float64(44100.0),
-        AVNumberOfChannelsKey: 1
-        ] as [String : Any]
+    let outputFormatSettings: [String : Any]
     
     init() {
         inputFormat = audioEngine.inputNode.inputFormat(forBus: inputBus)
         streamAnalyzer = SNAudioStreamAnalyzer(format: inputFormat)
+        
+        outputFormatSettings = [
+            AVFormatIDKey:kAudioFormatLinearPCM,
+            AVLinearPCMBitDepthKey:32,
+            AVLinearPCMIsFloatKey: true,
+            //  AVLinearPCMIsBigEndianKey: false,
+            AVSampleRateKey: inputFormat.sampleRate,
+            AVNumberOfChannelsKey: 1
+        ]
         
         let conf = MLModelConfiguration()
         conf.computeUnits = .cpuOnly
