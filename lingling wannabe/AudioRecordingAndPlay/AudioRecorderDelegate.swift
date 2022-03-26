@@ -6,3 +6,8 @@
 //
 
 import Foundation
+
+protocol AudioRecorderDelegate {
+    func didFinish()
+    func didBegin()
+}
