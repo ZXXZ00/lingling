@@ -62,6 +62,14 @@ class LeaderBoardNavigation : UINavigationController, LeaderBoardCellDelegate {
         userInfo.loadData()
         pushViewController(userInfo, animated: true)
     }
+    
+    override var shouldAutorotate: Bool {
+        return true
+    }
+    
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        return .all
+    }
 }
 
 extension LeaderBoardNavigation : UINavigationControllerDelegate {

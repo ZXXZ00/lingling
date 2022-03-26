@@ -132,7 +132,14 @@ class UserInfoViewController : UIViewController {
                 self.calendarView.scrollToItem(at: IndexPath(item: 0, section: section), at: .top, animated: false)
             }
         }
-        
+    }
+    
+    override var shouldAutorotate: Bool {
+        return true
+    }
+    
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        return .all
     }
 }
 

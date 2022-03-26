@@ -89,8 +89,6 @@ class MainViewController: UIViewController {
             intro.alpha = 0
         }, completion: {finished in
             intro.removeFromSuperview()
-            //let test = AudioRecorder(size: CGSize(width: 400, height: 400))
-            //self.present(test, animated: true)
         })
         
     }
@@ -216,6 +214,13 @@ class MainViewController: UIViewController {
                 userinfoView.loadData()
             }
         }
+    }
+    
+    @objc func showRecordings() {
+        let itemWidth = (42 * view.frame.width / 360).rounded()
+        let width = itemWidth*7+6
+        let recordings = RecordingViewController(size: CGSize(width: width, height: view.frame.height*0.7), isRecording: true)
+        present(recordings, animated: true)
     }
     
     @objc func showLeaderBoard() {
