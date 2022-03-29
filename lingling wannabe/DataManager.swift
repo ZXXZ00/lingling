@@ -13,7 +13,7 @@ import CryptoKit
 // This is the structure for each entry in the database
 // the attributes is a json string used to store future attributes
 // 0: unsynced, 1: synced
-struct Record {
+struct Record: Hashable {
     var username: String
     var time: Int64
     var duration: Int64
@@ -51,9 +51,21 @@ struct Record {
         }
         return ret
     }
+    
+    static func == (lhs: Record, rhs: Record) -> Bool {
+        return lhs.username == rhs.username && lhs.time == rhs.time
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(username)
+        hasher.combine(time)
+    }
 }
 
 enum DataStatus: Int {
+    case invalid = 3
+    case future = 2
+    case conflict = 1
     case success = 0
     case tokenError = -1
     case insertError = -2
@@ -111,28 +123,23 @@ final class DataManager {
     // there are two types of error: network and local, each is a table
     private var err: Connection!
     
-    var initialized = false
+    private var unsynced: Set<Record> = []
+    
+    private var totalMinutes = 0
+    private let interval = 120
+    private var canRecording = false
     
     private init() {
         do {
             let dir = getDocumentDirectory()
             db = try Connection(dir.appendingPathComponent("data.db").absoluteString)
-            if !UserDefaults.standard.bool(forKey: "build6db") {
-                try db.run("DROP TABLE IF EXISTS records")
-                UserDefaults.standard.set(true, forKey: "build6db")
-            }
             try db.run("CREATE TABLE IF NOT EXISTS records(username TEXT, time INTEGER, duration INTEGER NOT NULL, asset TEXT NOT NULL, synced INTEGER NOT NULL, checksum TEXT NOT NULL, attributes TEXT, PRIMARY KEY (username, time))")
             err = try Connection(dir.appendingPathComponent("error.db").absoluteString)
             try err.run("CREATE TABLE IF NOT EXISTS network(time REAL PRIMARY KEY, message TEXT)")
             try err.run("CREATE TABLE IF NOT EXISTS local(time REAL PRIMARY KEY, message TEXT)")
-            initialized = true
         } catch {
             print(error)
         }
-    }
-    
-    func isInitialized() -> Bool {
-        return initialized
     }
     
     private func cast(_ x: Binding?) -> Any? {
@@ -166,6 +173,15 @@ final class DataManager {
         return nil
     }
     
+    func getRecordingEligibility() -> Bool {
+        if canRecording {
+            canRecording = false
+            return true
+        } else {
+            return false
+        }
+    }
+    
     func insertErrorMessage(isNetwork: Bool, message: String) {
         let timestamp = Date().timeIntervalSince1970
         if isNetwork {
@@ -191,58 +207,11 @@ final class DataManager {
         }
     }
     
-    // Check if there could be any conflict with database
-    // return 0: OK
-    // return 1: Overlapping session
-    // return 2: Most recent record is in the future comparing to system time
-    // return 3: Invalid checksum
-    // TODO: this function handles the token and return -1 if auth failed
-    func checkAndLoad(username: String, time: Double, token: String?) -> Int {
-        let records = DataManager.shared.getRecord(username: username)
-        if records.count == 0 { return 0 }
-        var unsynced: [Record] = []
-        for i in 0..<records.count-1 {
-            if records[i].time + abs(records[i].duration) > records[i+1].time {
-                print("CONFLICT")
-                return 1
-            }
-            
-            let date = Date(timeIntervalSince1970: Double(records[i].time))
-            addCache(username: username, date: date, asset: records[i].asset)
-            
-            if !records[i].synced {
-                unsynced.append(records[i])
-            }
-            if !verifyCheckSum(start: Int(records[i].time), duration: Int(records[i].duration), checksum: records[i].checksum) {
-                print("INVALID")
-                return 3
-            }
-        }
-        if let last = records.last {
-            if Double(last.time + abs(last.duration)) > Date().timeIntervalSince1970 {
-                print("FUTURE") // TODO: add warning
-                return 2
-            }
-            if Double(last.time + abs(last.duration)) > time {
-                print("CONFLICT")
-                return 1
-            }
-            
-            let date = Date(timeIntervalSince1970: Double(last.time))
-            addCache(username: username, date: date, asset: last.asset)
-            
-            if !last.synced {
-                unsynced.append(last)
-            }
-            if !verifyCheckSum(start: Int(last.time), duration: Int(last.duration), checksum: last.checksum) {
-                print("INVALID")
-                return 3
-            }
-        }
-        if unsynced.count == 0 { return 0 }
-        guard let tk = token else { return -1 } // failed to get token
+    func uploadUnsynced(username: String, token: String?) {
+        if unsynced.count == 0 { return }
+        guard let token = token else { return }
         let json: [String:Any] = ["username": username, "records": unsynced.map({ $0.toDict(withUsername: false) })]
-        postJSON(url: dbURL, json: json, token: tk, success: { unprocessed, response in
+        postJSON(url: dbURL, json: json, token: token, success: { unprocessed, response in
             // TODO: implement handling
             if response.statusCode == 200 {
                 var unprocessedSet = Set<Int>()
@@ -263,9 +232,10 @@ final class DataManager {
                     print("failed to cast unprocessed")
                     return
                 }
-                for r in unsynced {
+                for r in self.unsynced {
                     if unprocessedSet.contains(Int(r.time)) { continue }
                     self.updateSynced(username: username, time: Int(r.time))
+                    self.unsynced.remove(r)
                 }
             } else {
                 self.insertErrorMessage(isNetwork: true, message: "failed to upload unsynced part, status code \(response.statusCode)")
@@ -273,11 +243,62 @@ final class DataManager {
         }, failure: { e in
             self.insertErrorMessage(isNetwork: false, message: e.localizedDescription )
         })
-        
+    }
+    
+    // Check if there could be any conflict with database
+    func checkAndLoad(username: String, token: String?) -> Int {
+        let records = DataManager.shared.getRecord(username: username)
+        if records.count == 0 { return 0 }
+        for i in 0..<records.count-1 {
+            totalMinutes += Int(abs(records[i].duration) / 60)
+            
+            if records[i].time + abs(records[i].duration) > records[i+1].time {
+                return DataStatus.conflict.rawValue
+            }
+            
+            let date = Date(timeIntervalSince1970: Double(records[i].time))
+            addCache(username: username, date: date, asset: records[i].asset)
+            
+            if !records[i].synced {
+                unsynced.insert(records[i])
+            }
+            if !verifyCheckSum(start: Int(records[i].time), duration: Int(records[i].duration), checksum: records[i].checksum) {
+                return DataStatus.invalid.rawValue
+            }
+        }
+        if let last = records.last {
+            totalMinutes += Int(abs(last.duration) / 60)
+            
+            let currentTime = Date().timeIntervalSince1970
+            if Double(last.time + abs(last.duration)) > currentTime {
+                return DataStatus.future.rawValue
+            }
+            if Double(last.time + abs(last.duration)) > currentTime {
+                return DataStatus.conflict.rawValue
+            }
+            
+            let date = Date(timeIntervalSince1970: Double(last.time))
+            addCache(username: username, date: date, asset: last.asset)
+            
+            if !last.synced {
+                unsynced.insert(last)
+            }
+            if !verifyCheckSum(start: Int(last.time), duration: Int(last.duration), checksum: last.checksum) {
+                print("INVALID")
+                return 3
+            }
+        }
+        uploadUnsynced(username: username, token: token)
         return 0
     }
 
     func addRecord(username: String, time: Int, duration: Int, asset: String, attributes: String?, upload: Bool) -> Int {
+        let before = totalMinutes
+        totalMinutes += abs(duration / 60) 
+        if (totalMinutes / interval - before / interval > 0) || (before == 0) {
+            canRecording = true
+        }
+        
         let date = Date(timeIntervalSince1970: Double(time))
         addCache(username: username, date: date, asset: asset)
         if username == "guest" { return DataStatus.success.rawValue }
@@ -292,8 +313,10 @@ final class DataManager {
             print(error)
             return DataStatus.insertError.rawValue
         }
+        
         let r = Record(username: username, time: Int64(time), duration: Int64(duration), asset: asset, synced: false, checksum: checksum, attributes: attributes)
         if !upload { return DataStatus.success.rawValue }
+        
         guard let token = CredentialManager.shared.getToken() else { return DataStatus.tokenError.rawValue }
         let json = ["username": username, "records": [r.toDict(withUsername: false)]] as [String : Any]
         // TODO: implement semaphore to wait, maybe no need for semaphore
@@ -305,6 +328,7 @@ final class DataManager {
                 self.updateSynced(username: username, time: time)
                 print("status 200 finished client handling")
             } else {
+                self.unsynced.insert(r)
                 self.insertErrorMessage(isNetwork: true, message: "Failed to insert (\(username), \(time), \(duration))\nstatusCode: \(response.statusCode)")
             }
         }, failure: { e in
@@ -371,13 +395,14 @@ final class DataManager {
         }, failure: { _ in }) // TODO: implement failure
     }
     
-    func sync(username: String) {
+    func sync(username: String, token: String?) {
         if username == "guest" { return }
         // only sync after 15 minutes has passed since last sync
         let current = Int(Date().timeIntervalSince1970)
         let lastSync = UserDefaults.standard.integer(forKey: "LastSync_"+username)
         if (lastSync + 900 > current) { return }
         downloadRecord(username: username, start: lastSync, end: current)
+        uploadUnsynced(username: username, token: token)
     }
     
     func clear() {

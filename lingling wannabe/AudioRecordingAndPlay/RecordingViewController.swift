@@ -20,34 +20,69 @@ class RecordingViewController: UIViewController, UITableViewDelegate, UITableVie
     let CONTROLVIEW_HEIGHT: CGFloat = 60
     let isRecording: Bool
     
-    let folder = getDocumentDirectory().appendingPathComponent("/recordings")
+    let folder: URL
     let tmp: URL
-    var files: [String]
+    var displayNames: [String] = []
+    var counter: [String:Int] = [:]
+    var filesMap: [String:String] = [:] // map displayNames to actual file name
+    
+    let formatter = DateFormatter()
     
     required init?(coder: NSCoder) {
         fatalError("NSCoding not supported")
     }
     
-    init(size: CGSize, isRecording: Bool) {
+    init(size: CGSize, username: String, isRecording: Bool) {
+        self.isRecording = isRecording
         self.size = size
         floatViewDelegate = FloatView(size)
+        
+        let bytes: [UInt8] = Array(username.utf8)
+        let usernameHex = bytes.compactMap { String(format: "%02x", $0) }.joined()
+        folder = getDocumentDirectory().appendingPathComponent("recordings/\(usernameHex)")
         tmp = folder.appendingPathComponent("tmp.flac")
+        let allFiles: [String]
         do {
             var yes: ObjCBool = true
             if !FileManager.default.fileExists(atPath: folder.path, isDirectory: &yes) {
-                try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: false)
+                try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
             }
-            files = try FileManager.default.contentsOfDirectory(atPath: folder.path)
+            allFiles = try FileManager.default.contentsOfDirectory(atPath: folder.path)
         } catch {
-            files = []
             // TODO: add error handling
+            allFiles = []
             print(error.localizedDescription)
         }
+        
         recordingView = AudioRecorderView(path: tmp)
-        self.isRecording = isRecording
+        
+        formatter.dateFormat = "yyyy-MM-dd"
+        
         super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = .custom
         transitioningDelegate = floatViewDelegate
+        
+        allFiles.forEach {
+            addFileToList(filename: $0)
+        }
+    }
+    
+    func addFileToList(filename: String) {
+        if filename.count < 5 { return }
+        let idx = filename.index(filename.endIndex, offsetBy: -5)
+        let str = String(filename[..<idx])
+        if let t = Double(str) {
+            let date = formatter.string(from: Date(timeIntervalSince1970: t))
+            counter[date, default: 0] += 1
+            if (counter[date]! > 1) {
+                let name = "\(date)_\(counter[date]! - 1)"
+                displayNames.append(name)
+                filesMap[name] = filename
+            } else {
+                displayNames.append(date)
+                filesMap[date] = filename
+            }
+        }
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -56,13 +91,13 @@ class RecordingViewController: UIViewController, UITableViewDelegate, UITableVie
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return files.count
+        return displayNames.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "FilesCell", for: indexPath)
         cell.textLabel?.textColor = .black
-        cell.textLabel?.text = files[indexPath.row]
+        cell.textLabel?.text = displayNames[indexPath.row]
         cell.backgroundColor = cell.isSelected ? UIColor(white: 0.9, alpha: 1) : .white
         let bgView = UIView()
         bgView.backgroundColor = UIColor(white: 0.9, alpha: 1)
@@ -72,7 +107,8 @@ class RecordingViewController: UIViewController, UITableViewDelegate, UITableVie
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let cell = tableView.cellForRow(at: indexPath)
-        guard let filename = cell?.textLabel?.text else { return }
+        guard let displayName = cell?.textLabel?.text,
+              let filename = filesMap[displayName] else { return }
         controlView.loadAudioAt(url: folder.appendingPathComponent(filename))
     }
     
@@ -133,8 +169,8 @@ class RecordingViewController: UIViewController, UITableViewDelegate, UITableVie
         saveButton.removeFromSuperview()
         recordingView.removeFromSuperview()
         
-        let idx = IndexPath(row: files.count, section: 0)
-        files.append(utc)
+        let idx = IndexPath(row: displayNames.count, section: 0)
+        addFileToList(filename: utc)
         filesView.insertRows(at: [idx], with: .automatic)
         filesView.selectRow(at: idx, animated: false, scrollPosition: .bottom)
     }
