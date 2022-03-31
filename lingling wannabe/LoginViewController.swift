@@ -309,6 +309,10 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
                 label.text = "Username Taken"
                 return
             }
+            if user.count > 40 {
+                label.text = "Username too long"
+                return
+            }
             let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
             let emailPred = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
             if !emailPred.evaluate(with: emailAddr) {

@@ -200,6 +200,5 @@ func highlightAnimate(name: String, position: CGPoint = .zero, duration: Double 
         f.addTrace(drawn: false, tracked: false)
         ret.addSublayer(f.layer)
     }
-    
     return ret
 }

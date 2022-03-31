@@ -41,7 +41,7 @@ class MainViewController: UIViewController {
         if username == "guest" {
             let signup = LoginViewController(CGSize(width: view.frame.width, height: view.frame.height), isFullScreen: true, didRegister: {
                 [weak self] user in self?.changeUser(user: user)
-                DataManager.shared.sync(username: user)
+                DataManager.shared.sync(username: user, token: CredentialManager.shared.getToken())
                 DispatchQueue.main.async {
                     let instruments = InstrumentSelectionViewController(style: .plain)
                     instruments.didSelected = {
@@ -62,7 +62,7 @@ class MainViewController: UIViewController {
                 }
             }, didLogin: {
                 [weak self] user in self?.changeUser(user: user)
-                DataManager.shared.sync(username: user)
+                DataManager.shared.sync(username: user, token: CredentialManager.shared.getToken())
             })
             addChild(signup)
             view.addSubview(signup.view)
@@ -83,7 +83,7 @@ class MainViewController: UIViewController {
         
         serialQueue.async {
             let token = CredentialManager.shared.getToken()
-            self.dataStatus = DataManager.shared.checkAndLoad(username: self.username, time: Date().timeIntervalSince1970, token: token)
+            self.dataStatus = DataManager.shared.checkAndLoad(username: self.username, token: token)
         }
         UIView.animate(withDuration: 1, delay: introTime, animations: {
             intro.alpha = 0
@@ -100,7 +100,6 @@ class MainViewController: UIViewController {
             // TODO: sign user out because there is a change in username
         }
         changeUser(user: tmp)
-        DataManager.shared.sync(username: username)
     }
     
     func checkData() {
@@ -124,11 +123,14 @@ class MainViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         checkData()
+        serialQueue.async {
+            DataManager.shared.sync(username: self.username, token: CredentialManager.shared.getToken())
+        }
     }
 
     private func openSetting(alert: UIAlertAction) {
         if let url = URL.init(string: UIApplication.openSettingsURLString) {
-                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
         }
     }
     
@@ -179,6 +181,13 @@ class MainViewController: UIViewController {
             print("nan")
             return
         }
+        
+        if username == "guest" {
+            FilesManager.shared.upload(username: UUID().uuidString, time: Int(Date().timeIntervalSince1970))
+        } else if let time = DataManager.shared.getLast(username: username)?.time {
+            FilesManager.shared.upload(username: username, time: Int(time))
+        }
+        
         var delay: Int = 15*60
         if let mainView = view as? MainView {
             delay = mainView.minutes * 60
@@ -209,18 +218,25 @@ class MainViewController: UIViewController {
         let userinfoView = UserInfoViewController(CGSize(width: width, height: width*4/3), username: username)
         present(userinfoView, animated: true, completion: nil)
         serialQueue.async {
-            DataManager.shared.sync(username: self.username)
+            DataManager.shared.sync(username: self.username, token: CredentialManager.shared.getToken())
             DispatchQueue.main.async {
                 userinfoView.loadData()
             }
         }
     }
     
-    @objc func showRecordings() {
+    func showRecordings(isRecording: Bool) {
         let itemWidth = (42 * view.frame.width / 360).rounded()
         let width = itemWidth*7+6
-        let recordings = RecordingViewController(size: CGSize(width: width, height: view.frame.height*0.7), isRecording: true)
+        let recordings = RecordingViewController(
+            size: CGSize(width: width, height: view.frame.height*0.7),
+            username: CredentialManager.shared.getUsername(),
+            isRecording: isRecording)
         present(recordings, animated: true)
+    }
+    
+    @objc func showRecordingsList() {
+        showRecordings(isRecording: false)
     }
     
     @objc func showLeaderBoard() {

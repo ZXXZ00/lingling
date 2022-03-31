@@ -20,6 +20,7 @@ class MainView: UIView, MSCircularSliderDelegate {
     let start: UIButton
     let username: UIButton
     let leaderboard: UIButton
+    let recordings: UIButton
     
     lazy var tap = UITapGestureRecognizer(target: self, action: #selector(touchHandler))
     
@@ -45,6 +46,7 @@ class MainView: UIView, MSCircularSliderDelegate {
         start = UIButton(frame: CGRect(x: 0, y: 0, width: 103.5*buttonScale, height: 64*buttonScale))
         username = UIButton(frame: CGRect(x: 4*buttonScale, y: 0, width: frame.width/2, height: 20*buttonScale))
         leaderboard = UIButton(frame: CGRect(x: frame.width - 60*buttonScale, y: -16*buttonScale, width: 60*buttonScale, height: 60*buttonScale))
+        recordings = UIButton()
         rect = CAShapeLayer()
         rect.path = UIBezierPath(rect: frame).cgPath
         rect.fillColor = UIColor(white: 1, alpha: 1).cgColor
@@ -109,6 +111,15 @@ class MainView: UIView, MSCircularSliderDelegate {
         leaderboard.setImage(UIImage(named: "leaderboard.pdf"), for: .normal)
         leaderboard.addTarget(controller, action: #selector(MainViewController.showLeaderBoard), for: .touchUpInside)
         addSubview(leaderboard)
+        
+        recordings.setImage(UIImage(named: "gramphone.pdf"), for: .normal)
+        recordings.addTarget(controller, action: #selector(MainViewController.showRecordingsList), for: .touchUpInside)
+        addSubview(recordings)
+        recordings.translatesAutoresizingMaskIntoConstraints = false
+        recordings.rightAnchor.constraint(equalTo: leaderboard.leftAnchor, constant: -5).isActive = true
+        recordings.centerYAnchor.constraint(equalTo: leaderboard.centerYAnchor).isActive = true
+        recordings.widthAnchor.constraint(equalToConstant: 50 * buttonScale).isActive = true
+        recordings.heightAnchor.constraint(equalToConstant: 50 * buttonScale).isActive = true
     }
     
     private func loadNote(filename: String) {
@@ -196,6 +207,10 @@ class MainView: UIView, MSCircularSliderDelegate {
             self.reward.transform = CGAffineTransform(scaleX: 0.05, y: 0.05)
         }, completion: { finished in
             self.reward.removeFromSuperview()
+            if DataManager.shared.getRecordingEligibility() {
+                print("eligible to record!")
+                (self.controller as? MainViewController)?.showRecordings(isRecording: true)
+            }
         })
     }
     
