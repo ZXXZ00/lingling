@@ -51,6 +51,7 @@ class RecordingViewController: UIViewController, UITableViewDelegate, UITableVie
         } catch {
             // TODO: add error handling
             allFiles = []
+            DataManager.shared.insertErrorMessage(isNetwork: false, message: "Failed to create folder: \(error)")
             print(error.localizedDescription)
         }
         
@@ -165,6 +166,7 @@ class RecordingViewController: UIViewController, UITableViewDelegate, UITableVie
         } catch {
             print(error.localizedDescription)
             // TODO: error handling
+            DataManager.shared.insertErrorMessage(isNetwork: false, message: "Failed to move file: \(error)")
         }
         saveButton.removeFromSuperview()
         recordingView.removeFromSuperview()

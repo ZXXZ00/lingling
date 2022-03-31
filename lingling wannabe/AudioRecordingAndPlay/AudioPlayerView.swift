@@ -111,6 +111,7 @@ class AudioPlayerView: UIView, AVAudioPlayerDelegate {
             slider.alpha = 1
         } catch {
             // TODO: error handling
+            DataManager.shared.insertErrorMessage(isNetwork: false, message: "fail to initlize AVaudioPlayer: \(error)")
             print(error.localizedDescription)
         }
     }
@@ -144,5 +145,6 @@ class AudioPlayerView: UIView, AVAudioPlayerDelegate {
     
     func audioPlayerDecodeErrorDidOccur(_ player: AVAudioPlayer, error: Error?) {
         // TODO: handle audio interruption
+        DataManager.shared.insertErrorMessage(isNetwork: false, message: "audio player encode error: \(error)")
     }
 }

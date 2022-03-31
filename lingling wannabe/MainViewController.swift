@@ -33,7 +33,6 @@ class MainViewController: UIViewController {
                 mainView.username.setTitle(user, for: .normal)
             }
         }
-        // TODO: implement and show a tutorial for user change
     }
     
     override func viewDidLoad() {

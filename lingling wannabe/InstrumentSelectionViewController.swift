@@ -74,8 +74,8 @@ class InstrumentSelectionViewController: UITableViewController {
             if let token = CredentialManager.shared.getToken() {
                 postJSON(url: url!, json: [
                     "username": CredentialManager.shared.getUsername(), "instruments": lists
-                ], token: token, success: { _, _ in
-                    
+                ], token: token, success: { data, res in
+                    // TODO: Error handling
                 }, failure: { e in
                     // TODO: Error Handling
                 })

@@ -86,6 +86,7 @@ class AudioRecorderView: UIView, AVAudioRecorderDelegate {
             delegate?.didBegin()
         } catch {
             // TODO: error handling
+            DataManager.shared.insertErrorMessage(isNetwork: false, message: "failed to initlize AVAudioRecorder: \(error)")
             print(error.localizedDescription)
         }
         label.text = "00:00"
@@ -114,5 +115,6 @@ class AudioRecorderView: UIView, AVAudioRecorderDelegate {
     
     func audioRecorderEncodeErrorDidOccur(_ recorder: AVAudioRecorder, error: Error?) {
         // TODO: error handling
+        DataManager.shared.insertErrorMessage(isNetwork: false, message: "audio recroder encode error: \(error)")
     }
 }

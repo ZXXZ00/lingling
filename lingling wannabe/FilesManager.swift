@@ -53,6 +53,7 @@ final class FilesManager {
                 task.resume()
             } else {
                 // TODO: error handling
+                DataManager.shared.insertErrorMessage(isNetwork: true, message: "request upload link, status code: \(res.statusCode)")
             }
         }, failure: { err in })
     }
