@@ -38,6 +38,7 @@ class AudioStreamAnalyzer {
     let analysisQueue = DispatchQueue(label: "com.zxxz.AnalysisQueue")
     
     var timeElapsed = 0.0
+    private var isSpaceEnough = true
     
     let outputFormatSettings: [String : Any]
     
@@ -104,7 +105,22 @@ class AudioStreamAnalyzer {
         //let emptyPtr: UnsafeBufferPointer<Float> = UnsafeBufferPointer(start: tmp, count: 8192)
         
         let url = getDocumentDirectory().appendingPathComponent("recording.wav")
-        let audioFile = try? AVAudioFile(forWriting: url, settings: outputFormatSettings, commonFormat: AVAudioCommonFormat.pcmFormatFloat32, interleaved: true)
+        let audioFile: AVAudioFile?
+        do {
+            let values = try url.resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey])
+            if let size = values.volumeAvailableCapacityForImportantUsage {
+                if size < 5*1024*1024*1024 { isSpaceEnough = false } // smaller than 5 GB
+            } else {
+                isSpaceEnough = false
+            }
+        } catch {
+            isSpaceEnough = false
+        }
+        if isSpaceEnough {
+            audioFile = try? AVAudioFile(forWriting: url, settings: outputFormatSettings, commonFormat: AVAudioCommonFormat.pcmFormatFloat32, interleaved: true)
+        } else {
+            audioFile = nil
+        }
         
         var startTime = -1.0
         audioEngine.inputNode.installTap(onBus: inputBus, bufferSize: UInt32(buffSize), format: inputFormat) {
@@ -138,7 +154,9 @@ class AudioStreamAnalyzer {
         streamAnalyzer.completeAnalysis()
         audioEngine.inputNode.removeTap(onBus: inputBus)
         audioEngine.stop()
-        FilesManager.shared.convert2FLAC()
+        if isSpaceEnough {
+            FilesManager.shared.convert2FLAC()
+        }
     }
     
     func pause() {

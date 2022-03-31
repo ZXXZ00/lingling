@@ -294,7 +294,7 @@ final class DataManager {
 
     func addRecord(username: String, time: Int, duration: Int, asset: String, attributes: String?, upload: Bool) -> Int {
         let before = totalMinutes
-        totalMinutes += abs(duration / 60) 
+        totalMinutes += abs(duration / 60)
         if (totalMinutes / interval - before / interval > 0) || (before == 0) {
             canRecording = true
         }
@@ -369,6 +369,18 @@ final class DataManager {
             print(error)
         }
         return ret
+    }
+    
+    func getLast(username: String) -> Record? {
+        do {
+            let stmt = try db.prepare("SELECT * FROM records WHERE username=? ORDER BY time DESC LIMIT 1", username)
+            for row in stmt {
+                return cast(row)
+            }
+        } catch {
+            print(error)
+        }
+        return nil
     }
     
     func downloadRecord(username: String, start: Int?=nil, end: Int?=nil) {
