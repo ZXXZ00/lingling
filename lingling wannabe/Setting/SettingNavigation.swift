@@ -13,10 +13,15 @@ class SettingNavigation: UINavigationController {
     let floatViewDelegate : FloatView
     let rootView = SettingViewController()
     
-    init(size: CGSize) {
+    init(size: CGSize, settingDelegate: SettingDelegate?) {
         self.size = size
         floatViewDelegate = FloatView(size)
+        
+        if let settingDelegate = settingDelegate {
+            rootView.delegate = settingDelegate
+        }
         super.init(rootViewController: rootView)
+        
         modalPresentationStyle = .custom
         transitioningDelegate = floatViewDelegate
     }

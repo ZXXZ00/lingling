@@ -9,6 +9,7 @@ import UIKit
 
 class SettingViewController: UIViewController {
     
+    weak var delegate: SettingDelegate?
     
     override func loadView() {
         let view = UIView()
@@ -29,6 +30,7 @@ class SettingViewController: UIViewController {
         signOut.setTitle("Log out", for: .normal)
         signOut.backgroundColor = .gray
         signOut.layer.cornerRadius = 10
+        signOut.addTarget(self, action: #selector(SettingViewController.logOut), for: .touchUpInside)
         view.addSubview(signOut)
         signOut.translatesAutoresizingMaskIntoConstraints = false
         signOut.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
@@ -37,5 +39,11 @@ class SettingViewController: UIViewController {
         signOut.heightAnchor.constraint(equalToConstant: 60).isActive = true
         
         self.view = view
+    }
+    
+    @objc func logOut() {
+        if let delegate = delegate {
+            delegate.logOut()
+        }
     }
 }
