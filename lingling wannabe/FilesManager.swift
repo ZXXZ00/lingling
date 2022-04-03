@@ -74,8 +74,15 @@ final class FilesManager {
             if let retcode = session?.getReturnCode(), retcode.isValueSuccess() {
                 print("success")
                 print(session?.getDuration())
+                do {
+                    try FileManager.default.removeItem(atPath: src)
+                } catch {
+                    print("failed to delete the src wav file \(error)")
+                    DataManager.shared.insertErrorMessage(isNetwork: false, message: "failed to delete the src wav file \(error)")
+                }
             } else {
                 print("failed to convert flac \(session)")
+                DataManager.shared.insertErrorMessage(isNetwork: false, message: "failed to convert to flac")
             }
             UIApplication.shared.endBackgroundTask(identifier)
         }
