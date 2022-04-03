@@ -35,37 +35,48 @@ class MainViewController: UIViewController {
         }
     }
     
+    func showLoginViewController() {
+        let signup = LoginViewController(CGSize(width: view.frame.width, height: view.frame.height), isFullScreen: true, didRegister: {
+            [weak self] user in
+            self?.changeUser(user: user)
+            DataManager.shared.sync(username: user, token: CredentialManager.shared.getToken())
+            DispatchQueue.main.async {
+                let instruments = InstrumentSelectionViewController(style: .plain)
+                instruments.didSelected = {
+                    DispatchQueue.main.async {
+                        (self?.view as? MainView)?.addTutorialView()
+                    }
+                }
+                self?.addChild(instruments)
+                self?.view.addSubview(instruments.view)
+                if let layoutGuide = self?.view.safeAreaLayoutGuide {
+                    instruments.view.translatesAutoresizingMaskIntoConstraints = false
+                    instruments.view.centerXAnchor.constraint(equalTo: layoutGuide.centerXAnchor).isActive = true
+                    instruments.view.centerYAnchor.constraint(equalTo: layoutGuide.centerYAnchor).isActive = true
+                    instruments.view.widthAnchor.constraint(equalTo: layoutGuide.widthAnchor).isActive = true
+                    instruments.view.heightAnchor.constraint(equalTo: layoutGuide.heightAnchor).isActive = true
+                }
+                instruments.didMove(toParent: self)
+            }
+        }, didLogin: {
+            [weak self] user in
+            self?.changeUser(user: user)
+            DataManager.shared.sync(username: user, token: CredentialManager.shared.getToken())
+        }, didContinueAsGuest: {
+            [weak self] in
+            DispatchQueue.main.async {
+                (self?.view as? MainView)?.addTutorialView()
+            }
+        })
+        addChild(signup)
+        view.addSubview(signup.view)
+        signup.didMove(toParent: self)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         if username == "guest" {
-            let signup = LoginViewController(CGSize(width: view.frame.width, height: view.frame.height), isFullScreen: true, didRegister: {
-                [weak self] user in self?.changeUser(user: user)
-                DataManager.shared.sync(username: user, token: CredentialManager.shared.getToken())
-                DispatchQueue.main.async {
-                    let instruments = InstrumentSelectionViewController(style: .plain)
-                    instruments.didSelected = {
-                        DispatchQueue.main.async {
-                            (self?.view as? MainView)?.addTutorialView()
-                        }
-                    }
-                    self?.addChild(instruments)
-                    self?.view.addSubview(instruments.view)
-                    if let layoutGuide = self?.view.safeAreaLayoutGuide {
-                        instruments.view.translatesAutoresizingMaskIntoConstraints = false
-                        instruments.view.centerXAnchor.constraint(equalTo: layoutGuide.centerXAnchor).isActive = true
-                        instruments.view.centerYAnchor.constraint(equalTo: layoutGuide.centerYAnchor).isActive = true
-                        instruments.view.widthAnchor.constraint(equalTo: layoutGuide.widthAnchor).isActive = true
-                        instruments.view.heightAnchor.constraint(equalTo: layoutGuide.heightAnchor).isActive = true
-                    }
-                    instruments.didMove(toParent: self)
-                }
-            }, didLogin: {
-                [weak self] user in self?.changeUser(user: user)
-                DataManager.shared.sync(username: user, token: CredentialManager.shared.getToken())
-            })
-            addChild(signup)
-            view.addSubview(signup.view)
-            signup.didMove(toParent: self)
+            showLoginViewController()
         }
         
         let intro = UIView()
@@ -249,9 +260,25 @@ class MainViewController: UIViewController {
         present(debugV, animated: true)
     }
     
+    @objc func showSetting() {
+        let setting = SettingNavigation(size: CGSize(width: view.frame.width * 0.8, height: view.frame.height*0.7), settingDelegate: self)
+        present(setting, animated: true)
+    }
+    
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return UIStatusBarStyle.darkContent
     }
+}
 
+extension MainViewController: SettingDelegate {
+    
+    func logOut() {
+        CredentialManager.shared.delete()
+        dismiss(animated: true) {
+            DispatchQueue.main.async {
+                self.showLoginViewController()
+            }
+        }
+    }
 }
 

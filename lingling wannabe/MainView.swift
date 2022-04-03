@@ -20,7 +20,8 @@ class MainView: UIView, MSCircularSliderDelegate {
     let start: UIButton
     let username: UIButton
     let leaderboard: UIButton
-    let recordings: UIButton
+    let recordings = UIButton()
+    let setting = UIButton()
     
     lazy var tap = UITapGestureRecognizer(target: self, action: #selector(touchHandler))
     
@@ -46,7 +47,6 @@ class MainView: UIView, MSCircularSliderDelegate {
         start = UIButton(frame: CGRect(x: 0, y: 0, width: 103.5*buttonScale, height: 64*buttonScale))
         username = UIButton(frame: CGRect(x: 4*buttonScale, y: 0, width: frame.width/2, height: 20*buttonScale))
         leaderboard = UIButton(frame: CGRect(x: frame.width - 60*buttonScale, y: -16*buttonScale, width: 60*buttonScale, height: 60*buttonScale))
-        recordings = UIButton()
         rect = CAShapeLayer()
         rect.path = UIBezierPath(rect: frame).cgPath
         rect.fillColor = UIColor(white: 1, alpha: 1).cgColor
@@ -67,7 +67,7 @@ class MainView: UIView, MSCircularSliderDelegate {
     }
     
     private func addDebugButton() {
-        let debugB = UIButton(frame: CGRect(x: 200, y: 20, width: 80, height: 40))
+        let debugB = UIButton(frame: CGRect(x: 200, y: 100, width: 80, height: 40))
         debugB.setTitle("debug", for: .normal)
         debugB.setTitleColor(.black, for: .normal)
         debugB.addTarget(controller, action: #selector(MainViewController.showDebug), for: .touchUpInside)
@@ -116,10 +116,21 @@ class MainView: UIView, MSCircularSliderDelegate {
         recordings.addTarget(controller, action: #selector(MainViewController.showRecordingsList), for: .touchUpInside)
         addSubview(recordings)
         recordings.translatesAutoresizingMaskIntoConstraints = false
-        recordings.rightAnchor.constraint(equalTo: leaderboard.leftAnchor, constant: -5).isActive = true
+        recordings.rightAnchor.constraint(equalTo: leaderboard.leftAnchor, constant: -4).isActive = true
         recordings.centerYAnchor.constraint(equalTo: leaderboard.centerYAnchor).isActive = true
         recordings.widthAnchor.constraint(equalToConstant: 50 * buttonScale).isActive = true
         recordings.heightAnchor.constraint(equalToConstant: 50 * buttonScale).isActive = true
+        
+        let gearConfig = UIImage.SymbolConfiguration(textStyle: .largeTitle, scale: .large)
+        let gearIcon = UIImage(systemName: "gearshape", withConfiguration: gearConfig)?.withTintColor(.black, renderingMode: .alwaysOriginal)
+        setting.setImage(gearIcon, for: .normal)
+        setting.addTarget(controller, action: #selector(MainViewController.showSetting), for: .touchUpInside)
+        addSubview(setting)
+        setting.translatesAutoresizingMaskIntoConstraints = false
+        setting.rightAnchor.constraint(equalTo: recordings.leftAnchor, constant: -10).isActive = true
+        setting.centerYAnchor.constraint(equalTo: recordings.centerYAnchor).isActive = true
+        setting.widthAnchor.constraint(equalToConstant: 30 * buttonScale).isActive = true
+        setting.heightAnchor.constraint(equalToConstant: 30 * buttonScale).isActive = true
     }
     
     private func loadNote(filename: String) {

@@ -29,16 +29,18 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
     
     var didLogin: ((_: String) -> Void)?
     var didRegister: ((_: String) -> Void)?
+    var didContinueAsGuest: (() -> Void)?
     
     required init?(coder: NSCoder) {
         fatalError("NSCoding not supported")
     }
     
-    init(_ size: CGSize, isFullScreen: Bool=false, didRegister: ((_: String) -> Void)? = nil, didLogin: ((_: String) -> Void)? = nil) {
+    init(_ size: CGSize, isFullScreen: Bool=false, didRegister: ((_: String) -> Void)? = nil, didLogin: ((_: String) -> Void)? = nil, didContinueAsGuest: (() -> Void)?) {
         self.size = size
         floatViewDelegate = FloatView(size)
         self.didLogin = didLogin
         self.didRegister = didRegister
+        self.didContinueAsGuest = didContinueAsGuest
         super.init(nibName: nil, bundle: nil)
         if isFullScreen {
             modalPresentationStyle = .fullScreen
@@ -219,6 +221,9 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
     @objc func asGuest(_: UIAlertAction) {
         view.removeFromSuperview()
         removeFromParent()
+        if let f = didContinueAsGuest {
+            f()
+        }
     }
     
     @objc func changeMethod() {
