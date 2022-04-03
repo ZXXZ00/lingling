@@ -21,6 +21,8 @@ class AudioRecorderView: UIView, AVAudioRecorderDelegate {
     var delegate: AudioRecorderDelegate?
     var timer: Timer?
     
+    let minimumAvaiableSpace: Int64 = 512 * 1024 * 1024 // 512 MB
+    
     required init?(coder: NSCoder) {
         fatalError("NSCoding not supported")
     }
@@ -67,6 +69,18 @@ class AudioRecorderView: UIView, AVAudioRecorderDelegate {
     
     func startRecording() {
         guard let path = path else { return }
+        
+        if let size = getAvailableSpace(at: getDocumentDirectory()) {
+            if size < minimumAvaiableSpace {
+                label.textColor = .red
+                label.text = "Not enough disk space"
+                return
+            }
+        } else {
+            label.textColor = .red
+            label.text = "Disk error"
+            return
+        }
         
         let settings: [String:Any] = [
             AVFormatIDKey: Int(kAudioFormatFLAC),

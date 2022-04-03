@@ -106,14 +106,9 @@ class AudioStreamAnalyzer {
         
         let url = getDocumentDirectory().appendingPathComponent("recording.wav")
         let audioFile: AVAudioFile?
-        do {
-            let values = try url.resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey])
-            if let size = values.volumeAvailableCapacityForImportantUsage {
-                if size < 5*1024*1024*1024 { isSpaceEnough = false } // smaller than 5 GB
-            } else {
-                isSpaceEnough = false
-            }
-        } catch {
+        if let size = getAvailableSpace(at: getDocumentDirectory()) {
+            if size < 5*1024*1024*1024 { isSpaceEnough = false } // smaller than 5 GB
+        } else {
             isSpaceEnough = false
         }
         if isSpaceEnough {

@@ -202,3 +202,14 @@ func highlightAnimate(name: String, position: CGPoint = .zero, duration: Double 
     }
     return ret
 }
+
+func getAvailableSpace(at: URL) -> Int64? {
+    do {
+        let values = try at.resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey])
+        return values.volumeAvailableCapacityForImportantUsage
+    } catch {
+        print("failed to get available space at \(at), error message: \(error)")
+        DataManager.shared.insertErrorMessage(isNetwork: false, message: "failed to get available space at \(at), error message: \(error)")
+    }
+    return nil
+}
