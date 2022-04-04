@@ -71,6 +71,9 @@
 		66FDECE22607CFA300FB9019 /* AudioStreamAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66FDECE12607CFA300FB9019 /* AudioStreamAnalyzer.swift */; };
 		66FDECE72607CFC500FB9019 /* TwoCategory.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 66FDECE62607CFC500FB9019 /* TwoCategory.mlmodel */; };
 		66FDECEC2607D10900FB9019 /* ResultDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66FDECEB2607D10900FB9019 /* ResultDelegate.swift */; };
+		66FFF8EB27F8D92F0045568E /* SettingNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66FFF8EA27F8D92F0045568E /* SettingNavigation.swift */; };
+		66FFF8ED27F8DA370045568E /* SettingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66FFF8EC27F8DA370045568E /* SettingViewController.swift */; };
+		66FFF8F027F8E0A00045568E /* SettingDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66FFF8EF27F8E0A00045568E /* SettingDelegate.swift */; };
 		A948108B89948C5A3CE6D423 /* Pods_lingling_wannabe.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B9109EB472831329D990D3AB /* Pods_lingling_wannabe.framework */; };
 /* End PBXBuildFile section */
 
@@ -164,6 +167,9 @@
 		66FDECE12607CFA300FB9019 /* AudioStreamAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioStreamAnalyzer.swift; sourceTree = "<group>"; };
 		66FDECE62607CFC500FB9019 /* TwoCategory.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = TwoCategory.mlmodel; sourceTree = "<group>"; };
 		66FDECEB2607D10900FB9019 /* ResultDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultDelegate.swift; sourceTree = "<group>"; };
+		66FFF8EA27F8D92F0045568E /* SettingNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingNavigation.swift; sourceTree = "<group>"; };
+		66FFF8EC27F8DA370045568E /* SettingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingViewController.swift; sourceTree = "<group>"; };
+		66FFF8EF27F8E0A00045568E /* SettingDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingDelegate.swift; sourceTree = "<group>"; };
 		A799DCDDF0CF2823F4980E80 /* Pods-lingling wannabe.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-lingling wannabe.debug.xcconfig"; path = "Target Support Files/Pods-lingling wannabe/Pods-lingling wannabe.debug.xcconfig"; sourceTree = "<group>"; };
 		B1C4BD008F0A0FADD58092A0 /* Pods-lingling wannabe.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-lingling wannabe.release.xcconfig"; path = "Target Support Files/Pods-lingling wannabe/Pods-lingling wannabe.release.xcconfig"; sourceTree = "<group>"; };
 		B9109EB472831329D990D3AB /* Pods_lingling_wannabe.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_lingling_wannabe.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -296,6 +302,7 @@
 				66E0478E27B899A40074935A /* TutorialView.swift */,
 				66DCD97127C5D47800BF768D /* InstrumentSelectionViewController.swift */,
 				66A4B1AD269246FA00FA38CB /* LoginViewController.swift */,
+				66FFF8EE27F8E0820045568E /* Setting */,
 				66E7604C2752E30C00FD0E0F /* LayerRemover.swift */,
 				66F134CE265D7D1500751D23 /* Helper.swift */,
 				6614E766269E2A61007C75A5 /* FourierSeries.swift */,
@@ -352,6 +359,16 @@
 				66D0864A266C07540089C833 /* LeaderBoardCell.swift */,
 			);
 			path = LeaderBoard;
+			sourceTree = "<group>";
+		};
+		66FFF8EE27F8E0820045568E /* Setting */ = {
+			isa = PBXGroup;
+			children = (
+				66FFF8EC27F8DA370045568E /* SettingViewController.swift */,
+				66FFF8EA27F8D92F0045568E /* SettingNavigation.swift */,
+				66FFF8EF27F8E0A00045568E /* SettingDelegate.swift */,
+			);
+			path = Setting;
 			sourceTree = "<group>";
 		};
 		895114EE1D2F5116CF963063 /* Frameworks */ = {
@@ -581,6 +598,7 @@
 				66BBDD62260A85CB008E54EC /* MSCircularSliderHandle.swift in Sources */,
 				66EC2F9A263EFF6400F700E5 /* PracticeViewController.swift in Sources */,
 				66F134CF265D7D1500751D23 /* Helper.swift in Sources */,
+				66FFF8EB27F8D92F0045568E /* SettingNavigation.swift in Sources */,
 				6620FA4C2652BD65009E9D86 /* FloatViewDelegate.swift in Sources */,
 				66ADE5AA25BE2B0A004B20C6 /* SceneDelegate.swift in Sources */,
 				66A4B1AE269246FA00FA38CB /* LoginViewController.swift in Sources */,
@@ -589,6 +607,7 @@
 				6617083F27EEA12700B56A23 /* AudioRecorderDelegate.swift in Sources */,
 				66E7604D2752E30C00FD0E0F /* LayerRemover.swift in Sources */,
 				66C957E426514D90008C5B7F /* Metronome.swift in Sources */,
+				66FFF8F027F8E0A00045568E /* SettingDelegate.swift in Sources */,
 				666C30F526652506003DCAB6 /* LeaderBoardNavigation.swift in Sources */,
 				66A4F650266035CF002985BA /* CalendarCell.swift in Sources */,
 				66BBDD6C260A85E0008E54EC /* MSGradientCircularSlider.swift in Sources */,
@@ -603,6 +622,7 @@
 				66E0478F27B899A40074935A /* TutorialView.swift in Sources */,
 				664E4DEA27E984E400BD21E1 /* AudioPlayerView.swift in Sources */,
 				66C099FB26693AA9008F892D /* LeaderBoardViewController.swift in Sources */,
+				66FFF8ED27F8DA370045568E /* SettingViewController.swift in Sources */,
 				66FDECE72607CFC500FB9019 /* TwoCategory.mlmodel in Sources */,
 				66FDECEC2607D10900FB9019 /* ResultDelegate.swift in Sources */,
 			);

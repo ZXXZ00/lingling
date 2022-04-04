@@ -8,7 +8,7 @@
 import UIKit
 import AVFoundation
 
-class RecordingViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, AudioRecorderDelegate {
+class RecordingViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     let size: CGSize
     let floatViewDelegate: FloatView
     
@@ -25,8 +25,11 @@ class RecordingViewController: UIViewController, UITableViewDelegate, UITableVie
     var displayNames: [String] = []
     var counter: [String:Int] = [:]
     var filesMap: [String:String] = [:] // map displayNames to actual file name
+    var labelMap: [String:String] = [:]
     
     let formatter = DateFormatter()
+    
+    let audioLabelView = AudioLabelView()
     
     required init?(coder: NSCoder) {
         fatalError("NSCoding not supported")
@@ -41,6 +44,28 @@ class RecordingViewController: UIViewController, UITableViewDelegate, UITableVie
         let usernameHex = bytes.compactMap { String(format: "%02x", $0) }.joined()
         folder = getDocumentDirectory().appendingPathComponent("recordings/\(usernameHex)")
         tmp = folder.appendingPathComponent("tmp.flac")
+        
+        recordingView = AudioRecorderView(path: tmp)
+        
+        formatter.dateFormat = "yyyy-MM-dd"
+        
+        super.init(nibName: nil, bundle: nil)
+        modalPresentationStyle = .custom
+        transitioningDelegate = floatViewDelegate
+        
+        var labels = Set<String>()
+        let res = FilesManager.shared.getLabels(username: CredentialManager.shared.getUsername())
+        res.map {
+            labelMap[$0] = $1
+            labels.insert($1)
+        }
+        audioLabelView.suggestionsArray = Array(labels)
+        
+        populate()
+    }
+    
+    // populate the arrays and maps used for tableview data such as displayNames filesMap
+    func populate() {
         let allFiles: [String]
         do {
             var yes: ObjCBool = true
@@ -55,19 +80,11 @@ class RecordingViewController: UIViewController, UITableViewDelegate, UITableVie
             print(error.localizedDescription)
         }
         
-        recordingView = AudioRecorderView(path: tmp)
-        
-        formatter.dateFormat = "yyyy-MM-dd"
-        
-        super.init(nibName: nil, bundle: nil)
-        modalPresentationStyle = .custom
-        transitioningDelegate = floatViewDelegate
-        
         allFiles.forEach {
             addFileToList(filename: $0)
         }
     }
-    
+
     func addFileToList(filename: String) {
         if filename.count < 5 { return }
         let idx = filename.index(filename.endIndex, offsetBy: -5)
@@ -75,13 +92,16 @@ class RecordingViewController: UIViewController, UITableViewDelegate, UITableVie
         if let t = Double(str) {
             let date = formatter.string(from: Date(timeIntervalSince1970: t))
             counter[date, default: 0] += 1
+            let key: String
             if (counter[date]! > 1) {
-                let name = "\(date)_\(counter[date]! - 1)"
-                displayNames.append(name)
-                filesMap[name] = filename
+                key = "\(date)_\(counter[date]! - 1)"
             } else {
-                displayNames.append(date)
-                filesMap[date] = filename
+                key = date
+            }
+            displayNames.append(key)
+            filesMap[key] = filename
+            if let label = labelMap[str] {
+                labelMap[key] = label
             }
         }
     }
@@ -96,9 +116,12 @@ class RecordingViewController: UIViewController, UITableViewDelegate, UITableVie
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "FilesCell", for: indexPath)
-        cell.textLabel?.textColor = .black
-        cell.textLabel?.text = displayNames[indexPath.row]
+        let cell = tableView.dequeueReusableCell(withIdentifier: "FilesCell", for: indexPath) as! AudioFileCell
+        cell.fileName.textColor = .black
+        cell.fileName.text = displayNames[indexPath.row]
+        if let label = labelMap[displayNames[indexPath.row]] {
+            cell.labelName.text = label
+        }
         cell.backgroundColor = cell.isSelected ? UIColor(white: 0.9, alpha: 1) : .white
         let bgView = UIView()
         bgView.backgroundColor = UIColor(white: 0.9, alpha: 1)
@@ -107,8 +130,8 @@ class RecordingViewController: UIViewController, UITableViewDelegate, UITableVie
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let cell = tableView.cellForRow(at: indexPath)
-        guard let displayName = cell?.textLabel?.text,
+        let cell = tableView.cellForRow(at: indexPath) as? AudioFileCell
+        guard let displayName = cell?.fileName.text,
               let filename = filesMap[displayName] else { return }
         controlView.loadAudioAt(url: folder.appendingPathComponent(filename))
     }
@@ -119,7 +142,9 @@ class RecordingViewController: UIViewController, UITableViewDelegate, UITableVie
         
         filesView.delegate = self
         filesView.dataSource = self
-        filesView.register(UITableViewCell.self, forCellReuseIdentifier: "FilesCell")
+        filesView.register(AudioFileCell.self, forCellReuseIdentifier: "FilesCell")
+        filesView.rowHeight = 44
+        filesView.separatorStyle = .none
         view.addSubview(filesView)
         filesView.backgroundColor = .white
         filesView.translatesAutoresizingMaskIntoConstraints = false
@@ -129,6 +154,10 @@ class RecordingViewController: UIViewController, UITableViewDelegate, UITableVie
         filesView.heightAnchor.constraint(equalTo: view.heightAnchor, constant: -CONTROLVIEW_HEIGHT).isActive = true
         
         if (isRecording) {
+            //DispatchQueue.global(qos: .userInteractive).async {
+            //    self.audioLabelView.suggestionsArray = FilesManager.shared.getLabels(username: CredentialManager.shared.getUsername())
+            //}
+            
             recordingView.delegate = self
             view.addSubview(recordingView)
             recordingView.translatesAutoresizingMaskIntoConstraints = false
@@ -160,7 +189,8 @@ class RecordingViewController: UIViewController, UITableViewDelegate, UITableVie
     }
     
     @objc func saveFile() {
-        let utc = String(format: "%d.flac", Int(Date().timeIntervalSince1970))
+        let time = Int(Date().timeIntervalSince1970)
+        let utc = String(format: "%d.flac", time)
         do {
             try FileManager.default.moveItem(at: tmp, to: folder.appendingPathComponent(utc))
         } catch {
@@ -168,6 +198,15 @@ class RecordingViewController: UIViewController, UITableViewDelegate, UITableVie
             // TODO: error handling
             DataManager.shared.insertErrorMessage(isNetwork: false, message: "Failed to move file: \(error)")
         }
+        
+        audioLabelView.audioFileTime = time
+        view.addSubview(audioLabelView)
+        audioLabelView.translatesAutoresizingMaskIntoConstraints = false
+        audioLabelView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        audioLabelView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+        audioLabelView.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
+        audioLabelView.heightAnchor.constraint(equalTo: view.heightAnchor).isActive = true
+        
         saveButton.removeFromSuperview()
         recordingView.removeFromSuperview()
         
@@ -176,6 +215,9 @@ class RecordingViewController: UIViewController, UITableViewDelegate, UITableVie
         filesView.insertRows(at: [idx], with: .automatic)
         filesView.selectRow(at: idx, animated: false, scrollPosition: .bottom)
     }
+}
+
+extension RecordingViewController: AudioRecorderDelegate {
     
     func didBegin() {
         controlView.pausePlaying()
