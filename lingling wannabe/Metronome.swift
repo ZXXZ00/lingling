@@ -10,19 +10,23 @@ import AVFoundation
 
 public class Metronome {
     
-    let engine = AVAudioEngine()
-    let player = AVAudioPlayerNode()
+    private let engine = AVAudioEngine()
+    private let player = AVAudioPlayerNode()
     let buffer : AVAudioPCMBuffer
     let file : AVAudioFile
     var length : UInt32
     var bpm = 60 {
         didSet {
-            let isPlaying = player.isPlaying
             player.stop()
             length = UInt32(sr * 60.0/(Double(bpm)))
             buffer.frameLength = length
-            if (isPlaying) {
-                start()
+            if (player.isPlaying) {
+                do {
+                    try start()
+                } catch {
+                    DataManager.shared.insertErrorMessage(isNetwork: false, message: "couldn't start motronome: \(error)")
+                    print(error)
+                }
             }
         }
     }
@@ -67,17 +71,14 @@ public class Metronome {
         engine.stop()
     }
     
-    @objc public func start() {
-        //if !engine.isRunning {
-        //    print("engine not running")
-        //    do {
-        //        try engine.start()
-        //    } catch {
-        //        print(error.localizedDescription)
-        //    }
-        //}
-        
-        // TO DO: handel audio interruption
+    public func startEngine() throws {
+        try engine.start()
+    }
+    
+    @objc public func start() throws {
+        if (!engine.isRunning) {
+            try engine.start()
+        }
         player.prepare(withFrameCount: length)
         player.play()
         player.scheduleBuffer(buffer, at: nil, options: .loops)
@@ -88,5 +89,6 @@ public class Metronome {
             return
         }
         player.stop()
+        engine.pause()
     }
 }

@@ -29,11 +29,16 @@ class PracticeViewController : UIViewController {
     
     let analyzer = AudioStreamAnalyzer()
     
+    let durationLimit = 60 * 60 // 1 hour
+    
     init(duration: Int, block: (() -> Void)? = nil) {
         completion = block
         self.duration = duration
         super.init(nibName: nil, bundle: nil)
         registerForNotifications()
+        if duration > durationLimit {
+            analyzer.isWritingToFile = false
+        }
     }
     
     required init?(coder: NSCoder) {
@@ -183,11 +188,18 @@ class PracticeViewController : UIViewController {
             case .began:
                 print("interruption started")
                 weakself.analyzer.pause()
+                weakself.metronome.pause()
+                DispatchQueue.main.async {
+                    weakself.playButton.setImage(weakself.playImage, for: .normal)
+                }
             case .ended:
                 print("interruption ended")
                 do {
+                    try AVAudioSession.sharedInstance().setActive(true, options: .notifyOthersOnDeactivation)
                     try weakself.analyzer.startAudioEngine()
+                    try weakself.metronome.startEngine()
                 } catch {
+                    print("Failed after interruption")
                     print(error.localizedDescription)
                 }
             @unknown default:
@@ -213,8 +225,13 @@ class PracticeViewController : UIViewController {
             playButton.setImage(playImage, for: .normal)
             metronome?.pause()
         } else {
-            playButton.setImage(pauseImage, for: .normal)
-            metronome?.start()
+            do {
+                try metronome?.start()
+                playButton.setImage(pauseImage, for: .normal)
+            } catch {
+                DataManager.shared.insertErrorMessage(isNetwork: false, message: "couldn't start motronome: \(error)")
+                print(error)
+            }
         }
     }
     

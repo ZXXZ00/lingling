@@ -38,9 +38,11 @@ class AudioStreamAnalyzer {
     let analysisQueue = DispatchQueue(label: "com.zxxz.AnalysisQueue")
     
     var timeElapsed = 0.0
-    private var isSpaceEnough = true
+    var isWritingToFile = true
     
     let outputFormatSettings: [String : Any]
+    
+    let minimumAvaiableSpace: Int64 = 1024 * 1024 * 1024 // 1024 MB
     
     init() {
         inputFormat = audioEngine.inputNode.inputFormat(forBus: inputBus)
@@ -66,7 +68,6 @@ class AudioStreamAnalyzer {
     }
 
     func startAudioEngine() throws {
-        try AVAudioSession.sharedInstance().setActive(true, options: .notifyOthersOnDeactivation)
         try audioEngine.start()
     }
     
@@ -107,11 +108,11 @@ class AudioStreamAnalyzer {
         let url = getDocumentDirectory().appendingPathComponent("recording.wav")
         let audioFile: AVAudioFile?
         if let size = getAvailableSpace(at: getDocumentDirectory()) {
-            if size < 5*1024*1024*1024 { isSpaceEnough = false } // smaller than 5 GB
+            if size < minimumAvaiableSpace { isWritingToFile = false } // smaller than 5 GB
         } else {
-            isSpaceEnough = false
+            isWritingToFile = false
         }
-        if isSpaceEnough {
+        if isWritingToFile {
             audioFile = try? AVAudioFile(forWriting: url, settings: outputFormatSettings, commonFormat: AVAudioCommonFormat.pcmFormatFloat32, interleaved: true)
         } else {
             audioFile = nil
@@ -149,7 +150,7 @@ class AudioStreamAnalyzer {
         streamAnalyzer.completeAnalysis()
         audioEngine.inputNode.removeTap(onBus: inputBus)
         audioEngine.stop()
-        if isSpaceEnough {
+        if isWritingToFile {
             FilesManager.shared.convert2FLAC()
         }
     }
