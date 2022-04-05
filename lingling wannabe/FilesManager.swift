@@ -8,6 +8,7 @@
 import Foundation
 import ffmpegkit
 import UIKit
+import SQLite
 
 final class FilesManager {
     static let shared = FilesManager()
@@ -16,10 +17,55 @@ final class FilesManager {
     let networkSession: URLSession
     
     let url = URL(string: "https://5b3gjwu0uc.execute-api.us-east-1.amazonaws.com/upload")!
+    
+    private var db: Connection!
 
     private init() {
         config = URLSessionConfiguration.background(withIdentifier: "com.zxxz.FileManager")
         networkSession = URLSession(configuration: config)
+        do {
+            db = try Connection(getDocumentDirectory().appendingPathComponent("files.db").absoluteString)
+            try db.run("CREATE TABLE IF NOT EXISTS files(username TEXT, time INTEGER, label TEXT, PRIMARY KEY (username, time))")
+        } catch {
+            print(error)
+        }
+    }
+    
+    private func cast(_ x: Binding?) -> Any? {
+        switch x {
+        case let integer as Int64:
+            return integer
+        case let double as Double:
+            return double
+        case let string as String:
+            return string
+        default:
+            return nil
+        }
+    }
+    
+    func getLabels(username: String) -> [(String,String)] {
+        var ret: [(String,String)] = []
+        do {
+            let stmt = try db.prepare("SELECT time, label FROM files WHERE username=?", username)
+            for row in stmt {
+                if let time = cast(row[0]) as? Int64,
+                   let label = cast(row[1]) as? String {
+                    ret.append((String(time), label))
+                }
+            }
+        } catch {
+            print(error)
+        }
+        return ret
+    }
+    
+    func addLabel(username: String, time: Int, label: String) {
+        do {
+            try db.run("INSERT INTO files VALUES (?, ?, ?)", username, time, label)
+        } catch {
+            
+        }
     }
     
     func upload(username: String, time: Int) {
