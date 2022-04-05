@@ -14,7 +14,7 @@ class MainViewController: UIViewController {
     let serialQueue = DispatchQueue(label: "MainView", qos: .userInteractive)
     var nav: LeaderBoardNavigation!
     var username = CredentialManager.shared.getUsername()
-    var dataStatus = 0
+    var dataStatus = DataStatus.success
     
     override func loadView() {
         let mainView = MainView(frame: UIScreen.main.bounds, user: username, controller: self)
@@ -115,11 +115,11 @@ class MainViewController: UIViewController {
     func checkData() {
         serialQueue.async {
             DispatchQueue.main.async {
-                if self.dataStatus == 1 {
+                if self.dataStatus == .conflict {
                     let alert = UIAlertController(title: "Warning", message: "There is a data corruption!", preferredStyle: .alert)
                     alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
                     self.present(alert, animated: true)
-                } else if self.dataStatus == 2 {
+                } else if self.dataStatus == .future {
                     // it is possible the system time is not right
                     // TODO: check time with server then notify the user if there is a data corruption or time is off
                     let alert = UIAlertController(title: "Warning", message: "Data corruption or inaccurate time!", preferredStyle: .alert)
@@ -261,7 +261,7 @@ class MainViewController: UIViewController {
     }
     
     @objc func showSetting() {
-        let setting = SettingNavigation(size: CGSize(width: view.frame.width * 0.8, height: view.frame.height*0.7), settingDelegate: self)
+        let setting = SettingNavigation(size: CGSize(width: view.frame.width * 0.8, height: 120), settingDelegate: self)
         present(setting, animated: true)
     }
     

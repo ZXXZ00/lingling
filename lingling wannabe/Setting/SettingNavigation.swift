@@ -24,6 +24,8 @@ class SettingNavigation: UINavigationController {
         
         modalPresentationStyle = .custom
         transitioningDelegate = floatViewDelegate
+        
+        navigationBar.isHidden = true
     }
     
     required init?(coder aDecoder: NSCoder) {

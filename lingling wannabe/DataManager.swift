@@ -246,14 +246,14 @@ final class DataManager {
     }
     
     // Check if there could be any conflict with database
-    func checkAndLoad(username: String, token: String?) -> Int {
+    func checkAndLoad(username: String, token: String?) -> DataStatus {
         let records = DataManager.shared.getRecord(username: username)
-        if records.count == 0 { return 0 }
+        if records.count == 0 { return .success }
         for i in 0..<records.count-1 {
             totalMinutes += Int(abs(records[i].duration) / 60)
             
             if records[i].time + abs(records[i].duration) > records[i+1].time {
-                return DataStatus.conflict.rawValue
+                return DataStatus.conflict
             }
             
             let date = Date(timeIntervalSince1970: Double(records[i].time))
@@ -263,7 +263,7 @@ final class DataManager {
                 unsynced.insert(records[i])
             }
             if !verifyCheckSum(start: Int(records[i].time), duration: Int(records[i].duration), checksum: records[i].checksum) {
-                return DataStatus.invalid.rawValue
+                return DataStatus.invalid
             }
         }
         if let last = records.last {
@@ -271,10 +271,10 @@ final class DataManager {
             
             let currentTime = Date().timeIntervalSince1970
             if Double(last.time + abs(last.duration)) > currentTime {
-                return DataStatus.future.rawValue
+                return DataStatus.future
             }
             if Double(last.time + abs(last.duration)) > currentTime {
-                return DataStatus.conflict.rawValue
+                return DataStatus.conflict
             }
             
             let date = Date(timeIntervalSince1970: Double(last.time))
@@ -285,11 +285,11 @@ final class DataManager {
             }
             if !verifyCheckSum(start: Int(last.time), duration: Int(last.duration), checksum: last.checksum) {
                 print("INVALID")
-                return 3
+                return DataStatus.invalid
             }
         }
         uploadUnsynced(username: username, token: token)
-        return 0
+        return DataStatus.success
     }
 
     func addRecord(username: String, time: Int, duration: Int, asset: String, attributes: String?, upload: Bool) -> Int {

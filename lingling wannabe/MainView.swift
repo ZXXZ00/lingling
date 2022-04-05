@@ -19,7 +19,7 @@ class MainView: UIView, MSCircularSliderDelegate {
     weak var controller: UIViewController?
     let start: UIButton
     let username: UIButton
-    let leaderboard: UIButton
+    let leaderboard =  UIButton()
     let recordings = UIButton()
     let setting = UIButton()
     
@@ -46,7 +46,6 @@ class MainView: UIView, MSCircularSliderDelegate {
         buttonScale = min(frame.width/350, 1.5)
         start = UIButton(frame: CGRect(x: 0, y: 0, width: 103.5*buttonScale, height: 64*buttonScale))
         username = UIButton(frame: CGRect(x: 4*buttonScale, y: 0, width: frame.width/2, height: 20*buttonScale))
-        leaderboard = UIButton(frame: CGRect(x: frame.width - 60*buttonScale, y: -16*buttonScale, width: 60*buttonScale, height: 60*buttonScale))
         rect = CAShapeLayer()
         rect.path = UIBezierPath(rect: frame).cgPath
         rect.fillColor = UIColor(white: 1, alpha: 1).cgColor
@@ -63,7 +62,6 @@ class MainView: UIView, MSCircularSliderDelegate {
     override func safeAreaInsetsDidChange() {
         super.safeAreaInsetsDidChange()
         username.center.y += safeAreaInsets.top
-        leaderboard.center.y += safeAreaInsets.top
     }
     
     private func addDebugButton() {
@@ -107,10 +105,26 @@ class MainView: UIView, MSCircularSliderDelegate {
         username.addTarget(controller, action: #selector(MainViewController.showUserInfo), for: .touchUpInside)
         addSubview(username)
         
+        let gearConfig = UIImage.SymbolConfiguration(textStyle: .largeTitle, scale: .large)
+        let gearIcon = UIImage(systemName: "gearshape", withConfiguration: gearConfig)?.withTintColor(.black, renderingMode: .alwaysOriginal)
+        setting.setImage(gearIcon, for: .normal)
+        setting.addTarget(controller, action: #selector(MainViewController.showSetting), for: .touchUpInside)
+        addSubview(setting)
+        setting.translatesAutoresizingMaskIntoConstraints = false
+        setting.rightAnchor.constraint(equalTo: rightAnchor, constant: -10).isActive = true
+        setting.centerYAnchor.constraint(equalTo: username.centerYAnchor, constant: 2).isActive = true
+        setting.widthAnchor.constraint(equalToConstant: 30 * buttonScale).isActive = true
+        setting.heightAnchor.constraint(equalToConstant: 30 * buttonScale).isActive = true
+        
         leaderboard.contentMode = .scaleAspectFit
         leaderboard.setImage(UIImage(named: "leaderboard.pdf"), for: .normal)
         leaderboard.addTarget(controller, action: #selector(MainViewController.showLeaderBoard), for: .touchUpInside)
         addSubview(leaderboard)
+        leaderboard.translatesAutoresizingMaskIntoConstraints = false
+        leaderboard.rightAnchor.constraint(equalTo: setting.leftAnchor, constant: -10).isActive = true
+        leaderboard.centerYAnchor.constraint(equalTo: username.centerYAnchor).isActive = true
+        leaderboard.widthAnchor.constraint(equalToConstant: 60 * buttonScale).isActive = true
+        leaderboard.heightAnchor.constraint(equalToConstant: 60 * buttonScale).isActive = true
         
         recordings.setImage(UIImage(named: "gramphone.pdf"), for: .normal)
         recordings.addTarget(controller, action: #selector(MainViewController.showRecordingsList), for: .touchUpInside)
@@ -120,17 +134,6 @@ class MainView: UIView, MSCircularSliderDelegate {
         recordings.centerYAnchor.constraint(equalTo: leaderboard.centerYAnchor).isActive = true
         recordings.widthAnchor.constraint(equalToConstant: 50 * buttonScale).isActive = true
         recordings.heightAnchor.constraint(equalToConstant: 50 * buttonScale).isActive = true
-        
-        let gearConfig = UIImage.SymbolConfiguration(textStyle: .largeTitle, scale: .large)
-        let gearIcon = UIImage(systemName: "gearshape", withConfiguration: gearConfig)?.withTintColor(.black, renderingMode: .alwaysOriginal)
-        setting.setImage(gearIcon, for: .normal)
-        setting.addTarget(controller, action: #selector(MainViewController.showSetting), for: .touchUpInside)
-        addSubview(setting)
-        setting.translatesAutoresizingMaskIntoConstraints = false
-        setting.rightAnchor.constraint(equalTo: recordings.leftAnchor, constant: -10).isActive = true
-        setting.centerYAnchor.constraint(equalTo: recordings.centerYAnchor).isActive = true
-        setting.widthAnchor.constraint(equalToConstant: 30 * buttonScale).isActive = true
-        setting.heightAnchor.constraint(equalToConstant: 30 * buttonScale).isActive = true
     }
     
     private func loadNote(filename: String) {
@@ -245,7 +248,7 @@ class MainView: UIView, MSCircularSliderDelegate {
     func addTutorialView() {
         let hole1 = CGRect(x: slider.frame.minX - 20 * buttonScale, y: slider.frame.minY - 20 * buttonScale, width: slider.frame.width + 40 * buttonScale, height: start.frame.maxY - slider.frame.minY + 40 * buttonScale)
         let sliderTutorial = TutorialView(frame: frame, holeRect: hole1)
-        sliderTutorial.interactive = CGRect(x: slider.frame.minX - 20, y: slider.frame.minY, width: slider.frame.width + 40, height: slider.frame.height)
+        sliderTutorial.interactive = CGRect(x: slider.frame.minX - 20, y: slider.frame.minY, width: slider.frame.width + 40, height: start.frame.minY - slider.frame.minY - 5)
         let sliderInstruction = UILabel()
         sliderInstruction.text = "slide to change practice duration"
         sliderInstruction.textAlignment = .center
