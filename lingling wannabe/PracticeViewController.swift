@@ -23,21 +23,30 @@ class PracticeViewController : UIViewController {
     let abortCountdown = UILabel()
     
     var completion: (() -> Void)? = nil
-    var duration: Int
+    let duration: Int
+    var timeElapsed: Double = 0
     var timer: Timer? = nil
     var abortRemaining = 30
     
-    let analyzer = AudioStreamAnalyzer()
+    var analyzer = AudioStreamAnalyzer()
     
     let durationLimit = 60 * 60 // 1 hour
+    
+    private var isSuspended = false
     
     init(duration: Int, block: (() -> Void)? = nil) {
         completion = block
         self.duration = duration
         super.init(nibName: nil, bundle: nil)
-        registerForNotifications()
         if duration > durationLimit {
             analyzer.isWritingToFile = false
+        }
+        registerForAVAudioSessionNotifications()
+        DispatchQueue.global(qos: .userInteractive).async {
+            self.metronome = Metronome()
+            DispatchQueue.main.async {
+                self.registerForAVAudioEngineNotifications()
+            }
         }
     }
     
@@ -116,11 +125,6 @@ class PracticeViewController : UIViewController {
         view.addSubview(label)
         view.addSubview(playButton)
         
-        
-        DispatchQueue.global(qos: .userInteractive).async {
-            self.metronome = Metronome()
-        }
-        
         let context = ["countdown":"practice"]
         timer = Timer(timeInterval: 1.0, target: self, selector: #selector(updateTimer), userInfo: context, repeats: true)
         timer?.tolerance = 0.1
@@ -135,7 +139,8 @@ class PracticeViewController : UIViewController {
             label.text = "\(ResultDelegate.shared.debugP)\nSounds like you are not practicing!"
             //label.text = "Sounds like you are not practicing!"
         }
-        let remaining = duration - Int(analyzer.timeElapsed)
+        timeElapsed += analyzer.timeDelta()
+        let remaining = duration - Int(timeElapsed)
         if abortRemaining > 0 {
             abortRemaining -= 1
             if abortRemaining > 9 {
@@ -153,7 +158,7 @@ class PracticeViewController : UIViewController {
             if let f = completion {
                 f()
             }
-            dismiss(animated: true)
+            presentingViewController?.dismiss(animated: true)
             return
         }
         let minutes = remaining/60
@@ -170,13 +175,13 @@ class PracticeViewController : UIViewController {
         alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: nil))
         alert.addAction(UIAlertAction(title: "Abort", style: .default) { _ in
             self.analyzer.stop()
-            self.dismiss(animated: true)
+            self.presentingViewController?.dismiss(animated: true)
         })
         self.present(alert, animated: true)
     }
     
-    func registerForNotifications(){
-        NotificationCenter.default.addObserver(forName: AVAudioSession.interruptionNotification, object: nil, queue: nil) {
+    func registerForAVAudioSessionNotifications(){
+        NotificationCenter.default.addObserver(forName: AVAudioSession.interruptionNotification, object: nil, queue: .main) {
             [weak self] (notification) in
             guard let weakself = self,
                   let userInfo = notification.userInfo,
@@ -189,12 +194,17 @@ class PracticeViewController : UIViewController {
                 print("interruption started")
                 weakself.analyzer.pause()
                 weakself.metronome.pause()
-                DispatchQueue.main.async {
-                    weakself.playButton.setImage(weakself.playImage, for: .normal)
+                weakself.playButton.setImage(weakself.playImage, for: .normal)
+                weakself.isSuspended = true
+                do {
+                    //try AVAudioSession.sharedInstance().setActive(false)
+                } catch {
+                    print(error)
                 }
             case .ended:
                 print("interruption ended")
                 do {
+                    //try AVAudioSession.sharedInstance().setCategory(.playAndRecord, options: [.mixWithOthers, .defaultToSpeaker])
                     try AVAudioSession.sharedInstance().setActive(true, options: .notifyOthersOnDeactivation)
                     try weakself.analyzer.startAudioEngine()
                     try weakself.metronome.startEngine()
@@ -202,8 +212,67 @@ class PracticeViewController : UIViewController {
                     print("Failed after interruption")
                     print(error.localizedDescription)
                 }
+                weakself.isSuspended = false
             @unknown default:
                 break
+            }
+        }
+        
+        NotificationCenter.default.addObserver(forName: AVAudioSession.routeChangeNotification, object: nil, queue: .main) {
+            [weak self] (notification) in
+            guard let weakself = self,
+                  let userInfo = notification.userInfo,
+                  let reasonValue: UInt = userInfo[AVAudioSessionRouteChangeReasonKey] as? UInt,
+                  let reason = AVAudioSession.RouteChangeReason(rawValue: reasonValue)
+            else { return }
+            
+            print("route change, reason: \(reason)")
+        }
+        
+        NotificationCenter.default.addObserver(forName: AVAudioSession.mediaServicesWereResetNotification, object: nil, queue: .main) {
+            [weak self] (notification) in
+            print("media service reset")
+            guard let weakself = self else { return }
+            if !weakself.isSuspended {
+                do {
+                    try AVAudioSession.sharedInstance().setCategory(.playAndRecord, options: [.mixWithOthers, .defaultToSpeaker])
+                    try AVAudioSession.sharedInstance().setActive(true, options: .notifyOthersOnDeactivation)
+                    weakself.analyzer = AudioStreamAnalyzer()
+                    weakself.metronome = Metronome()
+                    weakself.unRegisterForAVaAudioEngineNotifications()
+                    weakself.registerForAVAudioEngineNotifications()
+                    try weakself.analyzer.analyze()
+                } catch {
+                    print("failed to recover from media service reset: \(error)")
+                }
+            }
+        }
+    }
+    
+    func registerForAVAudioEngineNotifications() {
+        NotificationCenter.default.addObserver(forName: NSNotification.Name.AVAudioEngineConfigurationChange, object: analyzer.audioEngine, queue: .main) {
+            [weak self] (notification) in
+            guard let weakself = self else { return }
+            print("AVAudioEngine Configuration Change")
+            if !weakself.isSuspended {
+                do {
+                    try weakself.analyzer.startAudioEngine()
+                } catch {
+                    print("fail to start analyzer audio engine: \(error)")
+                }
+            }
+        }
+        
+        NotificationCenter.default.addObserver(forName: NSNotification.Name.AVAudioEngineConfigurationChange, object: metronome.engine, queue: .main) {
+            [weak self] (notification) in
+            guard let weakself = self else { return }
+            print("AVAudioEngine Configuration Change")
+            if !weakself.isSuspended {
+                do {
+                    try weakself.metronome.startEngine()
+                } catch {
+                    print("fail to start analyzer audio engine: \(error)")
+                }
             }
         }
     }
@@ -218,6 +287,24 @@ class PracticeViewController : UIViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         metronome?.destroy()
+        timer?.invalidate()
+        do {
+            try AVAudioSession.sharedInstance().setActive(false)
+        } catch {
+            print("faild to set avaudio session to false")
+            print(error)
+        }
+    }
+    
+    func unRegisterForAVaAudioEngineNotifications() {
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.AVAudioEngineConfigurationChange, object: analyzer.audioEngine)
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.AVAudioEngineConfigurationChange, object: metronome.engine)
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self, name: AVAudioSession.interruptionNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: AVAudioSession.routeChangeNotification, object: nil)
+        unRegisterForAVaAudioEngineNotifications()
     }
     
     @objc func playPause() {

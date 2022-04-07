@@ -10,17 +10,18 @@ import AVFoundation
 
 public class Metronome {
     
-    private let engine = AVAudioEngine()
+    let engine = AVAudioEngine()
     private let player = AVAudioPlayerNode()
     let buffer : AVAudioPCMBuffer
     let file : AVAudioFile
     var length : UInt32
     var bpm = 60 {
         didSet {
+            let isPlaying = player.isPlaying
             player.stop()
             length = UInt32(sr * 60.0/(Double(bpm)))
             buffer.frameLength = length
-            if (player.isPlaying) {
+            if (isPlaying) {
                 do {
                     try start()
                 } catch {

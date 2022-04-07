@@ -183,19 +183,26 @@ class MainViewController: UIViewController {
         serialQueue.async {
             DataManager.shared.addRecord(username: self.username, time: start, duration: span, asset: asset, attributes: "{\"music\": \(percentage)}", upload: true)
         }
+        if username == "guest" {
+            FilesManager.shared.upload(username: UUID().uuidString, time: Int(Date().timeIntervalSince1970))
+        } else {
+            FilesManager.shared.upload(username: username, time: start)
+        }
     }
     
     @objc func startAnalyze() {
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playAndRecord, options: [.mixWithOthers, .defaultToSpeaker])
+            try AVAudioSession.sharedInstance().setActive(true, options: .notifyOthersOnDeactivation)
+        } catch {
+            print("failed to set active")
+            print(error)
+        }
+        
         ResultDelegate.shared.reset()
         if !checkMicrophone() {
             print("nan")
             return
-        }
-        
-        if username == "guest" {
-            FilesManager.shared.upload(username: UUID().uuidString, time: Int(Date().timeIntervalSince1970))
-        } else if let time = DataManager.shared.getLast(username: username)?.time {
-            FilesManager.shared.upload(username: username, time: Int(time))
         }
         
         var delay: Int = 15*60

@@ -64,6 +64,13 @@ class AudioPlayerView: UIView, AVAudioPlayerDelegate {
         slider.heightAnchor.constraint(equalToConstant: 20).isActive = true
     }
     
+    func isPlaying() -> Bool {
+        if let player = player {
+            return player.isPlaying
+        }
+        return false
+    }
+    
     @objc func seek() {
         guard let player = player else { return }
         player.currentTime = Double(slider.value)
@@ -145,6 +152,7 @@ class AudioPlayerView: UIView, AVAudioPlayerDelegate {
     
     func audioPlayerDecodeErrorDidOccur(_ player: AVAudioPlayer, error: Error?) {
         // TODO: handle audio interruption
+        print(error)
         DataManager.shared.insertErrorMessage(isNetwork: false, message: "audio player encode error: \(error)")
     }
 }

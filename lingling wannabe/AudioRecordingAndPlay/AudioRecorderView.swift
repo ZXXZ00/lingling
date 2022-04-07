@@ -56,6 +56,13 @@ class AudioRecorderView: UIView, AVAudioRecorderDelegate {
         NSLayoutConstraint(item: label, attribute: .centerY, relatedBy: .equal, toItem: self, attribute: .centerY, multiplier: 0.5, constant: 0).isActive = true
     }
     
+    func isRecording() -> Bool {
+        if let recorder = recorder {
+            return recorder.isRecording
+        }
+        return false
+    }
+    
     @objc func toggleRecording() {
         if let _ = recorder {
             stopRecording()

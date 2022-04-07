@@ -53,6 +53,8 @@ class RecordingViewController: UIViewController, UITableViewDelegate, UITableVie
         modalPresentationStyle = .custom
         transitioningDelegate = floatViewDelegate
         
+        registerForAudioInterruption()
+        
         var labels = Set<String>()
         let res = FilesManager.shared.getLabels(username: CredentialManager.shared.getUsername())
         res.map {
@@ -66,13 +68,14 @@ class RecordingViewController: UIViewController, UITableViewDelegate, UITableVie
     
     // populate the arrays and maps used for tableview data such as displayNames filesMap
     func populate() {
-        let allFiles: [String]
+        var allFiles: [String]
         do {
             var yes: ObjCBool = true
             if !FileManager.default.fileExists(atPath: folder.path, isDirectory: &yes) {
                 try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
             }
             allFiles = try FileManager.default.contentsOfDirectory(atPath: folder.path)
+            allFiles.sort()
         } catch {
             // TODO: add error handling
             allFiles = []
@@ -192,7 +195,7 @@ class RecordingViewController: UIViewController, UITableViewDelegate, UITableVie
         let time = Int(Date().timeIntervalSince1970)
         let utc = String(format: "%d.flac", time)
         do {
-            try FileManager.default.moveItem(at: tmp, to: folder.appendingPathComponent(utc))
+            try FileManager.default.copyItem(at: tmp, to: folder.appendingPathComponent(utc))
         } catch {
             print(error.localizedDescription)
             // TODO: error handling
@@ -214,6 +217,33 @@ class RecordingViewController: UIViewController, UITableViewDelegate, UITableVie
         addFileToList(filename: utc)
         filesView.insertRows(at: [idx], with: .automatic)
         filesView.selectRow(at: idx, animated: false, scrollPosition: .bottom)
+    }
+    
+    func registerForAudioInterruption() {
+        NotificationCenter.default.addObserver(forName: AVAudioSession.interruptionNotification, object: nil, queue: .main) {
+            [weak self] (notification) in
+            guard let weakself = self,
+                  let userInfo = notification.userInfo,
+                  let interruptionTypeValue: UInt = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
+                  let interruptionType = AVAudioSession.InterruptionType(rawValue: interruptionTypeValue)
+            else { return }
+            
+            switch interruptionType {
+            case .began:
+                print("interruption started")
+                let recorder = weakself.recordingView
+                let player = weakself.controlView
+                if (weakself.isRecording && recorder.isRecording()) {
+                    weakself.recordingView.toggleRecording()
+                } else if player.isPlaying() {
+                    player.togglePlaying()
+                }
+            case .ended:
+                print("interruption ended")
+            @unknown default:
+                break
+            }
+        }
     }
 }
 
