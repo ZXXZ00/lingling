@@ -106,9 +106,10 @@ class AudioRecorderView: UIView, AVAudioRecorderDelegate {
             print("start recording")
             delegate?.didBegin()
         } catch {
-            // TODO: error handling
+            label.textColor = .red
+            label.text = "Failed to Start Recording"
             DataManager.shared.insertErrorMessage(isNetwork: false, message: "failed to initlize AVAudioRecorder: \(error)")
-            print(error.localizedDescription)
+            print("failed to initlize AVAudioRecorder: \(error)")
         }
         label.text = "00:00"
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) {
@@ -129,13 +130,16 @@ class AudioRecorderView: UIView, AVAudioRecorderDelegate {
     
     func audioRecorderDidFinishRecording(_ recorder: AVAudioRecorder, successfully flag: Bool) {
         if flag {
+            label.textColor = .black
             label.text = "Try again if not satisfied"
             delegate?.didFinish()
         }
     }
     
     func audioRecorderEncodeErrorDidOccur(_ recorder: AVAudioRecorder, error: Error?) {
-        // TODO: error handling
+        label.textColor = .red
+        label.text = "Failed to Record, Try Again"
+        print("audio recroder encode error: \(error)")
         DataManager.shared.insertErrorMessage(isNetwork: false, message: "audio recroder encode error: \(error)")
     }
 }

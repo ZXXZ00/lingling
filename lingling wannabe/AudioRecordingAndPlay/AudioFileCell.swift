@@ -13,13 +13,15 @@ class AudioFileCell: UITableViewCell {
     let labelName = UILabel()
     var isSeparatorAdded = false
     
+    let filenameLabelLength: CGFloat = 115
+    
     required init?(coder: NSCoder) {
         fatalError("NSCoding Not Supported!")
     }
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        let font = UIFont(name: "AmericanTypewriter", size: 17)
+        let font = UIFont(name: "AmericanTypewriter", size: 16)
         
         fileName.font = font
         fileName.textColor = .black
@@ -28,7 +30,7 @@ class AudioFileCell: UITableViewCell {
         fileName.translatesAutoresizingMaskIntoConstraints = false
         fileName.leftAnchor.constraint(equalTo: leftAnchor, constant: 4).isActive = true
         fileName.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
-        fileName.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.5).isActive = true
+        fileName.widthAnchor.constraint(equalToConstant: filenameLabelLength).isActive = true
         fileName.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
         
         labelName.font = font
@@ -38,7 +40,7 @@ class AudioFileCell: UITableViewCell {
         labelName.translatesAutoresizingMaskIntoConstraints = false
         labelName.rightAnchor.constraint(equalTo: rightAnchor, constant: -4).isActive = true
         labelName.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
-        labelName.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.5).isActive = true
+        labelName.widthAnchor.constraint(equalTo: widthAnchor, constant: -filenameLabelLength-10).isActive = true
         labelName.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
     }
     

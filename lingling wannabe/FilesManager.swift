@@ -116,7 +116,7 @@ final class FilesManager {
             })
             let src = getDocumentDirectory().appendingPathComponent("recording.wav").path
             let dst = getDocumentDirectory().appendingPathComponent("recording.flac").path
-            let session = FFmpegKit.execute("-y -i \(src) -c:a flac -sample_fmt s16 \(dst)")
+            let session = FFmpegKit.execute("-y -loglevel warning -i \(src) -c:a flac -sample_fmt s16 \(dst)")
             if let retcode = session?.getReturnCode(), retcode.isValueSuccess() {
                 print("success")
                 print(session?.getDuration())

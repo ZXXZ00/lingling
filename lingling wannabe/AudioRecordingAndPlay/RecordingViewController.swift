@@ -25,7 +25,7 @@ class RecordingViewController: UIViewController, UITableViewDelegate, UITableVie
     var displayNames: [String] = []
     var counter: [String:Int] = [:]
     var filesMap: [String:String] = [:] // map displayNames to actual file name
-    var labelMap: [String:String] = [:]
+    var labelMap: [String:String] = [:] // map files to label
     
     let formatter = DateFormatter()
     
@@ -58,6 +58,7 @@ class RecordingViewController: UIViewController, UITableViewDelegate, UITableVie
         var labels = Set<String>()
         let res = FilesManager.shared.getLabels(username: CredentialManager.shared.getUsername())
         res.map {
+            // $0 is filename, $1 is label
             labelMap[$0] = $1
             labels.insert($1)
         }
@@ -80,7 +81,7 @@ class RecordingViewController: UIViewController, UITableViewDelegate, UITableVie
             // TODO: add error handling
             allFiles = []
             DataManager.shared.insertErrorMessage(isNetwork: false, message: "Failed to create folder: \(error)")
-            print(error.localizedDescription)
+            print("Failed to create folder: \(error)")
         }
         
         allFiles.forEach {
@@ -157,10 +158,6 @@ class RecordingViewController: UIViewController, UITableViewDelegate, UITableVie
         filesView.heightAnchor.constraint(equalTo: view.heightAnchor, constant: -CONTROLVIEW_HEIGHT).isActive = true
         
         if (isRecording) {
-            //DispatchQueue.global(qos: .userInteractive).async {
-            //    self.audioLabelView.suggestionsArray = FilesManager.shared.getLabels(username: CredentialManager.shared.getUsername())
-            //}
-            
             recordingView.delegate = self
             view.addSubview(recordingView)
             recordingView.translatesAutoresizingMaskIntoConstraints = false
@@ -197,7 +194,7 @@ class RecordingViewController: UIViewController, UITableViewDelegate, UITableVie
         do {
             try FileManager.default.copyItem(at: tmp, to: folder.appendingPathComponent(utc))
         } catch {
-            print(error.localizedDescription)
+            print("Failed to move file: \(error)")
             // TODO: error handling
             DataManager.shared.insertErrorMessage(isNetwork: false, message: "Failed to move file: \(error)")
         }

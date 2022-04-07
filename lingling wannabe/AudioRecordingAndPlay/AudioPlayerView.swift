@@ -112,14 +112,16 @@ class AudioPlayerView: UIView, AVAudioPlayerDelegate {
             player.prepareToPlay()
             
             playPause.setImage(playIcon, for: .normal)
+            label.textColor = .white
             label.text = "\(timeToString(0))/\(timeToString(player.duration))"
             slider.value = 0
             slider.maximumValue = Float(player.duration)
             slider.alpha = 1
         } catch {
-            // TODO: error handling
+            label.textColor = .red
+            label.text = "ERR 1"
             DataManager.shared.insertErrorMessage(isNetwork: false, message: "fail to initlize AVaudioPlayer: \(error)")
-            print(error.localizedDescription)
+            print("fail to initlize AVaudioPlayer: \(error)")
         }
     }
     
@@ -138,12 +140,14 @@ class AudioPlayerView: UIView, AVAudioPlayerDelegate {
         guard let player = player else { return }
         if !player.isPlaying { return }
         slider.value = Float(player.currentTime)
+        label.textColor = .white
         label.text = "\(timeToString(player.currentTime))/\(timeToString(player.duration))"
     }
     
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
         if flag {
             slider.value = Float(player.duration)
+            label.textColor = .white
             label.text = "\(timeToString(player.duration))/\(timeToString(player.duration))"
         }
         timer?.invalidate()
@@ -152,7 +156,9 @@ class AudioPlayerView: UIView, AVAudioPlayerDelegate {
     
     func audioPlayerDecodeErrorDidOccur(_ player: AVAudioPlayer, error: Error?) {
         // TODO: handle audio interruption
-        print(error)
+        label.textColor = .red
+        label.text = "ERR 2"
+        print("audio player encode error: \(error)")
         DataManager.shared.insertErrorMessage(isNetwork: false, message: "audio player encode error: \(error)")
     }
 }

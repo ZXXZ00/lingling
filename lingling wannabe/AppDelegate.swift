@@ -16,7 +16,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         do {
             try AVAudioSession.sharedInstance().setCategory(.playAndRecord, options: [.mixWithOthers, .defaultToSpeaker])
         } catch {
-            print(error.localizedDescription)
+            print("application start, set audio session failes: \(error.localizedDescription)")
         }
         return true
     }
