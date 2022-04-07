@@ -10,8 +10,7 @@ import AVFAudio
 
 class PracticeViewController : UIViewController {
     
-    // TO DO for production: Error Handling for metronome it is optional type
-    var metronome : Metronome!
+    var metronome : Metronome?
     let slider = UISlider()
     let playButton = UIButton()
     let speed = UILabel()
@@ -193,7 +192,7 @@ class PracticeViewController : UIViewController {
             case .began:
                 print("interruption started")
                 weakself.analyzer.pause()
-                weakself.metronome.pause()
+                weakself.metronome?.pause()
                 weakself.playButton.setImage(weakself.playImage, for: .normal)
                 weakself.isSuspended = true
                 do {
@@ -207,7 +206,7 @@ class PracticeViewController : UIViewController {
                     //try AVAudioSession.sharedInstance().setCategory(.playAndRecord, options: [.mixWithOthers, .defaultToSpeaker])
                     try AVAudioSession.sharedInstance().setActive(true, options: .notifyOthersOnDeactivation)
                     try weakself.analyzer.startAudioEngine()
-                    try weakself.metronome.startEngine()
+                    try weakself.metronome?.startEngine()
                 } catch {
                     print("Failed after interruption")
                     print(error.localizedDescription)
@@ -263,13 +262,15 @@ class PracticeViewController : UIViewController {
             }
         }
         
-        NotificationCenter.default.addObserver(forName: NSNotification.Name.AVAudioEngineConfigurationChange, object: metronome.engine, queue: .main) {
+        guard let met = metronome else { return }
+        
+        NotificationCenter.default.addObserver(forName: NSNotification.Name.AVAudioEngineConfigurationChange, object: met.engine, queue: .main) {
             [weak self] (notification) in
             guard let weakself = self else { return }
             print("AVAudioEngine Configuration Change")
             if !weakself.isSuspended {
                 do {
-                    try weakself.metronome.startEngine()
+                    try weakself.metronome?.startEngine()
                 } catch {
                     print("fail to start analyzer audio engine: \(error)")
                 }
@@ -298,7 +299,8 @@ class PracticeViewController : UIViewController {
     
     func unRegisterForAVaAudioEngineNotifications() {
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name.AVAudioEngineConfigurationChange, object: analyzer.audioEngine)
-        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.AVAudioEngineConfigurationChange, object: metronome.engine)
+        guard let met = metronome else { return }
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.AVAudioEngineConfigurationChange, object: met.engine)
     }
     
     deinit {
@@ -308,12 +310,14 @@ class PracticeViewController : UIViewController {
     }
     
     @objc func playPause() {
-        if metronome!.isPlaying {
+        guard let metronome = metronome else { return}
+
+        if metronome.isPlaying {
             playButton.setImage(playImage, for: .normal)
-            metronome?.pause()
+            metronome.pause()
         } else {
             do {
-                try metronome?.start()
+                try metronome.start()
                 playButton.setImage(pauseImage, for: .normal)
             } catch {
                 DataManager.shared.insertErrorMessage(isNetwork: false, message: "couldn't start motronome: \(error)")
