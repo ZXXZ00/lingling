@@ -21,15 +21,15 @@ class LeaderBoardCell : UITableViewCell {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         backgroundColor = .clear
         rank.textAlignment = .left
-        rank.font = UIFont(name: "Arial", size: frame.height/3)
+        rank.font = UIFont(name: "AmericanTypewriter-Condensed", size: 16)
         rank.textColor = .black
         addSubview(rank)
         username.textAlignment = .center
-        username.font = UIFont(name: "AmericanTypewriter-Condensed", size: frame.height/3)
+        username.font = UIFont(name: "AmericanTypewriter-Condensed", size: 16)
         username.textColor = .black
         addSubview(username)
         hours.textAlignment = .right
-        hours.font = UIFont(name: "Arial", size: frame.height/3)
+        hours.font = UIFont(name: "AmericanTypewriter-Condensed", size: 16)
         hours.textColor = .black
         addSubview(hours)
     }

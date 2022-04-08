@@ -23,7 +23,8 @@ class LeaderBoardTableViewController : UITableViewController {
     let interval : Interval
     weak var delegate: LeaderBoardNavigation?
     
-    let username = "lingling" // TODO: get current user's username
+    // TODO: Maybe in the future get user's ranking as well
+    let username = "lingling"
     var count = 0
     var rank = 0 // the rank of user
     var anchor = 0 // the index path of user
@@ -33,8 +34,6 @@ class LeaderBoardTableViewController : UITableViewController {
     var calendar = Calendar(identifier: .iso8601)
     let countdown = UILabel()
     let loading = UIActivityIndicatorView(style: .large)
-    
-    var isRefreshing = false
     
     required init?(coder: NSCoder) {
         fatalError("NSCoding not supported")
@@ -69,7 +68,7 @@ class LeaderBoardTableViewController : UITableViewController {
             countdown.text = ""
             countdown.textColor = .black
             countdown.textAlignment = .center
-            countdown.font = UIFont(name: "Arial", size: 8)
+            countdown.font = UIFont(name: "AmericanTypewriter", size: 8)
             countdown.frame = CGRect(x: 0, y: -4, width: tmp.size.width, height: 22)
             countdown.backgroundColor = .clear
             view.addSubview(countdown)
@@ -83,10 +82,6 @@ class LeaderBoardTableViewController : UITableViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         loadData()
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        //tableView.endUpdates()
     }
     
     func updateTimerHelper(timeDiff: TimeInterval) {
@@ -138,17 +133,14 @@ class LeaderBoardTableViewController : UITableViewController {
             // cache is valid for 15 minutes
             loadDataHelper(lo: 0, hi: 100) { num in
                 DispatchQueue.main.async {
-                    if !self.isRefreshing {
-                        self.insert(num)
-                        self.isRefreshing = true
-                    } else {
-                        self.tableView.reloadData()
-                    }
+                    self.count = num
+                    self.tableView.reloadData()
                 }
             }
         }
     }
     
+    // Warning: currently the API doesn't not support query by username
     // didLoad has a parameter which is the number of loaded data entries
     func loadDataHelper(atTop: Bool=false, lo: Int?=nil, hi: Int?=nil, didLoad: ((_: Int) -> Void)?=nil) {
         loading.startAnimating()
@@ -166,7 +158,7 @@ class LeaderBoardTableViewController : UITableViewController {
                 return
             }
             LeaderBoardTableViewController.cacheTime[self.interval] = Date().timeIntervalSince1970
-            var tmp = 0
+            var nums = 0
             for rank in ranks {
                 if let r = rank[0] as? Int,
                    let user = rank[1] as? String,
@@ -175,18 +167,18 @@ class LeaderBoardTableViewController : UITableViewController {
                     
                     //if user == self.username {
                     //    self.rank = r
-                    //    self.anchor = tmp
+                    //    self.anchor = nums
                     //}
-                    tmp += 1
+                    nums += 1
                 }
             }
             if let closure = didLoad {
-                closure(tmp)
+                closure(nums)
             }
             DispatchQueue.main.async {
-            //    //self.addData(tmp, atTop: atTop)
-            //    if self.count - tmp > 0 {
-            //        self.insert(self.count - tmp)
+            //    //self.addData(nums, atTop: atTop)
+            //    if self.count - nums > 0 {
+            //        self.insert(self.count - nums)
             //    }
                 self.loading.stopAnimating()
             //    LeaderBoardTableViewController.isLoading[self.interval] = false

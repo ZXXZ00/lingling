@@ -18,7 +18,7 @@ class LeaderBoardNavigation : UINavigationController, LeaderBoardCellDelegate {
     
     let size : CGSize
     let floatViewDelegate : FloatView
-    let items = ["day", "week", "month"]
+    let items = ["day", "week", "month", "year"]
     let control : UISegmentedControl
     let lb: LeaderBoardViewController
     
@@ -31,6 +31,9 @@ class LeaderBoardNavigation : UINavigationController, LeaderBoardCellDelegate {
         super.init(rootViewController: lb)
         lb.delegate = self
 
+        if let font = UIFont(name: "AmericanTypewriter-Condensed", size: 16) {
+            control.setTitleTextAttributes([NSAttributedString.Key.font: font], for: .normal)
+        }
         
         modalPresentationStyle = .custom
         transitioningDelegate = floatViewDelegate

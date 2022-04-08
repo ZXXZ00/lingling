@@ -16,6 +16,8 @@ class LeaderBoardViewController : UIViewController {
     let first = LeaderBoardCell()
     let second = LeaderBoardCell()
     
+    let intervals: [Interval] = [.day, .week, .month, .year]
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -31,9 +33,8 @@ class LeaderBoardViewController : UIViewController {
     }
     
     func populate() {
-        let intervals: [Interval] = [.day, .week, .month, .year]
-        for i in 0..<3 {
-            let table = LeaderBoardTableViewController(interval: intervals[i], delegate: delegate)
+        for interval in intervals {
+            let table = LeaderBoardTableViewController(interval: interval, delegate: delegate)
             table.view.backgroundColor = .white
             tables.append(table)
         }
