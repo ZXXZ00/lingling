@@ -74,7 +74,7 @@ class PracticeViewController : UIViewController {
         
         label.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 80)
         label.textAlignment = .center
-        label.numberOfLines = 2
+        label.numberOfLines = 3
         label.font = UIFont(name: "AmericanTypewriter", size: 20)
         label.textColor = UIColor(white: 0.5, alpha: 1)
         label.center = view.center
@@ -132,11 +132,11 @@ class PracticeViewController : UIViewController {
     
     @objc func updateTimer() {
         if ResultDelegate.shared.isPracticing {
-            label.text = "\(ResultDelegate.shared.debugP)\n"
-            //label.text = ""
+            //label.text = "\(ResultDelegate.shared.debugP)\n"
+            label.text = ""
         } else {
-            label.text = "\(ResultDelegate.shared.debugP)\nSounds like you are not practicing!"
-            //label.text = "Sounds like you are not practicing!"
+            //label.text = "\(ResultDelegate.shared.debugP)\nSounds like you are not practicing!"
+            label.text = "Sounds like you are not practicing!\n(The recognition might be wrong)\n(If it is wrong, ignore it)"
         }
         timeElapsed += analyzer.timeDelta()
         let remaining = duration - Int(timeElapsed)
