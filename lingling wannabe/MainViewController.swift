@@ -13,8 +13,21 @@ class MainViewController: UIViewController {
     
     let serialQueue = DispatchQueue(label: "MainView", qos: .userInteractive)
     var nav: LeaderBoardNavigation!
-    var username = CredentialManager.shared.getUsername()
-    var dataStatus = DataStatus.success
+    private var previousUsername = CredentialManager.shared.getUsername()
+    var username : String {
+        get {
+            let ret = CredentialManager.shared.getUsername()
+            if ret != previousUsername {
+                logOut()
+            }
+            return ret
+        }
+    }
+    var dataStatus: DataStatus = .success {
+        didSet {
+            checkData()
+        }
+    }
     
     override func loadView() {
         let mainView = MainView(frame: UIScreen.main.bounds, user: username, controller: self)
@@ -27,7 +40,6 @@ class MainViewController: UIViewController {
     }
     
     func changeUser(user: String) {
-        username = user
         DispatchQueue.main.async {
             if let mainView = self.view as? MainView {
                 mainView.username.setTitle(user, for: .normal)
@@ -79,6 +91,8 @@ class MainViewController: UIViewController {
             showLoginViewController()
         }
         
+        NotificationCenter.default.addObserver(self, selector: #selector(MainViewController.resetData), name: DataManager.ConflictNotification, object: nil)
+        
         let intro = UIView()
         intro.backgroundColor = UIColor.white
         intro.frame = view.frame
@@ -103,36 +117,44 @@ class MainViewController: UIViewController {
         
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        let tmp = CredentialManager.shared.getUsername()
-        if tmp != username {
-            // TODO: sign user out because there is a change in username
-        }
-        changeUser(user: tmp)
-    }
-    
     func checkData() {
         serialQueue.async {
             DispatchQueue.main.async {
                 if self.dataStatus == .conflict {
                     let alert = UIAlertController(title: "Warning", message: "There is a data corruption!", preferredStyle: .alert)
-                    alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+                    alert.addAction(UIAlertAction(title: "Reset", style: .destructive, handler: self.resetDataHandler))
                     self.present(alert, animated: true)
                 } else if self.dataStatus == .future {
                     // it is possible the system time is not right
                     // TODO: check time with server then notify the user if there is a data corruption or time is off
-                    let alert = UIAlertController(title: "Warning", message: "Data corruption or inaccurate time!", preferredStyle: .alert)
+                    let alert = UIAlertController(title: "Warning", message: "Data corruption or inaccurate time!\nCheck your Time Setting!\nIf time is correct, reset data!", preferredStyle: .alert)
                     alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+                    alert.addAction(UIAlertAction(title: "Reset", style: .destructive, handler: self.resetDataHandler))
                     self.present(alert, animated: true)
                 }
             }
         }
     }
     
+    private func resetDataHandler(alert: UIAlertAction) {
+        resetDataHelper()
+    }
+    
+    @objc func resetData() {
+        print("notification received")
+        dataStatus = .conflict
+    }
+    
+    private func resetDataHelper() {
+        print("reset data")
+        DataManager.shared.clear()
+        CalendarData.cache.removeAll()
+        CalendarData.cacheTime.removeAll()
+        DataManager.shared.downloadRecord(username: username)
+    }
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        checkData()
         serialQueue.async {
             DataManager.shared.sync(username: self.username, token: CredentialManager.shared.getToken())
         }
@@ -231,7 +253,6 @@ class MainViewController: UIViewController {
         // 42 * 7 + 6 = 300, so the cell can all fit into a week with 1 being the margin between
         let itemWidth = (42 * view.frame.width / 360).rounded()
         let width = itemWidth*7+6
-        print(username)
         let userinfoView = UserInfoViewController(CGSize(width: width, height: width*4/3), username: username)
         present(userinfoView, animated: true, completion: nil)
         serialQueue.async {
