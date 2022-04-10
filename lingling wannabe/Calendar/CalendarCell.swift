@@ -34,8 +34,6 @@ class CalendarCell : UICollectionViewCell {
                 subview.removeFromSuperview()
             }
         }
-        //if layer.sublayers == nil { return }
-        //layer.sublayers?.removeSubrange(1..<layer.sublayers!.count)
     }
     
     override func prepareForReuse() {
@@ -62,9 +60,11 @@ class CalendarCell : UICollectionViewCell {
             if counter == 12 { break }
         }
         if filenames.count - counter > 0 {
-            // increment x position once again
-            position.x += 300*assetScale
-            // TODO: add ... asset to it
+            // increment x position twice
+            position.x += 600*assetScale
+            let dots = pdf(filename: "three_dot", scale: assetScale)
+            dots.center = position
+            addSubview(dots)
         }
     }
 }

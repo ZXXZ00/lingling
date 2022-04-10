@@ -9,6 +9,7 @@ import UIKit
 
 class CalendarData : NSObject, UICollectionViewDataSource {
     
+    static var cacheTime = [String:Int]()
     static var cache = [String:[String:[String]]]()
     static var cacheReady = false
     let formatter = DateFormatter()
@@ -80,7 +81,6 @@ class CalendarData : NSObject, UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CalendarCell", for: indexPath) as! CalendarCell
         if let date = indexPathToDate(indexPath) {
             cell.dayLabel.text = String(calendar.component(.day, from: date))
-            //cell.addAsset(filenames: ["whole", "semiquaver", "half", "quaver", "crotchet", "whole", "quaver", "half", "whole", "crotchet"])
             if let assets = CalendarData.cache[user]?[formatter.string(from: date)] {
                 cell.addAsset(filenames: assets)
             }

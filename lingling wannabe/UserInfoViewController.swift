@@ -85,6 +85,13 @@ class UserInfoViewController : UIViewController {
     }
     
     func loadData() {
+        let now = Int(Date().timeIntervalSince1970)
+        if let last = CalendarData.cacheTime[username], last + 900 < now {
+            // clear non current user cache after 15 minutes
+            if username != CredentialManager.shared.getUsername() {
+                CalendarData.cache.removeValue(forKey: username)
+            }
+        }
         if CalendarData.cache.keys.contains(username) {
             calendarData = CalendarData(username: username)
             calendarView.dataSource = calendarData
@@ -112,6 +119,7 @@ class UserInfoViewController : UIViewController {
                             }
                         }
                     }
+                    CalendarData.cacheTime[self.username] = now
                     self.dataDidLoad()
                 } else {
                     print("user doesn't exist")
