@@ -45,7 +45,7 @@ class MainView: UIView, MSCircularSliderDelegate {
         noteScale = frame.width/300 * 0.4 // 300 is the size of note
         buttonScale = min(frame.width/350, 1.5)
         start = UIButton(frame: CGRect(x: 0, y: 0, width: 103.5*buttonScale, height: 64*buttonScale))
-        username = UIButton(frame: CGRect(x: 4*buttonScale, y: 0, width: frame.width/2, height: 20*buttonScale))
+        username = UIButton(frame: CGRect(x: 4*buttonScale, y: 7*buttonScale, width: frame.width/2, height: 20*buttonScale))
         rect = CAShapeLayer()
         rect.path = UIBezierPath(rect: frame).cgPath
         rect.fillColor = UIColor(white: 1, alpha: 1).cgColor
@@ -112,7 +112,7 @@ class MainView: UIView, MSCircularSliderDelegate {
         addSubview(setting)
         setting.translatesAutoresizingMaskIntoConstraints = false
         setting.rightAnchor.constraint(equalTo: rightAnchor, constant: -10).isActive = true
-        setting.centerYAnchor.constraint(equalTo: username.centerYAnchor, constant: 6).isActive = true
+        setting.centerYAnchor.constraint(equalTo: username.centerYAnchor).isActive = true
         setting.widthAnchor.constraint(equalToConstant: 30 * buttonScale).isActive = true
         setting.heightAnchor.constraint(equalToConstant: 30 * buttonScale).isActive = true
         
@@ -122,7 +122,7 @@ class MainView: UIView, MSCircularSliderDelegate {
         addSubview(leaderboard)
         leaderboard.translatesAutoresizingMaskIntoConstraints = false
         leaderboard.rightAnchor.constraint(equalTo: setting.leftAnchor, constant: -10).isActive = true
-        leaderboard.centerYAnchor.constraint(equalTo: username.centerYAnchor, constant: 6).isActive = true
+        leaderboard.centerYAnchor.constraint(equalTo: username.centerYAnchor).isActive = true
         leaderboard.widthAnchor.constraint(equalToConstant: 60 * buttonScale).isActive = true
         leaderboard.heightAnchor.constraint(equalToConstant: 60 * buttonScale).isActive = true
         

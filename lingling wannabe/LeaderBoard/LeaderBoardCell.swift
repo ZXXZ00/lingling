@@ -24,14 +24,31 @@ class LeaderBoardCell : UITableViewCell {
         rank.font = UIFont(name: "AmericanTypewriter-Condensed", size: 16)
         rank.textColor = .black
         addSubview(rank)
+        rank.translatesAutoresizingMaskIntoConstraints = false
+        rank.leftAnchor.constraint(equalTo: leftAnchor, constant: 4).isActive = true
+        rank.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+        rank.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.15).isActive = true
+        rank.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
+        
         username.textAlignment = .center
         username.font = UIFont(name: "AmericanTypewriter-Condensed", size: 16)
         username.textColor = .black
         addSubview(username)
+        username.translatesAutoresizingMaskIntoConstraints = false
+        username.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
+        username.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+        username.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.6).isActive = true
+        username.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
+        
         hours.textAlignment = .right
         hours.font = UIFont(name: "AmericanTypewriter-Condensed", size: 16)
         hours.textColor = .black
         addSubview(hours)
+        hours.translatesAutoresizingMaskIntoConstraints = false
+        hours.rightAnchor.constraint(equalTo: rightAnchor, constant: -4).isActive = true
+        hours.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+        hours.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.18).isActive = true
+        hours.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
     }
     
     override func layoutSubviews() {
@@ -40,10 +57,6 @@ class LeaderBoardCell : UITableViewCell {
             layer.addLine(start: CGPoint(x: 0, y: frame.height), end: CGPoint(x: frame.width, y: frame.height), width: 1)
             isSeparatorAdded = true
         }
-        rank.frame = CGRect(x: frame.height*0.04, y: frame.height*0.05, width: frame.width*0.24, height: frame.height*0.9)
-        username.frame = CGRect(x: 0, y: frame.height*0.05, width: frame.width*0.6, height: frame.height*0.9)
-        username.center = CGPoint(x: frame.width*0.5, y: frame.height/2)
-        hours.frame = CGRect(x: frame.width - frame.width*0.16, y: frame.height*0.05, width: frame.width*0.15, height: frame.height*0.9)
     }
 }
 

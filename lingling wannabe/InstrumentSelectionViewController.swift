@@ -44,7 +44,7 @@ class InstrumentSelectionViewController: UITableViewController {
         title.textColor = .black
         title.font = UIFont(name: "AmericanTypewriter", size: 17)
         headerView.addSubview(title)
-        let submit = UIButton(frame: CGRect(x: tableView.frame.width-100, y: 5, width: 80, height: 40))
+        let submit = UIButton(frame: CGRect(x: tableView.frame.width-80, y: 5, width: 70, height: 40))
         submit.layer.borderWidth = 1
         submit.layer.cornerRadius = 10
         submit.setTitle("confirm", for: .normal)

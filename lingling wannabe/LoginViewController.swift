@@ -301,9 +301,8 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
             }
             self.isSending = false
         }, failure: { err in
-            print("opps!")
+            self.updateLabelAndFinishLoading(text: "No Internet Connection")
             self.isSending = false
-            self.loading.stopAnimating()
         })
     }
     
@@ -336,10 +335,10 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
                 } else {
                     self.succeed(user: user, token: data, didSucceeded: self.didRegister)
                 }
-            }, failure: { err in
-                print("oh no")
                 self.isSending = false
-                self.loading.stopAnimating()
+            }, failure: { err in
+                self.updateLabelAndFinishLoading(text: "No Internet Connection")
+                self.isSending = false
             })
         } else {
             label.text = "All Fields Are Required"
