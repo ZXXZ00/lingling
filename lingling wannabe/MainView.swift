@@ -112,7 +112,7 @@ class MainView: UIView, MSCircularSliderDelegate {
         addSubview(setting)
         setting.translatesAutoresizingMaskIntoConstraints = false
         setting.rightAnchor.constraint(equalTo: rightAnchor, constant: -10).isActive = true
-        setting.centerYAnchor.constraint(equalTo: username.centerYAnchor, constant: 2).isActive = true
+        setting.centerYAnchor.constraint(equalTo: username.centerYAnchor, constant: 6).isActive = true
         setting.widthAnchor.constraint(equalToConstant: 30 * buttonScale).isActive = true
         setting.heightAnchor.constraint(equalToConstant: 30 * buttonScale).isActive = true
         
@@ -122,7 +122,7 @@ class MainView: UIView, MSCircularSliderDelegate {
         addSubview(leaderboard)
         leaderboard.translatesAutoresizingMaskIntoConstraints = false
         leaderboard.rightAnchor.constraint(equalTo: setting.leftAnchor, constant: -10).isActive = true
-        leaderboard.centerYAnchor.constraint(equalTo: username.centerYAnchor).isActive = true
+        leaderboard.centerYAnchor.constraint(equalTo: username.centerYAnchor, constant: 6).isActive = true
         leaderboard.widthAnchor.constraint(equalToConstant: 60 * buttonScale).isActive = true
         leaderboard.heightAnchor.constraint(equalToConstant: 60 * buttonScale).isActive = true
         
@@ -131,7 +131,7 @@ class MainView: UIView, MSCircularSliderDelegate {
         addSubview(recordings)
         recordings.translatesAutoresizingMaskIntoConstraints = false
         recordings.rightAnchor.constraint(equalTo: leaderboard.leftAnchor, constant: -4).isActive = true
-        recordings.centerYAnchor.constraint(equalTo: leaderboard.centerYAnchor).isActive = true
+        recordings.centerYAnchor.constraint(equalTo: leaderboard.centerYAnchor, constant: 2).isActive = true
         recordings.widthAnchor.constraint(equalToConstant: 50 * buttonScale).isActive = true
         recordings.heightAnchor.constraint(equalToConstant: 50 * buttonScale).isActive = true
     }
@@ -156,21 +156,6 @@ class MainView: UIView, MSCircularSliderDelegate {
         addSubview(question)
         
         addGestureRecognizer(tap)
-        
-        let res = ResultDelegate.shared.test()
-        text.frame = CGRect(x: 40, y: 40, width: 250, height: 400)
-        var tmp = ""
-        for arr in res {
-            for per in arr {
-                tmp += String(per) + ","
-            }
-            tmp += "\n\n "
-        }
-        text.isEditable = false
-        text.backgroundColor = .clear
-        text.textColor = .black
-        text.text = tmp
-        //self.addSubview(text)
     }
     
     func reveal() {

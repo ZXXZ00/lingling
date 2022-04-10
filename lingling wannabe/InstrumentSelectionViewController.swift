@@ -38,18 +38,12 @@ class InstrumentSelectionViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let headerView = UIView()
-        //headerView.backgroundColor = .clear
-        // frame: CGRect(x: 0, y: 0, width: tableView.frame.width, height: headerHeight)
         let title = UILabel(frame: CGRect(x: 0, y: 0, width: tableView.frame.width, height: headerHeight))
         title.text = "    What instrument(s) do you play"
         title.backgroundColor = UIColor(white: 0.83, alpha: 1)
         title.textColor = .black
         title.font = UIFont(name: "AmericanTypewriter", size: 17)
         headerView.addSubview(title)
-        //title.translatesAutoresizingMaskIntoConstraints = false
-        //title.centerXAnchor.constraint(equalTo: headerView.centerXAnchor).isActive = true
-        //title.centerYAnchor.constraint(equalTo: headerView.centerYAnchor).isActive = true
-        print(tableView.frame)
         let submit = UIButton(frame: CGRect(x: tableView.frame.width-100, y: 5, width: 80, height: 40))
         submit.layer.borderWidth = 1
         submit.layer.cornerRadius = 10
@@ -71,13 +65,14 @@ class InstrumentSelectionViewController: UITableViewController {
                 }
             }
             let url = URL(string: "https://j7by90n61a.execute-api.us-east-1.amazonaws.com/instruments")
+            // not handle any connection failure or react to success because this feature is non essential
             if let token = CredentialManager.shared.getToken() {
                 postJSON(url: url!, json: [
                     "username": CredentialManager.shared.getUsername(), "instruments": lists
-                ], token: token, success: { data, res in
-                    // TODO: Error handling
-                }, failure: { e in
-                    // TODO: Error Handling
+                ], token: token, success: { _, _ in
+
+                }, failure: { _ in
+
                 })
             }
         }

@@ -13,7 +13,7 @@ class AudioFileCell: UITableViewCell {
     let labelName = UILabel()
     var isSeparatorAdded = false
     
-    let filenameLabelLength: CGFloat = 115
+    let filenameLabelLength: CGFloat = 100
     
     required init?(coder: NSCoder) {
         fatalError("NSCoding Not Supported!")
@@ -21,7 +21,7 @@ class AudioFileCell: UITableViewCell {
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        let font = UIFont(name: "AmericanTypewriter", size: 16)
+        let font = UIFont(name: "AmericanTypewriter-Condensed", size: 17)
         
         fileName.font = font
         fileName.textColor = .black

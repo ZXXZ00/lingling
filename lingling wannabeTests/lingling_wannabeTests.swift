@@ -38,9 +38,10 @@ class lingling_wannabeTests: XCTestCase {
     
     func testAddRecord() throws {
         var start = 1648422000
-        for _ in 0..<5 {
+        DataManager.shared.clear()
+        for _ in 0..<1 {
             DataManager.shared.addRecord(username: "iPad", time: start, duration: 900, asset: "semiquaver", attributes: nil, upload: false)
-            start += 901
+            start += 1
         }
         //sleep(5)
     }

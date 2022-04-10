@@ -78,7 +78,7 @@ class AudioStreamAnalyzer {
         let url = getDocumentDirectory().appendingPathComponent("recording.wav")
         let audioFile: AVAudioFile?
         if let size = getAvailableSpace(at: getDocumentDirectory()) {
-            if size < minimumAvaiableSpace { isWritingToFile = false } // smaller than 5 GB
+            if size < minimumAvaiableSpace { isWritingToFile = false }
         } else {
             isWritingToFile = false
         }
@@ -132,22 +132,12 @@ class ResultsObserver : NSObject, SNResultsObserving {
     
     func request(_ request: SNRequest, didProduce result: SNResult) {
         guard let result = result as? SNClassificationResult else { return }
-            //let classification = result.classifications.first else { return }
-        //let formattedTime = String(format: "%.2f", result.timeRange.start.seconds)
-        //print("time: \(formattedTime)")
-        //print("\(result.timeRange.start.seconds), \(result.timeRange.end.seconds)")
-        //let confidence = classification.confidence * 100.0
-        //let percent = String(format: "%.2f%%", confidence)
-        //print("\(classification.identifier): \(percent) \n")
-        
-        //time.append(result.timeRange.start.seconds)
-        //results.append(result.classifications)
         ResultDelegate.shared.append(start: result.timeRange.start.seconds, end: result.timeRange.end.seconds,
                                      result.classifications)
     }
     
     func request(_ request: SNRequest, didFailWithError error: Error) {
-        print(error.localizedDescription)
+        print("SNRequest Fails: \(error)")
         DataManager.shared.insertErrorMessage(isNetwork: false, message: "SNRequest Fails: \(error)")
     }
     

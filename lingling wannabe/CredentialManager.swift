@@ -18,24 +18,20 @@ class CredentialManager {
     static let shared = CredentialManager()
     private var username: String = "guest"
     private let queue = DispatchQueue(label: "credential", qos: .userInteractive)
-    var lock = pthread_rwlock_t()
+    private var lock = pthread_rwlock_t()
     
     let url = URL(string: "https://0j6a9nvvx3.execute-api.us-east-1.amazonaws.com/refresh")!
     
     private init() {
-        if !UserDefaults.standard.bool(forKey: "build6c") {
-            delete()
-            UserDefaults.standard.set(true, forKey: "build6c")
-        }
         pthread_rwlock_init(&lock, nil)
         if let token = getRefreshToken() {
             do {
                 let jwt = try decode(jwt: String(decoding: token, as: UTF8.self))
                 username = jwt.subject ?? "guest"
             } catch {
-                // TODO: error handling
                 DataManager.shared.insertErrorMessage(isNetwork: false, message: "Failed to decode JWT\n\(error.localizedDescription)")
-                print(error.localizedDescription)
+                print("Failed to decode JWT\n\(error.localizedDescription)")
+                delete()
             }
         }
     }
@@ -88,9 +84,9 @@ class CredentialManager {
                 pthread_rwlock_unlock(&lock)
             }
         } catch {
-            // TODO: error handling
             DataManager.shared.insertErrorMessage(isNetwork: false, message: "Failed to decode JWT\n\(error.localizedDescription)")
-            print(error.localizedDescription)
+            print("Failed to decode JWT\n\(error.localizedDescription)")
+            delete()
         }
     }
     
@@ -157,9 +153,9 @@ class CredentialManager {
                 return resD
             }
         } catch {
-            // TODO: error handling
             DataManager.shared.insertErrorMessage(isNetwork: false, message: "Failed to decode JWT\n\(error.localizedDescription)")
-            print(error.localizedDescription)
+            print("Failed to decode JWT\n\(error.localizedDescription)")
+            delete()
         }
         return nil
     }

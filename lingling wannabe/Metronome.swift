@@ -62,7 +62,7 @@ public class Metronome {
         do {
             try engine.start()
         } catch {
-            print(error.localizedDescription)
+            print("Failed to start metronome audio engine: \(error.localizedDescription)")
             return nil
         }
     }
