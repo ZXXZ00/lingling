@@ -114,6 +114,7 @@ func verifyCheckSum(start: Int, duration: Int, checksum: String) -> Bool {
 
 final class DataManager {
     static let shared = DataManager()
+    static let ConflictNotification = Notification.Name("DataConflict")
     
     let dbURL = URL(string: "https://j7by90n61a.execute-api.us-east-1.amazonaws.com/record")!
     
@@ -124,6 +125,8 @@ final class DataManager {
     private var err: Connection!
     
     private var unsynced: Set<Record> = []
+    // remove all unsynced if data has been previously resetted without removing all unsynced
+    private var hasRestted = false
     
     private var totalMinutes = 0
     private let interval = 120
@@ -212,7 +215,6 @@ final class DataManager {
         guard let token = token else { return }
         let json: [String:Any] = ["username": username, "records": unsynced.map({ $0.toDict(withUsername: false) })]
         postJSON(url: dbURL, json: json, token: token, success: { unprocessed, response in
-            // TODO: implement handling
             if response.statusCode == 200 {
                 var unprocessedSet = Set<Int>()
                 do {
@@ -237,6 +239,8 @@ final class DataManager {
                     self.updateSynced(username: username, time: Int(r.time))
                     self.unsynced.remove(r)
                 }
+            } else if response.statusCode == 409 {
+                NotificationCenter.default.post(name: DataManager.ConflictNotification, object: nil)
             } else {
                 self.insertErrorMessage(isNetwork: true, message: "failed to upload unsynced part, status code \(response.statusCode)")
             }
@@ -292,7 +296,7 @@ final class DataManager {
         return DataStatus.success
     }
 
-    func addRecord(username: String, time: Int, duration: Int, asset: String, attributes: String?, upload: Bool) -> Int {
+    func addRecord(username: String, time: Int, duration: Int, asset: String, attributes: String?, upload: Bool) -> DataStatus {
         let before = totalMinutes
         totalMinutes += abs(duration / 60)
         if (totalMinutes / interval - before / interval > 0) || (before == 0) {
@@ -301,7 +305,7 @@ final class DataManager {
         
         let date = Date(timeIntervalSince1970: Double(time))
         addCache(username: username, date: date, asset: asset)
-        if username == "guest" { return DataStatus.success.rawValue }
+        if username == "guest" { return DataStatus.success }
         let checksum = computeCheckSum(start: time, duration: duration)
         do {
             if let attr = attributes {
@@ -311,13 +315,13 @@ final class DataManager {
             }
         } catch {
             print(error)
-            return DataStatus.insertError.rawValue
+            return DataStatus.insertError
         }
         
         let r = Record(username: username, time: Int64(time), duration: Int64(duration), asset: asset, synced: false, checksum: checksum, attributes: attributes)
-        if !upload { return DataStatus.success.rawValue }
+        if !upload { return DataStatus.success }
         
-        guard let token = CredentialManager.shared.getToken() else { return DataStatus.tokenError.rawValue }
+        guard let token = CredentialManager.shared.getToken() else { return DataStatus.tokenError }
         let json = ["username": username, "records": [r.toDict(withUsername: false)]] as [String : Any]
         // TODO: implement semaphore to wait, maybe no need for semaphore
         postJSON(url: dbURL, json: json, token: token, success: { unprocessed, response in
@@ -327,6 +331,8 @@ final class DataManager {
                 print("status 200, upload success")
                 self.updateSynced(username: username, time: time)
                 print("status 200 finished client handling")
+            } else if response.statusCode == 409 {
+                NotificationCenter.default.post(name: DataManager.ConflictNotification, object: nil)
             } else {
                 self.unsynced.insert(r)
                 self.insertErrorMessage(isNetwork: true, message: "Failed to insert (\(username), \(time), \(duration))\nstatusCode: \(response.statusCode)")
@@ -334,7 +340,7 @@ final class DataManager {
         }, failure: { e in
             self.insertErrorMessage(isNetwork: false, message: e.localizedDescription)
         })
-        return DataStatus.success.rawValue
+        return DataStatus.success
     }
     
     func getRecord(username: String) -> [Record]{
@@ -391,19 +397,24 @@ final class DataManager {
             url?.query = "username=\(username)"
         }
         guard let u = url?.url else { return }
+        let now = Int(Date().timeIntervalSince1970)
         getJSON(url: u, success: { json in
             guard let arr = json as? [[String:Any]] else { return }
             for r in arr {
                 if let st = r["start_time"] as? Int,
                    let duration = r["duration"] as? Int,
                    let asset = r["asset"] as? String {
-                    self.addRecord(username: username, time: st, duration: duration, asset: asset, attributes: nil, upload: false)
-                    self.updateSynced(username: username, time: st)
+                    if self.addRecord(username: username, time: st,
+                                      duration: duration, asset: asset,
+                                      attributes: nil, upload: false) == .success
+                    {
+                        self.updateSynced(username: username, time: st)
+                    }
                 } else {
                     print("failed to cast downloaded records", r)
                 }
             }
-            UserDefaults.standard.set(Int(Date().timeIntervalSince1970), forKey: "LastSync_"+username)
+            UserDefaults.standard.set(now, forKey: "LastSync_"+username)
         }, failure: { _ in }) // TODO: implement failure
     }
     
@@ -418,11 +429,15 @@ final class DataManager {
     }
     
     func clear() {
+        if hasRestted {
+            unsynced.removeAll()
+        }
         do {
             try db.run("DELETE FROM records")
         } catch {
             print(error)
         }
+        hasRestted = !hasRestted
     }
     
     func delete(username: String, time: Int) {
