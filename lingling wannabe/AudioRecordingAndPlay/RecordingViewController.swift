@@ -57,12 +57,13 @@ class RecordingViewController: UIViewController, UITableViewDelegate, UITableVie
         
         var labels = Set<String>()
         let res = FilesManager.shared.getLabels(username: CredentialManager.shared.getUsername())
-        res.map {
+        res.forEach {
             // $0 is filename, $1 is label
             labelMap[$0] = $1
             labels.insert($1)
         }
         audioLabelView.suggestionsArray = Array(labels)
+        audioLabelView.controller = self
         
         populate()
     }
@@ -89,7 +90,7 @@ class RecordingViewController: UIViewController, UITableViewDelegate, UITableVie
         }
     }
 
-    func addFileToList(filename: String) {
+    func addFileToList(filename: String, label: String?=nil) {
         if filename.count < 5 { return }
         let idx = filename.index(filename.endIndex, offsetBy: -5)
         let str = String(filename[..<idx])
@@ -104,8 +105,10 @@ class RecordingViewController: UIViewController, UITableViewDelegate, UITableVie
             }
             displayNames.append(key)
             filesMap[key] = filename
-            if let label = labelMap[str] {
-                labelMap[key] = label
+            if let l = labelMap[str] {
+                labelMap[key] = l
+            } else if let l = label {
+                labelMap[key] = l
             }
         }
     }
@@ -209,9 +212,11 @@ class RecordingViewController: UIViewController, UITableViewDelegate, UITableVie
         
         saveButton.removeFromSuperview()
         recordingView.removeFromSuperview()
-        
+    }
+    
+    func updateAndInsertRow(filename: String, label: String?=nil) {
         let idx = IndexPath(row: displayNames.count, section: 0)
-        addFileToList(filename: utc)
+        addFileToList(filename: filename, label: label)
         filesView.insertRows(at: [idx], with: .automatic)
         filesView.selectRow(at: idx, animated: false, scrollPosition: .bottom)
     }

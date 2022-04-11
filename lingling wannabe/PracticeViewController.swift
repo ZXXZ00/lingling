@@ -195,11 +195,6 @@ class PracticeViewController : UIViewController {
                 weakself.metronome?.pause()
                 weakself.playButton.setImage(weakself.playImage, for: .normal)
                 weakself.isSuspended = true
-                do {
-                    //try AVAudioSession.sharedInstance().setActive(false)
-                } catch {
-                    print(error)
-                }
             case .ended:
                 print("interruption ended")
                 do {

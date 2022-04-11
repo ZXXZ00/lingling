@@ -12,6 +12,8 @@ class AudioLabelView: UIView, UITextFieldDelegate {
     let title = UILabel()
     let button = UIButton()
     
+    weak var controller: RecordingViewController?
+    
     var suggestionsArray: [String] = []
     var audioFileTime: Int? = nil
     
@@ -96,6 +98,7 @@ class AudioLabelView: UIView, UITextFieldDelegate {
     @objc func addLabel() {
         guard let time = audioFileTime, let labelText = label.text else { return }
         FilesManager.shared.addLabel(username: CredentialManager.shared.getUsername(), time: time, label: labelText)
+        controller?.updateAndInsertRow(filename: "\(time).flac", label: labelText)
         removeFromSuperview()
         audioFileTime = nil
     }

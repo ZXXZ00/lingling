@@ -116,7 +116,7 @@ final class DataManager {
     static let shared = DataManager()
     static let ConflictNotification = Notification.Name("DataConflict")
     
-    let dbURL = URL(string: "https://j7by90n61a.execute-api.us-east-1.amazonaws.com/record")!
+    let dbURL = URL(string: "https://linglingwannabe.com/record/record")!
     
     // the db is a connection to data.db which stores the record
     private var db: Connection!

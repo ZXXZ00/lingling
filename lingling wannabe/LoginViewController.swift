@@ -23,8 +23,8 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
     let alterLabel = UILabel()
     let loading = UIActivityIndicatorView(style: .large)
     
-    let register = URL(string: "https://0j6a9nvvx3.execute-api.us-east-1.amazonaws.com/register")!
-    let signin = URL(string: "https://0j6a9nvvx3.execute-api.us-east-1.amazonaws.com/login")!
+    let register = URL(string: "https://linglingwannabe.com/user/register")!
+    let signin = URL(string: "https://linglingwannabe.com/user/login")!
     var isSending = false
     
     var didLogin: ((_: String) -> Void)?

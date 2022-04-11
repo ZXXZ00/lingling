@@ -15,7 +15,7 @@ class UserInfoViewController : UIViewController {
     let monthLabel = UILabel()
     static var scale: CGFloat = 1
     let username: String
-    let baseURL = URL(string: "https://wi6n41chmb.execute-api.us-east-1.amazonaws.com/v1")!
+    let baseURL = URL(string: "https://linglingwannabe.com/record_asset")!
     
     let loading = UIActivityIndicatorView(style: .large)
     

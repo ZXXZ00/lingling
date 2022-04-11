@@ -64,7 +64,7 @@ class InstrumentSelectionViewController: UITableViewController {
                     lists.append(instrument)
                 }
             }
-            let url = URL(string: "https://j7by90n61a.execute-api.us-east-1.amazonaws.com/instruments")
+            let url = URL(string: "https://linglingwannabe.com/record/instruments")
             // not handle any connection failure or react to success because this feature is non essential
             if let token = CredentialManager.shared.getToken() {
                 postJSON(url: url!, json: [
@@ -75,6 +75,7 @@ class InstrumentSelectionViewController: UITableViewController {
 
                 })
             }
+            UserDefaults.standard.set(lists, forKey: CredentialManager.shared.getUsername()+"_instruments")
         }
         view.removeFromSuperview()
         removeFromParent()

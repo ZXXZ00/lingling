@@ -40,6 +40,7 @@ class MainViewController: UIViewController {
     }
     
     func changeUser(user: String) {
+        previousUsername = user
         DispatchQueue.main.async {
             if let mainView = self.view as? MainView {
                 mainView.username.setTitle(user, for: .normal)
@@ -302,8 +303,8 @@ extension MainViewController: SettingDelegate {
     
     func logOut() {
         CredentialManager.shared.delete()
-        dismiss(animated: true) {
-            DispatchQueue.main.async {
+        DispatchQueue.main.async {
+            self.dismiss(animated: true) {
                 self.showLoginViewController()
             }
         }

@@ -23,7 +23,7 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>The app shouldn&apos;t request for camera access</string>
+	<string>The app shouldn't request for camera access</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>To determine if you are practicing</string>
 	<key>UIApplicationSceneManifest</key>

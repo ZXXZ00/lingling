@@ -18,7 +18,7 @@ class LeaderBoardTableViewController : UITableViewController {
         [.day: [Int:Player](), .week: [Int:Player](),.month: [Int:Player](), .year: [Int:Player]()]
     static var cacheTime: [Interval:Double] = [.day: 0, .week: 0, .month: 0, .year: 0]
     static var isLoading: [Interval:Bool] = [.day: false, .week: false, .month: false, .year: false]
-    let baseURL = URL(string: "https://j7by90n61a.execute-api.us-east-1.amazonaws.com/leaderboard")!
+    let baseURL = URL(string: "https://linglingwannabe.com/record/leaderboard")!
     
     let interval : Interval
     weak var delegate: LeaderBoardNavigation?

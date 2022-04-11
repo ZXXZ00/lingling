@@ -20,7 +20,7 @@ class CredentialManager {
     private let queue = DispatchQueue(label: "credential", qos: .userInteractive)
     private var lock = pthread_rwlock_t()
     
-    let url = URL(string: "https://0j6a9nvvx3.execute-api.us-east-1.amazonaws.com/refresh")!
+    let url = URL(string: "https://linglingwannabe.com/user/refresh")!
     
     private init() {
         pthread_rwlock_init(&lock, nil)
