@@ -23,7 +23,9 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>The app shouldn't request for camera access</string>
+	<string>Record your progress</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>To access and store your progress videos</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>To determine if you are practicing</string>
 	<key>UIApplicationSceneManifest</key>

@@ -50,6 +50,8 @@
 		66ADE5B425BE2B0B004B20C6 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 66ADE5B225BE2B0B004B20C6 /* LaunchScreen.storyboard */; };
 		66ADE5BF25BE2B0B004B20C6 /* lingling_wannabeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ADE5BE25BE2B0B004B20C6 /* lingling_wannabeTests.swift */; };
 		66ADE5CA25BE2B0B004B20C6 /* lingling_wannabeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ADE5C925BE2B0B004B20C6 /* lingling_wannabeUITests.swift */; };
+		66B4369029DE233D007B9B5A /* AVRecorderViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B4368F29DE233D007B9B5A /* AVRecorderViewController.swift */; };
+		66B4369229F5AB26007B9B5A /* VideoEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B4369129F5AB26007B9B5A /* VideoEditorViewController.swift */; };
 		66B6D68526D54C1D0001F6B5 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B6D68426D54C1D0001F6B5 /* DataManager.swift */; };
 		66B6D68726D5505A0001F6B5 /* data.db in Resources */ = {isa = PBXBuildFile; fileRef = 66B6D68626D54F740001F6B5 /* data.db */; };
 		66B6D68A26D551730001F6B5 /* quaver_rest.svg in Resources */ = {isa = PBXBuildFile; fileRef = 66B6D68926D551730001F6B5 /* quaver_rest.svg */; };
@@ -147,6 +149,8 @@
 		66ADE5C525BE2B0B004B20C6 /* lingling wannabeUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "lingling wannabeUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		66ADE5C925BE2B0B004B20C6 /* lingling_wannabeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = lingling_wannabeUITests.swift; sourceTree = "<group>"; };
 		66ADE5CB25BE2B0B004B20C6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		66B4368F29DE233D007B9B5A /* AVRecorderViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVRecorderViewController.swift; sourceTree = "<group>"; };
+		66B4369129F5AB26007B9B5A /* VideoEditorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoEditorViewController.swift; sourceTree = "<group>"; };
 		66B6D68426D54C1D0001F6B5 /* DataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManager.swift; sourceTree = "<group>"; };
 		66B6D68626D54F740001F6B5 /* data.db */ = {isa = PBXFileReference; lastKnownFileType = file; path = data.db; sourceTree = SOURCE_ROOT; };
 		66B6D68926D551730001F6B5 /* quaver_rest.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = quaver_rest.svg; sourceTree = "<group>"; };
@@ -292,6 +296,8 @@
 				66FDECE12607CFA300FB9019 /* AudioStreamAnalyzer.swift */,
 				661F81762773B7AC00FC0A64 /* CredentialManager.swift */,
 				667FD6D7277FCF5D0075DC04 /* DebugViewController.swift */,
+				66B4368F29DE233D007B9B5A /* AVRecorderViewController.swift */,
+				66B4369129F5AB26007B9B5A /* VideoEditorViewController.swift */,
 				66B6D68426D54C1D0001F6B5 /* DataManager.swift */,
 				66E0478C27B84CA50074935A /* FilesManager.swift */,
 				66FDECEB2607D10900FB9019 /* ResultDelegate.swift */,
@@ -614,7 +620,9 @@
 				66FFF8F027F8E0A00045568E /* SettingDelegate.swift in Sources */,
 				666C30F526652506003DCAB6 /* LeaderBoardNavigation.swift in Sources */,
 				66A4F650266035CF002985BA /* CalendarCell.swift in Sources */,
+				66B4369229F5AB26007B9B5A /* VideoEditorViewController.swift in Sources */,
 				66BBDD6C260A85E0008E54EC /* MSGradientCircularSlider.swift in Sources */,
+				66B4369029DE233D007B9B5A /* AVRecorderViewController.swift in Sources */,
 				66DCD97227C5D47800BF768D /* InstrumentSelectionViewController.swift in Sources */,
 				66EA953C26603AA800B59721 /* CalendarData.swift in Sources */,
 				6692E5FC27F9CAD600180A0F /* AudioLabelView.swift in Sources */,
@@ -801,6 +809,7 @@
 				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_TEAM = LDB5QZMQ6L;
 				INFOPLIST_FILE = "lingling wannabe/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -822,6 +831,7 @@
 				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_TEAM = LDB5QZMQ6L;
 				INFOPLIST_FILE = "lingling wannabe/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

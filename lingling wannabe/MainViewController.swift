@@ -8,6 +8,7 @@
 import AVFoundation
 import UIKit
 import PocketSVG
+import MobileCoreServices
 
 class MainViewController: UIViewController {
     
@@ -284,9 +285,24 @@ class MainViewController: UIViewController {
     }
     
     @objc func showDebug() {
-        let debugV = DebugViewController()
-        debugV.modalPresentationStyle = .formSheet
-        present(debugV, animated: true)
+//        let debugV = DebugViewController()
+//        debugV.modalPresentationStyle = .formSheet
+//        present(debugV, animated: true)
+        //let testV = AVRecorderViewController()
+        //present(testV, animated: true)
+        
+//        let tt = UIImagePickerController()
+//        tt.sourceType = .photoLibrary
+//        tt.mediaTypes = [kUTTypeMovie as String]
+//        tt.videoQuality = .typeHigh
+//        tt.allowsEditing = true
+//        tt.videoExportPreset = AVAssetExportPresetHighestQuality
+//        present(tt, animated: true)
+        
+        let vv = VideoEditorViewController()
+        present(vv, animated: true)
+        
+        
     }
     
     @objc func showSetting() {
