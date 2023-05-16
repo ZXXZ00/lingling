@@ -166,14 +166,14 @@ extension UserInfoViewController : UIScrollViewDelegate {
 }
 
 extension CALayer {
-    func addLine(start: CGPoint, end: CGPoint, width: CGFloat) {
+    func addLine(start: CGPoint, end: CGPoint, width: CGFloat, color: UIColor = .gray) {
         let line = CAShapeLayer()
         let linePath = UIBezierPath()
         linePath.move(to: start)
         linePath.addLine(to: end)
         line.path = linePath.cgPath
         line.lineWidth = width
-        line.strokeColor = UIColor.gray.cgColor
+        line.strokeColor = color.cgColor
         self.addSublayer(line)
     }
 }

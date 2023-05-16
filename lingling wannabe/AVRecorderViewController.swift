@@ -45,8 +45,6 @@ class AVRecorderViewController: UIViewController, AVCaptureFileOutputRecordingDe
         captureSession.addOutput(movieOutput)
         captureSession.commitConfiguration()
         captureSession.startRunning()
-        
-        
     }
     
     private func configureSession() {

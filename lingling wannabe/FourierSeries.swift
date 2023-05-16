@@ -105,7 +105,7 @@ public class FourierSeries: NSObject, CAAnimationDelegate {
         ret.bounds = CGRect(x: 0, y: 0, width: norm, height: 1)
         ret.anchorPoint = CGPoint(x: 0, y: 0.5)
         ret.position = CGPoint(x: length, y: 0.5)
-        ret.strokeColor = UIColor.black .cgColor
+        ret.strokeColor = UIColor.black.cgColor
         ret.lineWidth = 0.3
         ret.fillColor = .none
         let initialAngle = x < 0 ? atanf(y/x)-Float.pi : atanf(y/x)
