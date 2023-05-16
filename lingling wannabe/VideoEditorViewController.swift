@@ -12,40 +12,37 @@ import MobileCoreServices
 class VideoEditorViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     let movie = AVMutableComposition()
     let videoComposition = AVMutableVideoComposition()
-    private var videoTrack: AVMutableCompositionTrack?
-    private var audioTrack: AVMutableCompositionTrack?
+    private let videoTrack: AVMutableCompositionTrack?
+    private let audioTrack: AVMutableCompositionTrack?
     private var end = CMTime.zero
     
-    private var player: AVPlayer?
+    private let player = AVPlayer()
     private var playerLayer: AVPlayerLayer?
     private let picker = UIImagePickerController()
     
     private let selectButton = UIButton()
     private let exportButton = UIButton()
+    private let trackView: TrackView
     
+    private var assets: [UIView] = []
     
     let WIDTH: CGFloat = 1080
     let HEIGHT: CGFloat = 1920
+    let TRACK_HEIGHT: CGFloat = 80
+    let LEFT_RIGHT_PADDING: CGFloat = 10
+    let TOP_PADDING: CGFloat = 8
     
+    required init?(coder: NSCoder) {
+        fatalError("NSCoding not supported")
+    }
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .white
-        
-        selectButton.frame = CGRect(x: 10, y: 10, width: 40, height: 30)
-        selectButton.setTitle("select", for: .normal)
-        selectButton.setTitleColor(.black, for: .normal)
-        selectButton.addTarget(self, action: #selector(VideoEditorViewController.selectVideo), for: .touchUpInside)
-        view.addSubview(selectButton)
-        
-        exportButton.frame = CGRect(x: 150, y: 10, width: 40, height: 30)
-        exportButton.setTitle("export", for: .normal)
-        exportButton.setTitleColor(.black, for: .normal)
-        exportButton.addTarget(self, action: #selector(VideoEditorViewController.exportVideo), for: .touchUpInside)
-        view.addSubview(exportButton)
+    init() {
+        trackView = TrackView(player: player)
         
         videoTrack = movie.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid)
         audioTrack = movie.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid)
+        
+        super.init(nibName: nil, bundle: nil)
         
         picker.sourceType = .photoLibrary
         picker.videoQuality = .typeHigh
@@ -54,20 +51,68 @@ class VideoEditorViewController: UIViewController, UIImagePickerControllerDelega
         picker.allowsEditing = true
         picker.delegate = self
         
-        player = AVPlayer()
         videoComposition.instructions = []
         videoComposition.frameDuration = CMTimeMake(value: 1, timescale: 30)
         videoComposition.renderSize = CGSize(width: WIDTH, height: HEIGHT)
+    }
+
+    
+    override func loadView() {
+        super.loadView()
+        let view = UIView()
+        view.backgroundColor = .white
         
+        selectButton.setTitle("select", for: .normal)
+        selectButton.setTitleColor(.black, for: .normal)
+        selectButton.addTarget(self, action: #selector(VideoEditorViewController.selectVideo), for: .touchUpInside)
+        selectButton.layer.borderColor = UIColor.black.cgColor
+        selectButton.layer.borderWidth = 1
+        selectButton.layer.cornerRadius = 10
+        view.addSubview(selectButton)
+        selectButton.translatesAutoresizingMaskIntoConstraints = false
+        selectButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: LEFT_RIGHT_PADDING).isActive = true
+        selectButton.topAnchor.constraint(equalTo: view.topAnchor, constant: TOP_PADDING).isActive = true
+        selectButton.widthAnchor.constraint(equalToConstant: 60).isActive = true
+        
+        exportButton.setTitle("export", for: .normal)
+        exportButton.setTitleColor(.black, for: .normal)
+        exportButton.addTarget(self, action: #selector(VideoEditorViewController.removeTest), for: .touchUpInside)
+        exportButton.layer.borderColor = UIColor.black.cgColor
+        exportButton.layer.borderWidth = 1
+        exportButton.layer.cornerRadius = 10
+        view.addSubview(exportButton)
+        exportButton.translatesAutoresizingMaskIntoConstraints = false
+        exportButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -LEFT_RIGHT_PADDING).isActive = true
+        exportButton.topAnchor.constraint(equalTo: view.topAnchor, constant: TOP_PADDING).isActive = true
+        exportButton.widthAnchor.constraint(equalToConstant: 60).isActive = true
+        
+        view.addSubview(trackView)
+        trackView.translatesAutoresizingMaskIntoConstraints = false
+        trackView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
+        trackView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -10).isActive = true
+        trackView.heightAnchor.constraint(equalToConstant: TRACK_HEIGHT).isActive = true
+        trackView.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
+
+        self.view = view
     }
     
     @objc func selectVideo() {
+        player.pause()
         present(picker, animated: true)
     }
     
+    @objc func removeTest() {
+        print(movie.duration)
+        let timeRange = CMTimeRange(start: CMTimeMakeWithSeconds(2, preferredTimescale: 1000), duration: CMTimeMakeWithSeconds(5, preferredTimescale: 1000))
+        videoTrack?.removeTimeRange(timeRange)
+        audioTrack?.removeTimeRange(timeRange)
+        print(movie.duration)
+    }
+    
     @objc func exportVideo() {
+        player.pause()
         let exporter = AVAssetExportSession(asset: movie, presetName: AVAssetExportPresetHighestQuality)
-        exporter?.outputURL = getDocumentDirectory().appendingPathComponent("april31.mov")
+        exporter?.outputURL = getDocumentDirectory().appendingPathComponent("may10.mov")
         exporter?.outputFileType = .mov
         exporter?.videoComposition = videoComposition
         exporter?.exportAsynchronously {
@@ -149,17 +194,19 @@ class VideoEditorViewController: UIViewController, UIImagePickerControllerDelega
             }
         }
         picker.dismiss(animated: true)
+        trackView.loadAsset(asset: movie)
         
         playerLayer?.removeFromSuperlayer()
+        playerLayer = nil
         let playerItem = AVPlayerItem(asset: movie)
         
         playerItem.videoComposition = videoComposition
-        player?.replaceCurrentItem(with: playerItem)
+        player.replaceCurrentItem(with: playerItem)
         playerLayer = AVPlayerLayer(player: player)
-        print(view.frame)
-        playerLayer!.frame = CGRect(x: 10, y: 50, width: view.frame.width-20, height: view.frame.height-200)
+        playerLayer!.frame = CGRect(x: 10, y: 50, width: view.frame.width-LEFT_RIGHT_PADDING*2, height: view.frame.height-50-TRACK_HEIGHT-LEFT_RIGHT_PADDING-TOP_PADDING)
         playerLayer!.videoGravity = .resizeAspect
         view.layer.addSublayer(playerLayer!)
-        player?.play()
+        player.play()
     }
 }
+
