@@ -22,7 +22,7 @@ class VideoEditorViewController: UIViewController, UIImagePickerControllerDelega
     
     private let selectButton = UIButton()
     private let exportButton = UIButton()
-    private let trackView: TrackView
+    private let trackViewController: TrackViewController
     
     private var assets: [UIView] = []
     
@@ -31,13 +31,14 @@ class VideoEditorViewController: UIViewController, UIImagePickerControllerDelega
     let TRACK_HEIGHT: CGFloat = 80
     let LEFT_RIGHT_PADDING: CGFloat = 10
     let TOP_PADDING: CGFloat = 8
+    let BOT_PADDING: CGFloat = 10
     
     required init?(coder: NSCoder) {
         fatalError("NSCoding not supported")
     }
     
     init() {
-        trackView = TrackView(player: player)
+        trackViewController = TrackViewController(player: player)
         
         videoTrack = movie.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid)
         audioTrack = movie.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid)
@@ -85,15 +86,21 @@ class VideoEditorViewController: UIViewController, UIImagePickerControllerDelega
         exportButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -LEFT_RIGHT_PADDING).isActive = true
         exportButton.topAnchor.constraint(equalTo: view.topAnchor, constant: TOP_PADDING).isActive = true
         exportButton.widthAnchor.constraint(equalToConstant: 60).isActive = true
-        
-        view.addSubview(trackView)
-        trackView.translatesAutoresizingMaskIntoConstraints = false
-        trackView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
-        trackView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -10).isActive = true
-        trackView.heightAnchor.constraint(equalToConstant: TRACK_HEIGHT).isActive = true
-        trackView.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
 
         self.view = view
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        addChild(trackViewController)
+        view.addSubview(trackViewController.view)
+        trackViewController.view.translatesAutoresizingMaskIntoConstraints = false
+        trackViewController.view.leftAnchor.constraint(equalTo: view.leftAnchor, constant: LEFT_RIGHT_PADDING).isActive = true
+        trackViewController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -BOT_PADDING).isActive = true
+        trackViewController.view.heightAnchor.constraint(equalToConstant: TRACK_HEIGHT).isActive = true
+        trackViewController.view.widthAnchor.constraint(equalTo: view.widthAnchor, constant: -2*LEFT_RIGHT_PADDING).isActive = true
+        trackViewController.didMove(toParent: self)
     }
     
     @objc func selectVideo() {
@@ -192,9 +199,10 @@ class VideoEditorViewController: UIViewController, UIImagePickerControllerDelega
             } catch {
                 print(error.localizedDescription)
             }
+            trackViewController.loadAsset(asset: asset, assetRange: assetRange)
         }
         picker.dismiss(animated: true)
-        trackView.loadAsset(asset: movie)
+//        trackView.loadAsset(asset: movie)
         
         playerLayer?.removeFromSuperlayer()
         playerLayer = nil

@@ -32,13 +32,22 @@
 		664C2C442610D0B3002301A0 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664C2C432610D0B3002301A0 /* MainView.swift */; };
 		664E4DE827E6872100BD21E1 /* RecordingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664E4DE727E6872100BD21E1 /* RecordingViewController.swift */; };
 		664E4DEA27E984E400BD21E1 /* AudioPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664E4DE927E984E400BD21E1 /* AudioPlayerView.swift */; };
+		665685702A0333E300DD749E /* TrackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6656856F2A0333E300DD749E /* TrackView.swift */; };
 		666C30F526652506003DCAB6 /* LeaderBoardNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 666C30F426652506003DCAB6 /* LeaderBoardNavigation.swift */; };
 		667FD6D8277FCF5D0075DC04 /* DebugViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667FD6D7277FCF5D0075DC04 /* DebugViewController.swift */; };
+		6687F2932A10077F00382F44 /* WaveFormLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6687F2922A10077F00382F44 /* WaveFormLayer.swift */; };
+		6687F2972A11A8D800382F44 /* TrackViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6687F2962A11A8D800382F44 /* TrackViewController.swift */; };
+		6687F2992A13CEC100382F44 /* TrackItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6687F2982A13CEC100382F44 /* TrackItemView.swift */; };
+		6687F29B2A17302400382F44 /* TrackAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6687F29A2A17302300382F44 /* TrackAsset.swift */; };
+		6687F29D2A1AD90900382F44 /* TrackEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6687F29C2A1AD90800382F44 /* TrackEditView.swift */; };
 		668AAFEF265B099C0083CB5B /* UserInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 668AAFEE265B099C0083CB5B /* UserInfoViewController.swift */; };
 		6692E5FC27F9CAD600180A0F /* AudioLabelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6692E5FB27F9CAD600180A0F /* AudioLabelView.swift */; };
 		6692E5FE27FA5DA800180A0F /* AudioFileCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6692E5FD27FA5DA800180A0F /* AudioFileCell.swift */; };
 		66A4B1AE269246FA00FA38CB /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A4B1AD269246FA00FA38CB /* LoginViewController.swift */; };
 		66A4F650266035CF002985BA /* CalendarCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A4F64F266035CF002985BA /* CalendarCell.swift */; };
+		66A973072A0A9939006D2D8D /* FDAudioContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A973062A0A9939006D2D8D /* FDAudioContext.swift */; };
+		66A973092A0A993D006D2D8D /* FDWaveformRenderOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A973082A0A993D006D2D8D /* FDWaveformRenderOperation.swift */; };
+		66A9730B2A0A9941006D2D8D /* FDWaveformView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A9730A2A0A9940006D2D8D /* FDWaveformView.swift */; };
 		66AC52C326B87332005ED27F /* half_rest.svg in Resources */ = {isa = PBXBuildFile; fileRef = 66AC52C126B87332005ED27F /* half_rest.svg */; };
 		66AC52C626B87885005ED27F /* crotchet_rest.svg in Resources */ = {isa = PBXBuildFile; fileRef = 66AC52C526B87885005ED27F /* crotchet_rest.svg */; };
 		66AC52C826B87A49005ED27F /* whole_rest.svg in Resources */ = {isa = PBXBuildFile; fileRef = 66AC52C726B87A49005ED27F /* whole_rest.svg */; };
@@ -124,14 +133,23 @@
 		664E4DE727E6872100BD21E1 /* RecordingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingViewController.swift; sourceTree = "<group>"; };
 		664E4DE927E984E400BD21E1 /* AudioPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlayerView.swift; sourceTree = "<group>"; };
 		6650B723278CEE7100E420D5 /* xcframework.mk */ = {isa = PBXFileReference; lastKnownFileType = text; name = xcframework.mk; path = ../SFBAudioEngine/XCFrameworks/xcframework.mk; sourceTree = "<group>"; };
+		6656856F2A0333E300DD749E /* TrackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackView.swift; sourceTree = "<group>"; };
 		6656DF2027952EA7006A0FBE /* lingling wannabe-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "lingling wannabe-Bridging-Header.h"; sourceTree = "<group>"; };
 		666C30F426652506003DCAB6 /* LeaderBoardNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeaderBoardNavigation.swift; sourceTree = "<group>"; };
 		667FD6D7277FCF5D0075DC04 /* DebugViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugViewController.swift; sourceTree = "<group>"; };
+		6687F2922A10077F00382F44 /* WaveFormLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaveFormLayer.swift; sourceTree = "<group>"; };
+		6687F2962A11A8D800382F44 /* TrackViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackViewController.swift; sourceTree = "<group>"; };
+		6687F2982A13CEC100382F44 /* TrackItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackItemView.swift; sourceTree = "<group>"; };
+		6687F29A2A17302300382F44 /* TrackAsset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackAsset.swift; sourceTree = "<group>"; };
+		6687F29C2A1AD90800382F44 /* TrackEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackEditView.swift; sourceTree = "<group>"; };
 		668AAFEE265B099C0083CB5B /* UserInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInfoViewController.swift; sourceTree = "<group>"; };
 		6692E5FB27F9CAD600180A0F /* AudioLabelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioLabelView.swift; sourceTree = "<group>"; };
 		6692E5FD27FA5DA800180A0F /* AudioFileCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioFileCell.swift; sourceTree = "<group>"; };
 		66A4B1AD269246FA00FA38CB /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		66A4F64F266035CF002985BA /* CalendarCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarCell.swift; sourceTree = "<group>"; };
+		66A973062A0A9939006D2D8D /* FDAudioContext.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FDAudioContext.swift; sourceTree = "<group>"; };
+		66A973082A0A993D006D2D8D /* FDWaveformRenderOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FDWaveformRenderOperation.swift; sourceTree = "<group>"; };
+		66A9730A2A0A9940006D2D8D /* FDWaveformView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FDWaveformView.swift; sourceTree = "<group>"; };
 		66AC52C126B87332005ED27F /* half_rest.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = half_rest.svg; sourceTree = "<group>"; };
 		66AC52C526B87885005ED27F /* crotchet_rest.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = crotchet_rest.svg; sourceTree = "<group>"; };
 		66AC52C726B87A49005ED27F /* whole_rest.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = whole_rest.svg; sourceTree = "<group>"; };
@@ -256,6 +274,17 @@
 			path = Notations;
 			sourceTree = "<group>";
 		};
+		6687F29E2A1AD91400382F44 /* Track */ = {
+			isa = PBXGroup;
+			children = (
+				6687F2962A11A8D800382F44 /* TrackViewController.swift */,
+				6687F29C2A1AD90800382F44 /* TrackEditView.swift */,
+				6687F2982A13CEC100382F44 /* TrackItemView.swift */,
+				6687F29A2A17302300382F44 /* TrackAsset.swift */,
+			);
+			path = Track;
+			sourceTree = "<group>";
+		};
 		66A4F65726603712002985BA /* Calendar */ = {
 			isa = PBXGroup;
 			children = (
@@ -263,6 +292,16 @@
 				66EA953B26603AA800B59721 /* CalendarData.swift */,
 			);
 			path = Calendar;
+			sourceTree = "<group>";
+		};
+		66A973052A0A98CA006D2D8D /* FDWaveView */ = {
+			isa = PBXGroup;
+			children = (
+				66A973062A0A9939006D2D8D /* FDAudioContext.swift */,
+				66A973082A0A993D006D2D8D /* FDWaveformRenderOperation.swift */,
+				66A9730A2A0A9940006D2D8D /* FDWaveformView.swift */,
+			);
+			path = FDWaveView;
 			sourceTree = "<group>";
 		};
 		66ADE59B25BE2B0A004B20C6 = {
@@ -298,6 +337,9 @@
 				667FD6D7277FCF5D0075DC04 /* DebugViewController.swift */,
 				66B4368F29DE233D007B9B5A /* AVRecorderViewController.swift */,
 				66B4369129F5AB26007B9B5A /* VideoEditorViewController.swift */,
+				6656856F2A0333E300DD749E /* TrackView.swift */,
+				6687F29E2A1AD91400382F44 /* Track */,
+				6687F2922A10077F00382F44 /* WaveFormLayer.swift */,
 				66B6D68426D54C1D0001F6B5 /* DataManager.swift */,
 				66E0478C27B84CA50074935A /* FilesManager.swift */,
 				66FDECEB2607D10900FB9019 /* ResultDelegate.swift */,
@@ -325,6 +367,7 @@
 				662904F226A8911400342E3D /* Notations */,
 				66ADE5B225BE2B0B004B20C6 /* LaunchScreen.storyboard */,
 				66ADE5B525BE2B0B004B20C6 /* Info.plist */,
+				66A973052A0A98CA006D2D8D /* FDWaveView */,
 				66BBDD5B260A857C008E54EC /* MSCircularSlider */,
 			);
 			path = "lingling wannabe";
@@ -603,7 +646,9 @@
 				66E0478D27B84CA60074935A /* FilesManager.swift in Sources */,
 				66ADE5AC25BE2B0A004B20C6 /* MainViewController.swift in Sources */,
 				66D08643266AC76E0089C833 /* LeaderBoardTableViewController.swift in Sources */,
+				6687F2932A10077F00382F44 /* WaveFormLayer.swift in Sources */,
 				66BBDD67260A85D8008E54EC /* MSDoubleHandleCircularSlider.swift in Sources */,
+				6687F2972A11A8D800382F44 /* TrackViewController.swift in Sources */,
 				66ADE5A825BE2B0A004B20C6 /* AppDelegate.swift in Sources */,
 				66BBDD62260A85CB008E54EC /* MSCircularSliderHandle.swift in Sources */,
 				66EC2F9A263EFF6400F700E5 /* PracticeViewController.swift in Sources */,
@@ -612,29 +657,36 @@
 				6620FA4C2652BD65009E9D86 /* FloatViewDelegate.swift in Sources */,
 				66ADE5AA25BE2B0A004B20C6 /* SceneDelegate.swift in Sources */,
 				66A4B1AE269246FA00FA38CB /* LoginViewController.swift in Sources */,
+				6687F2992A13CEC100382F44 /* TrackItemView.swift in Sources */,
 				66BBDD5D260A85C4008E54EC /* MSCircularSlider.swift in Sources */,
 				664C2C442610D0B3002301A0 /* MainView.swift in Sources */,
 				6617083F27EEA12700B56A23 /* AudioRecorderDelegate.swift in Sources */,
 				66E7604D2752E30C00FD0E0F /* LayerRemover.swift in Sources */,
 				66C957E426514D90008C5B7F /* Metronome.swift in Sources */,
+				66A973092A0A993D006D2D8D /* FDWaveformRenderOperation.swift in Sources */,
+				6687F29D2A1AD90900382F44 /* TrackEditView.swift in Sources */,
 				66FFF8F027F8E0A00045568E /* SettingDelegate.swift in Sources */,
 				666C30F526652506003DCAB6 /* LeaderBoardNavigation.swift in Sources */,
 				66A4F650266035CF002985BA /* CalendarCell.swift in Sources */,
 				66B4369229F5AB26007B9B5A /* VideoEditorViewController.swift in Sources */,
 				66BBDD6C260A85E0008E54EC /* MSGradientCircularSlider.swift in Sources */,
 				66B4369029DE233D007B9B5A /* AVRecorderViewController.swift in Sources */,
+				6687F29B2A17302400382F44 /* TrackAsset.swift in Sources */,
+				66A973072A0A9939006D2D8D /* FDAudioContext.swift in Sources */,
 				66DCD97227C5D47800BF768D /* InstrumentSelectionViewController.swift in Sources */,
 				66EA953C26603AA800B59721 /* CalendarData.swift in Sources */,
 				6692E5FC27F9CAD600180A0F /* AudioLabelView.swift in Sources */,
 				6614E767269E2A61007C75A5 /* FourierSeries.swift in Sources */,
 				667FD6D8277FCF5D0075DC04 /* DebugViewController.swift in Sources */,
 				66D0864B266C07540089C833 /* LeaderBoardCell.swift in Sources */,
+				665685702A0333E300DD749E /* TrackView.swift in Sources */,
 				664E4DE827E6872100BD21E1 /* RecordingViewController.swift in Sources */,
 				661F81772773B7AC00FC0A64 /* CredentialManager.swift in Sources */,
 				66E0478F27B899A40074935A /* TutorialView.swift in Sources */,
 				664E4DEA27E984E400BD21E1 /* AudioPlayerView.swift in Sources */,
 				66C099FB26693AA9008F892D /* LeaderBoardViewController.swift in Sources */,
 				66FFF8ED27F8DA370045568E /* SettingViewController.swift in Sources */,
+				66A9730B2A0A9941006D2D8D /* FDWaveformView.swift in Sources */,
 				66FDECE72607CFC500FB9019 /* TwoCategory.mlmodel in Sources */,
 				66FDECEC2607D10900FB9019 /* ResultDelegate.swift in Sources */,
 			);
