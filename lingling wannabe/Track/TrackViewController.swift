@@ -27,7 +27,9 @@ class TrackViewController: UIViewController {
             if let editView = currentEditView {
                 editContainerView.addSubview(editView)
                 leftHandleView.alpha = 1
+                editContainerView.bringSubviewToFront(leftHandleView)
                 rightHandleView.alpha = 1
+                editContainerView.bringSubviewToFront(rightHandleView)
             } else {
                 leftHandleView.alpha = 0
                 rightHandleView.alpha = 0
@@ -62,7 +64,8 @@ class TrackViewController: UIViewController {
     
     private var assets: [TrackAsset] = []
     
-    static let HANDLE_WIDTH: CGFloat = 8
+    static let HANDLE_WIDTH: CGFloat = 12
+    
     static let DEFAULT_COLOR: UIColor = .gray
 
     required init?(coder: NSCoder) {
@@ -86,7 +89,7 @@ class TrackViewController: UIViewController {
         editContainerView.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
         editContainerView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.5).isActive = true
         
-        let backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.5)
+        let backgroundColor = UIColor(red: 0.5, green: 0.5, blue: 0.5, alpha: 0.5)
         
         leftHandleView.image = UIImage(systemName: "lessthan")?.withTintColor(.white, renderingMode: .alwaysOriginal)
         leftHandleView.backgroundColor = backgroundColor
@@ -96,6 +99,9 @@ class TrackViewController: UIViewController {
         leftHandleView.heightAnchor.constraint(equalTo: editContainerView.heightAnchor).isActive = true
         leftHandleConstraint.isActive = true
         leftHandleView.alpha = 0
+        leftHandleView.isUserInteractionEnabled = true
+        let leftPan = UIPanGestureRecognizer(target: self, action: #selector(handleLeftHandlerPan))
+        leftHandleView.addGestureRecognizer(leftPan)
         
         rightHandleView.image = UIImage(systemName: "greaterthan")?.withTintColor(.white, renderingMode: .alwaysOriginal)
         rightHandleView.backgroundColor = backgroundColor
@@ -105,6 +111,9 @@ class TrackViewController: UIViewController {
         rightHandleView.heightAnchor.constraint(equalTo: editContainerView.heightAnchor).isActive = true
         rightHandleConstraint.isActive = true
         rightHandleView.alpha = 0
+        rightHandleView.isUserInteractionEnabled = true
+        let rightPan = UIPanGestureRecognizer(target: self, action: #selector(handleRightHandlerPan))
+        rightHandleView.addGestureRecognizer(rightPan)
     }
     
     override func viewDidLoad() {
@@ -160,6 +169,24 @@ class TrackViewController: UIViewController {
         return nil
     }
     
+    @objc func handleRightHandlerPan(_ recognizer: UIPanGestureRecognizer) {
+        let translation = recognizer.translation(in: editContainerView)
+        let newX = rightHandleConstraint.constant + translation.x
+        if newX >= leftHandleConstraint.constant && newX <= editContainerView.frame.width - TrackViewController.HANDLE_WIDTH {
+            rightHandleConstraint.constant = newX
+        }
+        recognizer.setTranslation(.zero, in: editContainerView)
+    }
+    
+    @objc func handleLeftHandlerPan(_ recognizer: UIPanGestureRecognizer) {
+        let translation = recognizer.translation(in: editContainerView)
+        let newX = leftHandleConstraint.constant + translation.x
+        if newX >= TrackViewController.HANDLE_WIDTH && newX <= rightHandleConstraint.constant {
+            leftHandleConstraint.constant = newX
+        }
+        recognizer.setTranslation(.zero, in: editContainerView)
+    }
+    
     
     // TODO: to enable reorder, maybe use UICollectionView instead of stacked view
     @objc func handleLongPress(_ recognizer: UILongPressGestureRecognizer) {
@@ -184,5 +211,4 @@ class TrackViewController: UIViewController {
         trackView.addArrangedSubview(item)
         assets.append(TrackAsset(asset: asset, assetTimeRange: assetRange, trackTimeRange: assetRange))
     }
-    
 }

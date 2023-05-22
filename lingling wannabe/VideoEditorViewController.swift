@@ -6,6 +6,7 @@
 //
 
 import AVFoundation
+import AVKit
 import UIKit
 import MobileCoreServices
 
@@ -17,11 +18,14 @@ class VideoEditorViewController: UIViewController, UIImagePickerControllerDelega
     private var end = CMTime.zero
     
     private let player = AVPlayer()
-    private var playerLayer: AVPlayerLayer?
     private let picker = UIImagePickerController()
+    private let playerView = UIView()
+    
+    private let testvc = AVPlayerViewController()
     
     private let selectButton = UIButton()
     private let exportButton = UIButton()
+    private let backButton = UIButton()
     private let trackViewController: TrackViewController
     
     private var assets: [UIView] = []
@@ -57,36 +61,50 @@ class VideoEditorViewController: UIViewController, UIImagePickerControllerDelega
         videoComposition.renderSize = CGSize(width: WIDTH, height: HEIGHT)
     }
 
+    private func styleButton(button: UIButton, text: String) {
+        button.setTitle(text, for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        button.layer.borderColor = UIColor.white.cgColor
+        button.layer.borderWidth = 1
+        button.layer.cornerRadius = 10
+    }
     
     override func loadView() {
         super.loadView()
         let view = UIView()
-        view.backgroundColor = .white
+        view.backgroundColor = UIColor(red: 0.15, green: 0.15, blue: 0.15, alpha: 1)
         
-        selectButton.setTitle("select", for: .normal)
-        selectButton.setTitleColor(.black, for: .normal)
-        selectButton.addTarget(self, action: #selector(VideoEditorViewController.selectVideo), for: .touchUpInside)
-        selectButton.layer.borderColor = UIColor.black.cgColor
-        selectButton.layer.borderWidth = 1
-        selectButton.layer.cornerRadius = 10
-        view.addSubview(selectButton)
-        selectButton.translatesAutoresizingMaskIntoConstraints = false
-        selectButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: LEFT_RIGHT_PADDING).isActive = true
-        selectButton.topAnchor.constraint(equalTo: view.topAnchor, constant: TOP_PADDING).isActive = true
-        selectButton.widthAnchor.constraint(equalToConstant: 60).isActive = true
+        backButton.addTarget(self, action: #selector(VideoEditorViewController.back), for: .touchUpInside)
+        styleButton(button: backButton, text: "back")
+        view.addSubview(backButton)
+        backButton.translatesAutoresizingMaskIntoConstraints = false
+        backButton.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: LEFT_RIGHT_PADDING).isActive = true
+        backButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: TOP_PADDING).isActive = true
+        backButton.widthAnchor.constraint(equalToConstant: 60).isActive = true
         
-        exportButton.setTitle("export", for: .normal)
-        exportButton.setTitleColor(.black, for: .normal)
-        exportButton.addTarget(self, action: #selector(VideoEditorViewController.removeTest), for: .touchUpInside)
-        exportButton.layer.borderColor = UIColor.black.cgColor
-        exportButton.layer.borderWidth = 1
-        exportButton.layer.cornerRadius = 10
+        exportButton.addTarget(self, action: #selector(VideoEditorViewController.exportVideo), for: .touchUpInside)
+        styleButton(button: exportButton, text: "export")
         view.addSubview(exportButton)
         exportButton.translatesAutoresizingMaskIntoConstraints = false
-        exportButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -LEFT_RIGHT_PADDING).isActive = true
-        exportButton.topAnchor.constraint(equalTo: view.topAnchor, constant: TOP_PADDING).isActive = true
+        exportButton.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: -LEFT_RIGHT_PADDING).isActive = true
+        exportButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: TOP_PADDING).isActive = true
         exportButton.widthAnchor.constraint(equalToConstant: 60).isActive = true
-
+        
+        selectButton.addTarget(self, action: #selector(VideoEditorViewController.selectVideo), for: .touchUpInside)
+        styleButton(button: selectButton, text: "select")
+        view.addSubview(selectButton)
+        selectButton.translatesAutoresizingMaskIntoConstraints = false
+        selectButton.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: -LEFT_RIGHT_PADDING).isActive = true
+        selectButton.topAnchor.constraint(equalTo: exportButton.bottomAnchor, constant: BOT_PADDING).isActive = true
+        selectButton.widthAnchor.constraint(equalToConstant: 60).isActive = true
+        
+        view.addSubview(playerView)
+        playerView.translatesAutoresizingMaskIntoConstraints = false
+        playerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: TOP_PADDING).isActive = true
+        playerView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -BOT_PADDING-TRACK_HEIGHT).isActive = true
+        playerView.leftAnchor.constraint(equalTo: backButton.rightAnchor, constant: LEFT_RIGHT_PADDING).isActive = true
+        playerView.rightAnchor.constraint(equalTo: exportButton.leftAnchor, constant: -LEFT_RIGHT_PADDING).isActive = true
+        
         self.view = view
     }
     
@@ -101,6 +119,16 @@ class VideoEditorViewController: UIViewController, UIImagePickerControllerDelega
         trackViewController.view.heightAnchor.constraint(equalToConstant: TRACK_HEIGHT).isActive = true
         trackViewController.view.widthAnchor.constraint(equalTo: view.widthAnchor, constant: -2*LEFT_RIGHT_PADDING).isActive = true
         trackViewController.didMove(toParent: self)
+        
+        testvc.player = player
+        addChild(testvc)
+        view.addSubview(testvc.view)
+        testvc.view.translatesAutoresizingMaskIntoConstraints = false
+        testvc.view.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: TOP_PADDING).isActive = true
+        testvc.view.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -BOT_PADDING-TRACK_HEIGHT).isActive = true
+        testvc.view.leftAnchor.constraint(equalTo: backButton.rightAnchor, constant: LEFT_RIGHT_PADDING).isActive = true
+        testvc.view.rightAnchor.constraint(equalTo: exportButton.leftAnchor, constant: -LEFT_RIGHT_PADDING).isActive = true
+        testvc.didMove(toParent: self)
     }
     
     @objc func selectVideo() {
@@ -108,12 +136,8 @@ class VideoEditorViewController: UIViewController, UIImagePickerControllerDelega
         present(picker, animated: true)
     }
     
-    @objc func removeTest() {
-        print(movie.duration)
-        let timeRange = CMTimeRange(start: CMTimeMakeWithSeconds(2, preferredTimescale: 1000), duration: CMTimeMakeWithSeconds(5, preferredTimescale: 1000))
-        videoTrack?.removeTimeRange(timeRange)
-        audioTrack?.removeTimeRange(timeRange)
-        print(movie.duration)
+    @objc func back() {
+        presentingViewController?.dismiss(animated: true)
     }
     
     @objc func exportVideo() {
@@ -204,17 +228,15 @@ class VideoEditorViewController: UIViewController, UIImagePickerControllerDelega
         picker.dismiss(animated: true)
 //        trackView.loadAsset(asset: movie)
         
-        playerLayer?.removeFromSuperlayer()
-        playerLayer = nil
         let playerItem = AVPlayerItem(asset: movie)
-        
         playerItem.videoComposition = videoComposition
         player.replaceCurrentItem(with: playerItem)
-        playerLayer = AVPlayerLayer(player: player)
-        playerLayer!.frame = CGRect(x: 10, y: 50, width: view.frame.width-LEFT_RIGHT_PADDING*2, height: view.frame.height-50-TRACK_HEIGHT-LEFT_RIGHT_PADDING-TOP_PADDING)
-        playerLayer!.videoGravity = .resizeAspect
-        view.layer.addSublayer(playerLayer!)
+        print(testvc.view.frame, testvc.videoBounds, testvc.view.bounds)
         player.play()
+    }
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return UIStatusBarStyle.lightContent
     }
 }
 

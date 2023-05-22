@@ -39,7 +39,6 @@
 		6687F2972A11A8D800382F44 /* TrackViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6687F2962A11A8D800382F44 /* TrackViewController.swift */; };
 		6687F2992A13CEC100382F44 /* TrackItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6687F2982A13CEC100382F44 /* TrackItemView.swift */; };
 		6687F29B2A17302400382F44 /* TrackAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6687F29A2A17302300382F44 /* TrackAsset.swift */; };
-		6687F29D2A1AD90900382F44 /* TrackEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6687F29C2A1AD90800382F44 /* TrackEditView.swift */; };
 		668AAFEF265B099C0083CB5B /* UserInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 668AAFEE265B099C0083CB5B /* UserInfoViewController.swift */; };
 		6692E5FC27F9CAD600180A0F /* AudioLabelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6692E5FB27F9CAD600180A0F /* AudioLabelView.swift */; };
 		6692E5FE27FA5DA800180A0F /* AudioFileCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6692E5FD27FA5DA800180A0F /* AudioFileCell.swift */; };
@@ -141,7 +140,6 @@
 		6687F2962A11A8D800382F44 /* TrackViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackViewController.swift; sourceTree = "<group>"; };
 		6687F2982A13CEC100382F44 /* TrackItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackItemView.swift; sourceTree = "<group>"; };
 		6687F29A2A17302300382F44 /* TrackAsset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackAsset.swift; sourceTree = "<group>"; };
-		6687F29C2A1AD90800382F44 /* TrackEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackEditView.swift; sourceTree = "<group>"; };
 		668AAFEE265B099C0083CB5B /* UserInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInfoViewController.swift; sourceTree = "<group>"; };
 		6692E5FB27F9CAD600180A0F /* AudioLabelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioLabelView.swift; sourceTree = "<group>"; };
 		6692E5FD27FA5DA800180A0F /* AudioFileCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioFileCell.swift; sourceTree = "<group>"; };
@@ -278,7 +276,6 @@
 			isa = PBXGroup;
 			children = (
 				6687F2962A11A8D800382F44 /* TrackViewController.swift */,
-				6687F29C2A1AD90800382F44 /* TrackEditView.swift */,
 				6687F2982A13CEC100382F44 /* TrackItemView.swift */,
 				6687F29A2A17302300382F44 /* TrackAsset.swift */,
 			);
@@ -664,7 +661,6 @@
 				66E7604D2752E30C00FD0E0F /* LayerRemover.swift in Sources */,
 				66C957E426514D90008C5B7F /* Metronome.swift in Sources */,
 				66A973092A0A993D006D2D8D /* FDWaveformRenderOperation.swift in Sources */,
-				6687F29D2A1AD90900382F44 /* TrackEditView.swift in Sources */,
 				66FFF8F027F8E0A00045568E /* SettingDelegate.swift in Sources */,
 				666C30F526652506003DCAB6 /* LeaderBoardNavigation.swift in Sources */,
 				66A4F650266035CF002985BA /* CalendarCell.swift in Sources */,

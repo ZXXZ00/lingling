@@ -300,6 +300,7 @@ class MainViewController: UIViewController {
 //        present(tt, animated: true)
         
         let vv = VideoEditorViewController()
+        vv.modalPresentationStyle = .fullScreen
         present(vv, animated: true)
         
         

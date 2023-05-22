@@ -36,6 +36,7 @@ class TrackItemView: FDWaveformView {
         editView.doesAllowScrubbing = false
         editView.doesAllowStretch = false
         editView.doesAllowScroll = false
+        editView.wavesColor = .white
         editView.waveformType = .linear
         editView.frame = CGRect(x: TrackViewController.HANDLE_WIDTH, y: 0, width: size.width - 2*TrackViewController.HANDLE_WIDTH, height: size.height)
     }
