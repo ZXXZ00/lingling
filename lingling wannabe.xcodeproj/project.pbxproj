@@ -39,6 +39,8 @@
 		6687F2972A11A8D800382F44 /* TrackViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6687F2962A11A8D800382F44 /* TrackViewController.swift */; };
 		6687F2992A13CEC100382F44 /* TrackItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6687F2982A13CEC100382F44 /* TrackItemView.swift */; };
 		6687F29B2A17302400382F44 /* TrackAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6687F29A2A17302300382F44 /* TrackAsset.swift */; };
+		6687F2A02A1E56A800382F44 /* ToolBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6687F29F2A1E56A800382F44 /* ToolBarView.swift */; };
+		6687F2A22A1E63C200382F44 /* TrackViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6687F2A12A1E63C200382F44 /* TrackViewControllerDelegate.swift */; };
 		668AAFEF265B099C0083CB5B /* UserInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 668AAFEE265B099C0083CB5B /* UserInfoViewController.swift */; };
 		6692E5FC27F9CAD600180A0F /* AudioLabelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6692E5FB27F9CAD600180A0F /* AudioLabelView.swift */; };
 		6692E5FE27FA5DA800180A0F /* AudioFileCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6692E5FD27FA5DA800180A0F /* AudioFileCell.swift */; };
@@ -140,6 +142,8 @@
 		6687F2962A11A8D800382F44 /* TrackViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackViewController.swift; sourceTree = "<group>"; };
 		6687F2982A13CEC100382F44 /* TrackItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackItemView.swift; sourceTree = "<group>"; };
 		6687F29A2A17302300382F44 /* TrackAsset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackAsset.swift; sourceTree = "<group>"; };
+		6687F29F2A1E56A800382F44 /* ToolBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolBarView.swift; sourceTree = "<group>"; };
+		6687F2A12A1E63C200382F44 /* TrackViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackViewControllerDelegate.swift; sourceTree = "<group>"; };
 		668AAFEE265B099C0083CB5B /* UserInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInfoViewController.swift; sourceTree = "<group>"; };
 		6692E5FB27F9CAD600180A0F /* AudioLabelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioLabelView.swift; sourceTree = "<group>"; };
 		6692E5FD27FA5DA800180A0F /* AudioFileCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioFileCell.swift; sourceTree = "<group>"; };
@@ -276,6 +280,7 @@
 			isa = PBXGroup;
 			children = (
 				6687F2962A11A8D800382F44 /* TrackViewController.swift */,
+				6687F2A12A1E63C200382F44 /* TrackViewControllerDelegate.swift */,
 				6687F2982A13CEC100382F44 /* TrackItemView.swift */,
 				6687F29A2A17302300382F44 /* TrackAsset.swift */,
 			);
@@ -334,6 +339,7 @@
 				667FD6D7277FCF5D0075DC04 /* DebugViewController.swift */,
 				66B4368F29DE233D007B9B5A /* AVRecorderViewController.swift */,
 				66B4369129F5AB26007B9B5A /* VideoEditorViewController.swift */,
+				6687F29F2A1E56A800382F44 /* ToolBarView.swift */,
 				6656856F2A0333E300DD749E /* TrackView.swift */,
 				6687F29E2A1AD91400382F44 /* Track */,
 				6687F2922A10077F00382F44 /* WaveFormLayer.swift */,
@@ -683,6 +689,8 @@
 				66C099FB26693AA9008F892D /* LeaderBoardViewController.swift in Sources */,
 				66FFF8ED27F8DA370045568E /* SettingViewController.swift in Sources */,
 				66A9730B2A0A9941006D2D8D /* FDWaveformView.swift in Sources */,
+				6687F2A02A1E56A800382F44 /* ToolBarView.swift in Sources */,
+				6687F2A22A1E63C200382F44 /* TrackViewControllerDelegate.swift in Sources */,
 				66FDECE72607CFC500FB9019 /* TwoCategory.mlmodel in Sources */,
 				66FDECEC2607D10900FB9019 /* ResultDelegate.swift in Sources */,
 			);

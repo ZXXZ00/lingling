@@ -111,6 +111,8 @@ class VideoEditorViewController: UIViewController, UIImagePickerControllerDelega
     }
     
     @objc func back() {
+        player.pause()
+        player.replaceCurrentItem(with: nil)
         presentingViewController?.dismiss(animated: true)
     }
     
@@ -119,7 +121,6 @@ class VideoEditorViewController: UIViewController, UIImagePickerControllerDelega
         let exporter = AVAssetExportSession(asset: movie, presetName: AVAssetExportPresetHighestQuality)
         exporter?.outputURL = getDocumentDirectory().appendingPathComponent("june3_.mov")
         exporter?.outputFileType = .mov
-        exporter?.videoComposition = videoComposition
         exporter?.exportAsynchronously {
             print("export finished")
             print(exporter?.status.rawValue)
@@ -190,7 +191,7 @@ class VideoEditorViewController: UIViewController, UIImagePickerControllerDelega
         playerLayer?.removeFromSuperlayer()
         playerLayer = nil
         let playerItem = AVPlayerItem(asset: movie)
-        playerItem.videoComposition = videoComposition
+//        playerItem.videoComposition = videoComposition
         player.replaceCurrentItem(with: playerItem)
         // IDK why creating AVPlayerLayer works
         // but if I delete the line, the playback will only be video+audio of first item and audio for the rest
@@ -205,18 +206,18 @@ class VideoEditorViewController: UIViewController, UIImagePickerControllerDelega
             let assetRange = CMTimeRangeMake(start: .zero, duration: asset.duration)
             let aTrack = asset.tracks(withMediaType: .audio).first!
             let vTrack = asset.tracks(withMediaType: .video).first!
-//            if orientationFromTransform(transform: vTrack.preferredTransform).isPortrait {
-//                videoTrack?.preferredTransform = vTrack.preferredTransform
-//            } else {
-//                print("ONLY SUPPORT POTRAIT")
-//                // TODO: add popup warning
-//                return
-//            }
+            if orientationFromTransform(transform: vTrack.preferredTransform).isPortrait {
+                videoTrack?.preferredTransform = vTrack.preferredTransform
+            } else {
+                print("ONLY SUPPORT POTRAIT")
+                // TODO: add popup warning
+                return
+            }
             do {
                 try audioTrack?.insertTimeRange(assetRange, of: aTrack, at: end)
                 try videoTrack?.insertTimeRange(assetRange, of: vTrack, at: end)
-                let instruction = videoCompositionInstruction(track: videoTrack!, asset: asset, start: end, duration: asset.duration)
-                videoComposition.instructions.append(instruction)
+//                let instruction = videoCompositionInstruction(track: videoTrack!, asset: asset, start: end, duration: asset.duration)
+//                videoComposition.instructions.append(instruction)
                 end = CMTimeAdd(end, asset.duration)
             } catch {
                 print(error.localizedDescription)
@@ -231,11 +232,22 @@ class VideoEditorViewController: UIViewController, UIImagePickerControllerDelega
     }
     
     @objc func deleteAsset() {
-        guard let (idx, removed) = trackViewController.deleteSelected() else { return }
+        guard let removed = trackViewController.deleteSelected() else { return }
         player.pause()
         movie.removeTimeRange(removed)
-        videoComposition = videoComposition.removeTimeRange(removed)
+//        videoComposition = videoComposition.removeTimeRange(removed)
         end = CMTimeSubtract(end, removed.duration)
+        reloadPlayer()
+    }
+    
+    @objc func trimAsset() {
+        guard let (left, right) = trackViewController.trim() else { return }
+        player.pause()
+        // must delete right first
+        // otherwise deleting left will change the section right should delete
+        movie.removeTimeRange(right)
+        movie.removeTimeRange(left)
+        end = CMTimeSubtract(end, left.duration + right.duration)
         reloadPlayer()
     }
     
@@ -248,6 +260,12 @@ extension VideoEditorViewController: TrackViewControllerDelegate {
     
     func didSelectView(view: TrackItemView) {
         toolBarView.deleteButton.alpha = 1
+        toolBarView.checkButton.alpha = 1
+    }
+    
+    func didUnselect() {
+        toolBarView.deleteButton.alpha = 0
+        toolBarView.checkButton.alpha = 0
     }
 }
 

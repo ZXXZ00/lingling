@@ -17,6 +17,7 @@ class TrackViewController: UIViewController {
             widthConstraint.constant = itemWidth * CGFloat(trackView.arrangedSubviews.count)
         }
     }
+    weak var delegate: TrackViewControllerDelegate?
     
     let editContainerView = UIView()
     let leftHandleView = UIImageView()
@@ -54,13 +55,30 @@ class TrackViewController: UIViewController {
     private let widthConstraint: NSLayoutConstraint
     private let leftHandleConstraint: NSLayoutConstraint
     private let rightHandleConstraint: NSLayoutConstraint
-    private var selectedView: TrackItemView? = nil {
+    private var _selectedView: TrackItemView? = nil {
         didSet {
+            guard oldValue?.index != _selectedView?.index else { return }
             oldValue?.backgroundColor = TrackViewController.DEFAULT_COLOR
-            selectedView?.backgroundColor = .systemRed
-            currentEditView = selectedView?.editView
+            _selectedView?.backgroundColor = .systemRed
+            currentEditView = _selectedView?.editView
+            if let selected = _selectedView {
+                delegate?.didSelectView(view: selected)
+            } else {
+                delegate?.didUnselect()
+            }
         }
     }
+    var selectedView: TrackItemView? {
+        get { return _selectedView }
+    }
+    private var currentPlayingView: TrackItemView? = nil {
+        didSet {
+            guard oldValue?.index != currentPlayingView?.index else { return }
+            oldValue?.backgroundColor = TrackViewController.DEFAULT_COLOR
+            currentPlayingView?.backgroundColor = .red
+        }
+    }
+    private var playerObserver: Any?
     
     private var assets: [TrackAsset] = []
     
@@ -78,6 +96,9 @@ class TrackViewController: UIViewController {
         leftHandleConstraint = leftHandleView.rightAnchor.constraint(equalTo: editContainerView.leftAnchor)
         rightHandleConstraint = rightHandleView.leftAnchor.constraint(equalTo: editContainerView.leftAnchor)
         super.init(nibName: nil, bundle: nil)
+        playerObserver = player.addPeriodicTimeObserver(forInterval: CMTime(value: 1, timescale: 3), queue: .main) { [weak self] _ in
+            self?.updateCurrentPlayingItem()
+        }
     }
     
     private func setUpEditView() {
@@ -142,25 +163,28 @@ class TrackViewController: UIViewController {
         trackView.addGestureRecognizer(tapGesture)
     }
     
-    @objc func handleTouch(_ recognizer: UITapGestureRecognizer) {
-        let location = recognizer.location(in: trackView)
-        selectedView = getSelectedView(in: location)
-        guard let selectedView = selectedView else {
-            return
-        }
-        let asset = assets[selectedView.index]
+    private func calculateZoomSamples(asset: TrackAsset, totalSamples: Int) -> Range<Int> {
         let duration = asset.asset.duration.seconds
         let start = asset.assetTimeRange.start.seconds / duration
         let end = asset.assetTimeRange.end.seconds / duration
                 
-        let totalSamples = Double(selectedView.totalSamples)
-        selectedView.editView.zoomSamples = Int(start*totalSamples) ..< Int(end*totalSamples)
+        return Int(start*Double(totalSamples)) ..< Int(end*Double(totalSamples))
+    }
+    
+    @objc func handleTouch(_ recognizer: UITapGestureRecognizer) {
+        let location = recognizer.location(in: trackView)
+        _selectedView = get_selectedView(in: location)
+        guard let _selectedView = _selectedView else {
+            return
+        }
+        let asset = assets[_selectedView.index]
+        _selectedView.editView.zoomSamples = calculateZoomSamples(asset: asset, totalSamples: _selectedView.editView.totalSamples)
         
         leftHandleConstraint.constant = TrackViewController.HANDLE_WIDTH
         rightHandleConstraint.constant = editContainerView.frame.width - TrackViewController.HANDLE_WIDTH
     }
     
-    private func getSelectedView(in location: CGPoint) -> TrackItemView? {
+    private func get_selectedView(in location: CGPoint) -> TrackItemView? {
         for subview in trackView.arrangedSubviews {
             if subview.frame.contains(location) {
                 return subview as? TrackItemView
@@ -193,13 +217,25 @@ class TrackViewController: UIViewController {
         let location = recognizer.location(in: trackView)
         // TODO: drop the clip to location it should be / maybe animate it
         if recognizer.state == .began {
-            selectedView = getSelectedView(in: location)
+            _selectedView = get_selectedView(in: location)
         }
         if recognizer.state == .changed {
-            selectedView?.center.x = location.x
+            _selectedView?.center.x = location.x
         }
         if recognizer.state == .ended {
 
+        }
+    }
+    
+    private func updateCurrentPlayingItem() {
+        let t = player.currentTime()
+        for (idx, asset) in assets.enumerated() {
+            if asset.trackTimeRange.containsTime(t) {
+                if let item = trackView.subviews[idx] as? TrackItemView {
+                    currentPlayingView = item
+                    break
+                }
+            }
         }
     }
     
@@ -209,6 +245,56 @@ class TrackViewController: UIViewController {
         item.index = trackView.arrangedSubviews.count
         item.heightAnchor.constraint(equalToConstant: view.frame.height / 2).isActive = true
         trackView.addArrangedSubview(item)
-        assets.append(TrackAsset(asset: asset, assetTimeRange: assetRange, trackTimeRange: assetRange))
+        let trackTimeRange = assets.last != nil ? CMTimeRangeMake(start: assets.last!.trackTimeRange.end, duration: assetRange.duration) : assetRange
+        assets.append(TrackAsset(asset: asset, assetTimeRange: assetRange, trackTimeRange: trackTimeRange))
+    }
+    
+    func deleteSelected() -> CMTimeRange? {
+        guard let selected = _selectedView else { return nil }
+        let removed = assets.remove(at: selected.index)
+        for i in selected.index..<assets.count {
+            assets[i].trackSubtract(removed.trackTimeRange.duration)
+        }
+        widthConstraint.constant -= itemWidth
+        for v in trackView.subviews {
+            guard let v = v as? TrackItemView else { continue }
+            if (v.index > selected.index) {
+                selected.index -= 1
+            }
+        }
+        selected.removeFromSuperview()
+        if currentPlayingView?.index == selected.index {
+            currentPlayingView = nil
+        }
+        _selectedView = nil
+        return removed.trackTimeRange
+    }
+    
+    // return track timerange that needs to be removed
+    func trim() -> (CMTimeRange, CMTimeRange)? {
+        guard let selected = _selectedView else { return nil }
+        let left = (leftHandleConstraint.constant - TrackViewController.HANDLE_WIDTH) / (editContainerView.frame.width - TrackViewController.HANDLE_WIDTH * 2)
+        let right = (rightHandleConstraint.constant - TrackViewController.HANDLE_WIDTH) / (editContainerView.frame.width - TrackViewController.HANDLE_WIDTH * 2)
+        let asset = assets[selected.index]
+        let duration = asset.assetTimeRange.duration
+        let start = CMTimeMake(value: Int64(round(Double(duration.value) * left)), timescale: duration.timescale)
+        let end = CMTimeMake(value: Int64(round(Double(duration.value) * right)), timescale: duration.timescale)
+        // + assetTimeRange.start because it could be second, third ... edit on the same clip
+        // the previous edit already changed the assetTimeRange, moving the start of assetTimeRange
+        if let (leftRange, rightRange) = asset.trim(start: asset.assetTimeRange.start + start, end: asset.assetTimeRange.start + end) {
+            selected.zoomSamples = calculateZoomSamples(asset: asset, totalSamples: selected.totalSamples)
+            let subtract = leftRange.duration + rightRange.duration
+            for i in selected.index+1 ..< assets.count {
+                assets[i].trackSubtract(subtract)
+            }
+            _selectedView = nil
+            return (leftRange, rightRange)
+        }
+        return nil
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        player.removeTimeObserver(playerObserver)
     }
 }
