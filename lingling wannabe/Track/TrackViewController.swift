@@ -7,7 +7,7 @@
 
 import UIKit
 import AVFoundation
-
+import AVKit
 
 class TrackViewController: UIViewController {
     
@@ -58,8 +58,8 @@ class TrackViewController: UIViewController {
     private var _selectedView: TrackItemView? = nil {
         didSet {
             guard oldValue?.index != _selectedView?.index else { return }
-            oldValue?.backgroundColor = TrackViewController.DEFAULT_COLOR
-            _selectedView?.backgroundColor = .systemRed
+            oldValue?.backgroundColor = TrackViewController.DEFAULT_BG_COLOR
+            _selectedView?.backgroundColor = UIColor(red: 0.75, green: 0.5, blue: 0.5, alpha: 1)
             currentEditView = _selectedView?.editView
             if let selected = _selectedView {
                 delegate?.didSelectView(view: selected)
@@ -74,17 +74,18 @@ class TrackViewController: UIViewController {
     private var currentPlayingView: TrackItemView? = nil {
         didSet {
             guard oldValue?.index != currentPlayingView?.index else { return }
-            oldValue?.backgroundColor = TrackViewController.DEFAULT_COLOR
-            currentPlayingView?.backgroundColor = .red
+            oldValue?.wavesColor = TrackViewController.DEFAULT_WAVE_COLOR
+            currentPlayingView?.wavesColor = UIColor(red: 0.4, green: 0.42, blue: 0.43, alpha: 1)
         }
     }
-    private var playerObserver: Any?
+    private var playerObservers: [Any] = []
     
     private var assets: [TrackAsset] = []
     
-    static let HANDLE_WIDTH: CGFloat = 12
+    static let HANDLE_WIDTH: CGFloat = 16
     
-    static let DEFAULT_COLOR: UIColor = .gray
+    static let DEFAULT_BG_COLOR = UIColor(red: 0.7176, green: 0.7176, blue: 0.7176, alpha: 1)
+    static let DEFAULT_WAVE_COLOR: UIColor = .white
 
     required init?(coder: NSCoder) {
         fatalError("NSCoding not supported")
@@ -96,9 +97,13 @@ class TrackViewController: UIViewController {
         leftHandleConstraint = leftHandleView.rightAnchor.constraint(equalTo: editContainerView.leftAnchor)
         rightHandleConstraint = rightHandleView.leftAnchor.constraint(equalTo: editContainerView.leftAnchor)
         super.init(nibName: nil, bundle: nil)
-        playerObserver = player.addPeriodicTimeObserver(forInterval: CMTime(value: 1, timescale: 3), queue: .main) { [weak self] _ in
+        playerObservers.append(self.player.addPeriodicTimeObserver(forInterval: CMTime(value: 1, timescale: 5), queue: .main) { [weak self] _ in
             self?.updateCurrentPlayingItem()
-        }
+        })
+        playerObservers.append(self.player.addPeriodicTimeObserver(forInterval: CMTime(value: 1, timescale: 30), queue: .main) {
+            [weak self] _ in
+            self?.updateEditViewProgress()
+        })
     }
     
     private func setUpEditView() {
@@ -194,6 +199,7 @@ class TrackViewController: UIViewController {
     }
     
     @objc func handleRightHandlerPan(_ recognizer: UIPanGestureRecognizer) {
+        player.pause()
         let translation = recognizer.translation(in: editContainerView)
         let newX = rightHandleConstraint.constant + translation.x
         if newX >= leftHandleConstraint.constant && newX <= editContainerView.frame.width - TrackViewController.HANDLE_WIDTH {
@@ -203,6 +209,7 @@ class TrackViewController: UIViewController {
     }
     
     @objc func handleLeftHandlerPan(_ recognizer: UIPanGestureRecognizer) {
+        player.pause()
         let translation = recognizer.translation(in: editContainerView)
         let newX = leftHandleConstraint.constant + translation.x
         if newX >= TrackViewController.HANDLE_WIDTH && newX <= rightHandleConstraint.constant {
@@ -236,6 +243,22 @@ class TrackViewController: UIViewController {
                     break
                 }
             }
+        }
+    }
+    
+    private func updateEditViewProgress() {
+        guard let selectedView = _selectedView else { return }
+        let asset = assets[selectedView.index]
+        let currentTime = player.currentTime()
+        if asset.trackTimeRange.containsTime(currentTime) {
+            let percentage = (currentTime - asset.trackTimeRange.start).seconds / asset.trackTimeRange.duration.seconds
+            let sampleRange = selectedView.editView.zoomSamples
+            let duration = Int(Double(sampleRange.upperBound - sampleRange.lowerBound) * percentage)
+            selectedView.editView.highlightedSamples = sampleRange.lowerBound ..< sampleRange.lowerBound + duration
+        } else if currentTime > asset.trackTimeRange.end {
+            selectedView.editView.highlightedSamples = selectedView.editView.zoomSamples
+        } else {
+            selectedView.editView.highlightedSamples = nil
         }
     }
     
@@ -295,6 +318,8 @@ class TrackViewController: UIViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        player.removeTimeObserver(playerObserver)
+        for observer in playerObservers {
+            player.removeTimeObserver(observer)
+        }
     }
 }

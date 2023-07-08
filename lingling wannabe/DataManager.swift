@@ -296,6 +296,7 @@ final class DataManager {
         return DataStatus.success
     }
 
+    // TODO: after finish a session, the record is inserted and it also triggers a sync that downloads the latest, which cause double add record
     func addRecord(username: String, time: Int, duration: Int, asset: String, attributes: String?, upload: Bool) -> DataStatus {
         let before = totalMinutes
         totalMinutes += abs(duration / 60)
@@ -304,8 +305,11 @@ final class DataManager {
         }
         
         let date = Date(timeIntervalSince1970: Double(time))
-        addCache(username: username, date: date, asset: asset)
-        if username == "guest" { return DataStatus.success }
+        
+        if username == "guest" {
+            addCache(username: username, date: date, asset: asset)
+            return DataStatus.success
+        }
         let checksum = computeCheckSum(start: time, duration: duration)
         do {
             if let attr = attributes {
@@ -317,7 +321,7 @@ final class DataManager {
             print(error)
             return DataStatus.insertError
         }
-        
+        addCache(username: username, date: date, asset: asset)
         let r = Record(username: username, time: Int64(time), duration: Int64(duration), asset: asset, synced: false, checksum: checksum, attributes: attributes)
         if !upload { return DataStatus.success }
         
@@ -388,7 +392,7 @@ final class DataManager {
         }
         return nil
     }
-    
+
     func downloadRecord(username: String, start: Int?=nil, end: Int?=nil) {
         var url = URLComponents(url: dbURL, resolvingAgainstBaseURL: true)
         if let s = start, let e = end {

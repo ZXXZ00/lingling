@@ -247,7 +247,6 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
     
     @objc func buttonPressed() {
         if isSending { return }
-        isSending = true
         if button.currentTitle == "Login" {
             login()
         } else {
@@ -292,6 +291,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
             return
         }
         loading.startAnimating()
+        isSending = true
         postJSON(url: signin, json: ["username": user, "password": pass], success: { data, res in
             print(res.statusCode)
             if res.statusCode != 200 {
@@ -328,6 +328,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
                 return
             }
             loading.startAnimating()
+            isSending = true
             postJSON(url: register, json: ["username": user, "email": emailAddr, "password": pass], success: { data, res in
                 // TODO: check more status code rather than just != 200
                 if res.statusCode != 200 {

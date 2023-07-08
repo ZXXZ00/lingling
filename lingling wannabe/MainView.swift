@@ -126,8 +126,8 @@ class MainView: UIView, MSCircularSliderDelegate {
         leaderboard.widthAnchor.constraint(equalToConstant: 60 * buttonScale).isActive = true
         leaderboard.heightAnchor.constraint(equalToConstant: 60 * buttonScale).isActive = true
         
-        recordings.setImage(UIImage(named: "gramphone.pdf"), for: .normal)
-        recordings.addTarget(controller, action: #selector(MainViewController.showRecordingsList), for: .touchUpInside)
+        recordings.setImage(UIImage(named: "clipboard.pdf"), for: .normal)
+        recordings.addTarget(controller, action: #selector(MainViewController.showVideoEditor), for: .touchUpInside)
         addSubview(recordings)
         recordings.translatesAutoresizingMaskIntoConstraints = false
         recordings.rightAnchor.constraint(equalTo: leaderboard.leftAnchor, constant: -4).isActive = true

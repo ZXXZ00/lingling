@@ -7,6 +7,8 @@
 
 import UIKit
 import PocketSVG
+import Photos
+import Toast_Swift
 
 func getDocumentDirectory() -> URL {
     return FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -212,4 +214,18 @@ func getAvailableSpace(at: URL) -> Int64? {
         DataManager.shared.insertErrorMessage(isNetwork: false, message: "failed to get available space at \(at), error message: \(error)")
     }
     return nil
+}
+
+func saveToPhoto(source: URL, view: UIView) {
+    PHPhotoLibrary.shared().performChanges({ PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: source) }) {
+        success, error in
+        DispatchQueue.main.async {
+            if success {
+                view.makeToast("Saved to Photos")
+            } else {
+                view.makeToast("Failed to save: \(error?.localizedDescription ?? "")")
+                DataManager.shared.insertErrorMessage(isNetwork: false, message: "Failed to save: \(error?.localizedDescription ?? "")")
+            }
+        }
+    }
 }

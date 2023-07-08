@@ -9,6 +9,8 @@ import AVFoundation
 import AVKit
 import UIKit
 import MobileCoreServices
+import Photos
+import Toast_Swift
 
 class VideoEditorViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     let movie = AVMutableComposition()
@@ -53,7 +55,7 @@ class VideoEditorViewController: UIViewController, UIImagePickerControllerDelega
         
         picker.sourceType = .photoLibrary
         picker.videoQuality = .typeHigh
-        picker.videoExportPreset = AVAssetExportPresetHighestQuality
+        picker.videoExportPreset = AVAssetExportPresetPassthrough
         picker.mediaTypes = [kUTTypeMovie as String]
         picker.allowsEditing = true
         picker.delegate = self
@@ -100,7 +102,8 @@ class VideoEditorViewController: UIViewController, UIImagePickerControllerDelega
         playerViewController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -VideoEditorViewController.BOT_PADDING-TRACK_HEIGHT).isActive = true
         playerViewController.view.leftAnchor.constraint(equalTo: toolBarView.rightAnchor, constant: LEFT_RIGHT_PADDING).isActive = true
         playerViewController.view.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: -LEFT_RIGHT_PADDING).isActive = true
-//        playerViewController.view.backgroundColor = .none
+        playerViewController.view.backgroundColor = .none
+        playerViewController.allowsPictureInPicturePlayback = false
         
         playerViewController.didMove(toParent: self)
     }
@@ -119,15 +122,30 @@ class VideoEditorViewController: UIViewController, UIImagePickerControllerDelega
     @objc func exportVideo() {
         player.pause()
         let exporter = AVAssetExportSession(asset: movie, presetName: AVAssetExportPresetHighestQuality)
-        exporter?.outputURL = getDocumentDirectory().appendingPathComponent("june3_.mov")
+        let url = getDocumentDirectory().appendingPathComponent("\(Date().timeIntervalSince1970).mov")
+        exporter?.outputURL = url
         exporter?.outputFileType = .mov
         exporter?.exportAsynchronously {
-            print("export finished")
-            print(exporter?.status.rawValue)
-            print(exporter?.error)
+            if (exporter?.status == .completed) {
+                self.saveToPhoto(source: url)
+            } else {
+                self.view.makeToast("Failed to export: \(exporter?.error?.localizedDescription ?? "")")
+                DataManager.shared.insertErrorMessage(isNetwork: false, message: "Failed to export: \(exporter?.error?.localizedDescription ?? "")")
+            }
         }
     }
     
+    func saveToPhoto(source: URL) {
+        PHPhotoLibrary.shared().performChanges({ PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: source) }) {
+            success, error in
+            if success {
+                self.view.makeToast("Saved to Photos")
+            } else {
+                self.view.makeToast("Failed to save: \(error?.localizedDescription ?? "")")
+                DataManager.shared.insertErrorMessage(isNetwork: false, message: "Failed to save: \(error?.localizedDescription ?? "")")
+            }
+        }
+    }
     
     
     // copied from https://stackoverflow.com/questions/25104232/merge-two-videos-in-ios-app-still-maintain-the-orientation-of-each-video
@@ -209,8 +227,8 @@ class VideoEditorViewController: UIViewController, UIImagePickerControllerDelega
             if orientationFromTransform(transform: vTrack.preferredTransform).isPortrait {
                 videoTrack?.preferredTransform = vTrack.preferredTransform
             } else {
-                print("ONLY SUPPORT POTRAIT")
-                // TODO: add popup warning
+                picker.dismiss(animated: true)
+                view.makeToast("Please Select Video in Potrait Orientation", position: .center)
                 return
             }
             do {

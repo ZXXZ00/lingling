@@ -26,8 +26,8 @@ class TrackItemView: FDWaveformView {
         doesAllowStretch = false
         doesAllowScroll = false
         waveformType = .linear
-        wavesColor = .white
-        backgroundColor = TrackViewController.DEFAULT_COLOR
+        wavesColor = TrackViewController.DEFAULT_WAVE_COLOR
+        backgroundColor = TrackViewController.DEFAULT_BG_COLOR
         layer.borderColor = UIColor.black.cgColor
         layer.borderWidth = TrackItemView.BORDER_WIDTH
         isUserInteractionEnabled = false
@@ -37,6 +37,7 @@ class TrackItemView: FDWaveformView {
         editView.doesAllowStretch = false
         editView.doesAllowScroll = false
         editView.wavesColor = .white
+        editView.progressColor = UIColor(red: 0.6, green: 0.66, blue: 0.56, alpha: 1)
         editView.waveformType = .linear
         editView.frame = CGRect(x: TrackViewController.HANDLE_WIDTH, y: 0, width: size.width - 2*TrackViewController.HANDLE_WIDTH, height: size.height)
     }

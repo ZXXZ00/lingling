@@ -119,7 +119,7 @@ class CredentialManager {
                             }
                         }
                     }
-                    if res.statusCode == 403 {
+                    if res.statusCode == 403 || res.statusCode == 401 {
                         self.delete()
                         pthread_rwlock_wrlock(&(self.lock))
                         self.username = "guest"
@@ -179,5 +179,6 @@ class CredentialManager {
                  kSecAttrService: "access",
                  kSecAttrAccount: "com.zxxz"] as CFDictionary
         SecItemDelete(access)
+        username = "guest"
     }
 }

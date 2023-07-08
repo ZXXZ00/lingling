@@ -6,4 +6,5 @@ target 'lingling wannabe' do
 	pod 'SQLite.swift', '~> 0.12.0'
 	pod 'JWTDecode', '~> 2.6'
 	pod 'ffmpeg-kit-ios-audio', '~> 4.5.1'
+	pod 'Toast-Swift', '~> 5.0.1'
 end

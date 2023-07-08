@@ -31,7 +31,7 @@ class ToolBarView: UIView {
         super.layoutSubviews()
         
         backButton.addTarget(controller, action: #selector(VideoEditorViewController.back), for: .touchUpInside)
-        styleTextButton(button: backButton, text: "< back")
+        styleTextButton(button: backButton, text: "< bach")
         addSubview(backButton)
         backButton.translatesAutoresizingMaskIntoConstraints = false
         backButton.leftAnchor.constraint(equalTo: leftAnchor).isActive = true

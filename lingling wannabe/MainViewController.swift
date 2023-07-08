@@ -9,6 +9,7 @@ import AVFoundation
 import UIKit
 import PocketSVG
 import MobileCoreServices
+import Toast_Swift
 
 class MainViewController: UIViewController {
     
@@ -78,6 +79,7 @@ class MainViewController: UIViewController {
             DataManager.shared.sync(username: user, token: CredentialManager.shared.getToken())
         }, didContinueAsGuest: {
             [weak self] in
+            self?.changeUser(user: "guest")
             DispatchQueue.main.async {
                 (self?.view as? MainView)?.addTutorialView()
             }
@@ -244,7 +246,7 @@ class MainViewController: UIViewController {
                 self.handleResult(start: Int(start), duration: Int(delay), assetName: mainview.currSymbol)
                 print(ResultDelegate.shared.test())
                 print("time","end", "music","bg")
-                ResultDelegate.shared.print_()
+//                ResultDelegate.shared.print_()
             }
         }
         practiceView.modalPresentationStyle = .fullScreen
@@ -275,8 +277,24 @@ class MainViewController: UIViewController {
         present(recordings, animated: true)
     }
     
-    @objc func showRecordingsList() {
-        showRecordings(isRecording: false)
+    func showRecordToast() {
+        
+    }
+    
+    func showVideoCamera() {
+        let videoTaker = UIImagePickerController()
+        videoTaker.sourceType = .camera
+        videoTaker.mediaTypes = [kUTTypeMovie as String]
+        videoTaker.videoQuality = .typeHigh
+        videoTaker.allowsEditing = true
+        videoTaker.videoExportPreset = AVAssetExportPresetHEVCHighestQuality
+        present(videoTaker, animated: true)
+    }
+    
+    @objc func showVideoEditor() {
+        let videoEditor = VideoEditorViewController()
+        videoEditor.modalPresentationStyle = .fullScreen
+        present(videoEditor, animated: true)
     }
     
     @objc func showLeaderBoard() {
@@ -291,19 +309,14 @@ class MainViewController: UIViewController {
         //let testV = AVRecorderViewController()
         //present(testV, animated: true)
         
-//        let tt = UIImagePickerController()
-//        tt.sourceType = .photoLibrary
-//        tt.mediaTypes = [kUTTypeMovie as String]
-//        tt.videoQuality = .typeHigh
-//        tt.allowsEditing = true
-//        tt.videoExportPreset = AVAssetExportPresetHighestQuality
-//        present(tt, animated: true)
-        
-        let vv = VideoEditorViewController()
-        vv.modalPresentationStyle = .fullScreen
-        present(vv, animated: true)
-        
-        
+        let tt = UIImagePickerController()
+        tt.sourceType = .camera
+        tt.mediaTypes = [kUTTypeMovie as String]
+        tt.videoQuality = .typeHigh
+        tt.allowsEditing = true
+        tt.videoExportPreset = AVAssetExportPresetHEVCHighestQuality
+        tt.delegate = self
+        present(tt, animated: true)
     }
     
     @objc func showSetting() {
@@ -313,6 +326,15 @@ class MainViewController: UIViewController {
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return UIStatusBarStyle.darkContent
+    }
+}
+
+extension MainViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        if let url = info[.mediaURL] as? URL {
+            saveToPhoto(source: url, view: view)
+        }
+        picker.dismiss(animated: true)
     }
 }
 
