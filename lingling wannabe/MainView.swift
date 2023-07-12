@@ -206,10 +206,11 @@ class MainView: UIView, MSCircularSliderDelegate {
             self.reward.transform = CGAffineTransform(scaleX: 0.05, y: 0.05)
         }, completion: { finished in
             self.reward.removeFromSuperview()
-            if DataManager.shared.getRecordingEligibility() {
-                print("eligible to record!")
-                (self.controller as? MainViewController)?.showRecordings(isRecording: true)
-            }
+            (self.controller as? MainViewController)?.showRecordToast()
+//            if DataManager.shared.getRecordingEligibility() {
+//                print("eligible to record!")
+//                (self.controller as? MainViewController)?.showRecordings(isRecording: true)
+//            }
         })
     }
     

@@ -24,10 +24,10 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>Record your progress</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>To access and store your progress videos</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>To determine if you are practicing</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>To access and store your progress videos</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

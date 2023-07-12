@@ -278,7 +278,11 @@ class MainViewController: UIViewController {
     }
     
     func showRecordToast() {
-        
+        view.makeToast("Tap Here to Record Progress") { [weak self] didTab in
+            if didTab {
+                self?.showVideoCamera()
+            }
+        }
     }
     
     func showVideoCamera() {
@@ -288,6 +292,7 @@ class MainViewController: UIViewController {
         videoTaker.videoQuality = .typeHigh
         videoTaker.allowsEditing = true
         videoTaker.videoExportPreset = AVAssetExportPresetHEVCHighestQuality
+        videoTaker.delegate = self
         present(videoTaker, animated: true)
     }
     
@@ -303,20 +308,9 @@ class MainViewController: UIViewController {
     }
     
     @objc func showDebug() {
-//        let debugV = DebugViewController()
-//        debugV.modalPresentationStyle = .formSheet
-//        present(debugV, animated: true)
-        //let testV = AVRecorderViewController()
-        //present(testV, animated: true)
-        
-        let tt = UIImagePickerController()
-        tt.sourceType = .camera
-        tt.mediaTypes = [kUTTypeMovie as String]
-        tt.videoQuality = .typeHigh
-        tt.allowsEditing = true
-        tt.videoExportPreset = AVAssetExportPresetHEVCHighestQuality
-        tt.delegate = self
-        present(tt, animated: true)
+        let debugV = DebugViewController()
+        debugV.modalPresentationStyle = .formSheet
+        present(debugV, animated: true)
     }
     
     @objc func showSetting() {

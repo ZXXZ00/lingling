@@ -9,7 +9,6 @@ import AVFoundation
 import AVKit
 import UIKit
 import MobileCoreServices
-import Photos
 import Toast_Swift
 
 class VideoEditorViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
@@ -121,28 +120,36 @@ class VideoEditorViewController: UIViewController, UIImagePickerControllerDelega
     
     @objc func exportVideo() {
         player.pause()
-        let exporter = AVAssetExportSession(asset: movie, presetName: AVAssetExportPresetHighestQuality)
-        let url = getDocumentDirectory().appendingPathComponent("\(Date().timeIntervalSince1970).mov")
-        exporter?.outputURL = url
-        exporter?.outputFileType = .mov
-        exporter?.exportAsynchronously {
-            if (exporter?.status == .completed) {
-                self.saveToPhoto(source: url)
-            } else {
-                self.view.makeToast("Failed to export: \(exporter?.error?.localizedDescription ?? "")")
-                DataManager.shared.insertErrorMessage(isNetwork: false, message: "Failed to export: \(exporter?.error?.localizedDescription ?? "")")
-            }
+        
+        guard let exporter = AVAssetExportSession(asset: movie, presetName: AVAssetExportPresetHighestQuality) else {
+            view.makeToast("Failed to initialize export")
+            return
         }
-    }
-    
-    func saveToPhoto(source: URL) {
-        PHPhotoLibrary.shared().performChanges({ PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: source) }) {
-            success, error in
-            if success {
-                self.view.makeToast("Saved to Photos")
+        
+        let progressView = VideoExportProgressView(exporter: exporter)
+        view.addSubview(progressView)
+        progressView.translatesAutoresizingMaskIntoConstraints = false
+        progressView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
+        progressView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
+        progressView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        progressView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        progressView.delegate = self
+        
+        let url = getDocumentDirectory().appendingPathComponent("\(Date().timeIntervalSince1970).mov")
+        exporter.outputURL = url
+        exporter.outputFileType = .mov
+        exporter.exportAsynchronously {
+            if (exporter.status == .completed) {
+                DispatchQueue.main.async {
+                    saveToPhoto(source: url, view: self.view)
+                    progressView.removeFromSuperview()
+                }
+            } else if (exporter.status == .cancelled) {
+                progressView.removeFromSuperview()
+                self.view.makeToast("Failed to export: \(exporter.error?.localizedDescription ?? "")")
+                DataManager.shared.insertErrorMessage(isNetwork: false, message: "Failed to export (\(exporter.status)): \(exporter.error?.localizedDescription ?? "")")
             } else {
-                self.view.makeToast("Failed to save: \(error?.localizedDescription ?? "")")
-                DataManager.shared.insertErrorMessage(isNetwork: false, message: "Failed to save: \(error?.localizedDescription ?? "")")
+                progressView.removeFromSuperview()
             }
         }
     }
@@ -284,6 +291,18 @@ extension VideoEditorViewController: TrackViewControllerDelegate {
     func didUnselect() {
         toolBarView.deleteButton.alpha = 0
         toolBarView.checkButton.alpha = 0
+    }
+}
+
+extension VideoEditorViewController: VideoExportProgressViewDelegate {
+    func didCancel(progressView: VideoExportProgressView, exporter: AVAssetExportSession) {
+        let alert = UIAlertController(title: "Cancel Export", message: "Are you sure you want to cancel?", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "No", style: .cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: "Yes", style: .destructive) { _ in
+            exporter.cancelExport()
+            progressView.removeFromSuperview()
+        })
+        present(alert, animated: true)
     }
 }
 
